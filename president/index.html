@@ -29,10 +29,26 @@
             <h2 class="section-title">意見回饋</h2>
             <div class="zen-box">
                 <p class="box-desc">你的建議將直接傳達至會長室。請像投石入水般，留下你的聲音。</p>
-               <form action="https://formspree.io/f/xwvwwloe" method="POST" class="zen-form">
-                    <div class="form-group"><label>你的稱呼</label><input type="text" name="name" required></div>
-                    <div class="form-group"><label>水滴訊息</label><textarea name="message" rows="5" required></textarea></div>
-                    <button type="submit" class="submit-btn"><span>匯集成水</span></button>
+                
+                <div id="fs-status" style="margin-bottom: 20px; font-size: 0.9rem; letter-spacing: 2px; text-align: center;">
+                    <span data-fs-success style="display:none; color: #C5B358;">✨ 訊息已匯集成水，成功傳達至會長室。</span>
+                    <span data-fs-error style="display:none; color: #ff6b6b;">⚠️ 傳送失敗，請檢查網路連線或稍後再試。</span>
+                </div>
+
+                <form id="my-form" class="zen-form">
+                    <div class="form-group">
+                        <label>你的稱呼</label>
+                        <input type="text" name="name" required data-fs-field placeholder="如何稱呼您？">
+                        <span data-fs-error="name" style="color: #ff6b6b; font-size: 0.7rem; display: block; margin-top: 5px;"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>水滴訊息</label>
+                        <textarea name="message" rows="5" required data-fs-field placeholder="請留下您的建議..."></textarea>
+                        <span data-fs-error="message" style="color: #ff6b6b; font-size: 0.7rem; display: block; margin-top: 5px;"></span>
+                    </div>
+                    
+                    <button type="submit" data-fs-submit-btn class="submit-btn"><span>匯集成水</span></button>
                 </form>
             </div>
         </section>
@@ -48,6 +64,23 @@
             requestAnimationFrame(anim);
         }
         anim();
+    </script>
+
+    <script src="https://unpkg.com/@formspree/ajax@1" defer></script>
+    <script>
+      window.formspree = window.formspree || function () { (formspree.q = formspree.q || []).push(arguments); };
+      
+      // 初始化表單：填入你的專屬 ID xwvwwloe
+      formspree('initForm', { 
+        formElement: '#my-form', 
+        formId: 'xwvwwloe',
+        onSuccess: function() {
+            // 成功後的額外視覺動作
+            const form = document.getElementById('my-form');
+            form.style.opacity = '0.3';
+            form.style.pointerEvents = 'none';
+        }
+      });
     </script>
 </body>
 </html>
