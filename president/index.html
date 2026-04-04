@@ -74,12 +74,34 @@
       formspree('initForm', { 
         formElement: '#my-form', 
         formId: 'xwvwwloe',
-        onSuccess: function() {
-            // 成功後的額外視覺動作
-            const form = document.getElementById('my-form');
-            form.style.opacity = '0.3';
-            form.style.pointerEvents = 'none';
-        }
+        // 初始化表單
+  formspree('initForm', { 
+    formElement: '#my-form', 
+    formId: 'xwvwwloe',
+    onSuccess: function() {
+        // 1. 獲取表單元件
+        const form = document.getElementById('my-form');
+        const status = document.getElementById('fs-status');
+        
+        // 2. 讓表單先閃爍一下，表示「水滴已匯入」
+        form.style.transition = 'opacity 0.5s';
+        form.style.opacity = '0'; 
+
+        // 3. 延遲 1 秒後：清空內容、恢復亮度
+        setTimeout(() => {
+            form.reset();             // 清空輸入框
+            form.style.opacity = '1';  // 恢復亮度
+            form.style.pointerEvents = 'auto'; // 恢復點擊功能
+            
+            // 4. 讓成功訊息在 5 秒後靜靜消失
+            setTimeout(() => {
+                const successMsg = status.querySelector('[data-fs-success]');
+                if (successMsg) successMsg.style.display = 'none';
+            }, 5000);
+            
+        }, 1000);
+    }
+  });
       });
     </script>
 </body>
