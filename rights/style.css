@@ -1,0 +1,73 @@
+/* 學權組專屬：澄澈正義裝潢 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;400&display=swap');
+
+:root {
+    --rights-accent: #88C0D0; /* 冰川藍，象徵透明與理性 */
+    --zen-warm: #C5B358;
+}
+
+body {
+    background-color: #030303;
+    /* 延續大廳的黑曜石深邃感 */
+    background-image: radial-gradient(circle at center, #0F1416 0%, #030303 100%);
+    background-attachment: fixed;
+    margin: 0;
+    color: #D1D1D1;
+    font-family: "PingFang TC", sans-serif;
+    letter-spacing: 0.12em;
+}
+
+#cursor-glow {
+    position: fixed; width: 800px; height: 800px; z-index: 1; pointer-events: none;
+    background: radial-gradient(circle, rgba(136, 192, 208, 0.04) 0%, transparent 60%);
+    transform: translate(-50%, -50%); mix-blend-mode: screen;
+}
+
+/* 學權組頂欄 */
+.page-header {
+    padding: 140px 24px 100px;
+    text-align: center;
+    border-bottom: 1px solid #1A1A1A;
+}
+
+.page-header h1 {
+    font-size: 3rem;
+    font-weight: 200; /* 維持極細體高級感 */
+    letter-spacing: 20px;
+    color: #FFF;
+}
+
+.back-link { color: #444; text-decoration: none; font-size: 0.8rem; letter-spacing: 2px; }
+.back-link:hover { color: var(--rights-accent); }
+
+.container { max-width: 1000px; margin: 0 auto; padding-bottom: 100px; position: relative; z-index: 2; }
+
+.section-title {
+    font-size: 0.9rem; color: var(--rights-accent); margin: 80px 0 40px; 
+    font-weight: 200; letter-spacing: 5px; opacity: 0.8;
+}
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+
+/* 專業信任感卡片 */
+.card {
+    background: rgba(13, 13, 13, 0.8); padding: 50px 40px; border: 1px solid #1A1A1A;
+    transition: 0.8s;
+}
+.card:hover { border-color: var(--rights-accent); transform: translateY(-5px); }
+.card h3 { color: #EEE; font-size: 1.2rem; margin-bottom: 20px; font-weight: 400; }
+.card p { color: #666; font-size: 0.85rem; line-height: 2.2; }
+
+/* 申訴區塊 */
+.appeal-box {
+    background: #0D0D0D; padding: 60px; border: 1px solid #1A1A1A;
+    text-align: center; line-height: 2.5; color: #888;
+}
+.appeal-btn {
+    display: inline-block; margin-top: 40px; padding: 15px 40px;
+    border: 1px solid var(--rights-accent); color: var(--rights-accent);
+    text-decoration: none; letter-spacing: 4px; transition: 0.5s;
+}
+.appeal-btn:hover { background: var(--rights-accent); color: #000; }
+
+footer { text-align: center; padding: 100px; color: #222; font-size: 0.7rem; }

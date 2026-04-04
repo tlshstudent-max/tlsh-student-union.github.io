@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文書組 | 斗六高中學生會</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="docs-page">
+    <div id="cursor-glow"></div>
+    
+    <header class="page-header">
+        <a href="../index.html" class="back-link">← 返回石澗大廳</a>
+        <div class="header-content">
+            <h1>文書組</h1>
+            <p class="motto">行政透明，讓每一份紀錄成為可追溯的歷史</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="zen-section">
+            <h2 class="section-title">行政核心</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>會議紀錄</h3>
+                    <p>負責校內重要會議的筆記與整理，確保決策過程公開透明。</p>
+                </div>
+                <div class="card">
+                    <h3>檔案管理</h3>
+                    <p>統籌學生會各組文件、公文及雲端硬碟的架構規劃與備份。</p>
+                </div>
+                <div class="card">
+                    <h3>法規彙編</h3>
+                    <p>管理學生會組織章程與各項施行細則，提供同學隨時查閱。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="archive-section">
+            <h2 class="section-title">檔案庫</h2>
+            <div class="archive-list">
+                <div class="archive-item">
+                    <span class="date">2026.02.10</span>
+                    <span class="title">第一學期第二次全體幹部會議紀錄</span>
+                    <a href="#" class="download-link">檢視檔案</a>
+                </div>
+                <div class="archive-item">
+                    <span class="date">2026.01.15</span>
+                    <span class="title">斗六高中學生會組織章程 (最新修訂版)</span>
+                    <a href="#" class="download-link">檢視檔案</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>&copy; 2026 國立斗六高級中學學生會文書組.</footer>
+
+    <script>
+        const glow = document.getElementById('cursor-glow');
+        let mx = 0, my = 0, bx = 0, by = 0;
+        document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+        function anim() {
+            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
+            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
+            requestAnimationFrame(anim);
+        }
+        anim();
+    </script>
+</body>
+</html>

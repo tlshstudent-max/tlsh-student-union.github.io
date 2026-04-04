@@ -1,0 +1,77 @@
+/* 斗六高中學生會 - 禪意石澗 (黑曜石深度版) */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;400&display=swap');
+
+:root {
+    --bg-void: #030303;        /* 深不見底的暗 */
+    --stone-grain: #121212;    /* 石材紋理色 */
+    --zen-gold: #C5B358;       /* 暖金點綴 */
+}
+
+body {
+    background-color: var(--bg-void);
+    /* 核心：三層複合石材背景 */
+    background-image: 
+        /* 第一層：四角暗角 (Vignette)，強化隧道感 */
+        radial-gradient(circle at center, transparent 0%, var(--bg-void) 90%),
+        /* 第二層：模擬石材表面的微小孔洞 (SVG 噪點) */
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.07'/%3E%3C/svg%3E"),
+        /* 第三層：底層石質色 */
+        radial-gradient(circle at 50% 30%, #151515 0%, var(--bg-void) 70%);
+    background-attachment: fixed;
+    margin: 0;
+    font-family: "PingFang TC", "Noto Sans TC", sans-serif;
+    color: #D1D1D1;
+    letter-spacing: 0.12em;
+    overflow-x: hidden;
+}
+
+/* 穩定版暖光光暈 */
+#cursor-glow {
+    position: fixed; width: 900px; height: 900px; z-index: 1; pointer-events: none;
+    background: radial-gradient(circle, rgba(197, 179, 88, 0.07) 0%, rgba(197, 179, 88, 0) 60%);
+    transform: translate(-50%, -50%);
+    mix-blend-mode: screen; /* 確保光影在黑底上絕對可見 */
+}
+
+/* 標題：恢復極細體與大空隙 */
+header { padding: 180px 24px 100px; text-align: center; position: relative; z-index: 10; }
+header h1 {
+    font-size: 3.5rem;
+    font-weight: 200;
+    letter-spacing: 25px;
+    color: #FFFFFF;
+    text-indent: 25px;
+    opacity: 0.9;
+    text-shadow: 0 0 20px rgba(255,255,255,0.1);
+}
+
+.container { max-width: 1100px; margin: 0 auto; padding-bottom: 120px; position: relative; z-index: 10; }
+
+/* 抬頭裝飾線 */
+h2 {
+    font-size: 1rem; color: var(--zen-gold); margin: 100px 0 40px; 
+    font-weight: 300; letter-spacing: 6px; display: flex; align-items: center;
+    opacity: 0.6;
+}
+h2::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, #222, transparent); margin-left: 20px; }
+
+/* 行政卡片：強化邊緣高光細節 */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 50px; }
+
+.card {
+    background: #0D0D0D; padding: 60px 45px; border: 1px solid #181818;
+    text-decoration: none; color: inherit; transition: 1.2s; position: relative; overflow: hidden; display: block;
+    box-shadow: 20px 20px 60px rgba(0,0,0,0.8);
+}
+/* 濕潤反射線 */
+.card::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.08), transparent);
+}
+.card:hover { border-color: #333; transform: translateY(-10px); background: #111; }
+
+.card h3 { color: #FFF; font-size: 1.4rem; margin-bottom: 20px; font-weight: 400; }
+.card p { color: #666; line-height: 2.2; font-size: 0.9rem; }
+
+/* 公告標籤 */
+.category-tag { font-size: 0.7rem; padding: 2px 10px; border: 1px solid rgba(255,255,255,0.15); margin-bottom: 25px; display: inline-block; color: #555; }

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美宣組 | 斗六高中學生會</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="design-page">
+    <div id="cursor-glow"></div>
+    
+    <header class="page-header">
+        <a href="../index.html" class="back-link">← 返回石澗大廳</a>
+        <div class="header-content">
+            <h1>美宣組</h1>
+            <p class="motto">用視覺與創意，定義屬於斗中的美學印記</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="zen-section">
+            <h2 class="section-title">核心業務</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>品牌識別</h3>
+                    <p>統籌學生會視覺形象，包括標誌應用、字體規範與標準色設定。</p>
+                </div>
+                <div class="card">
+                    <h3>宣傳設計</h3>
+                    <p>製作活動海報、社群媒體圖文與周邊產品，提升活動曝光質感。</p>
+                </div>
+                <div class="card">
+                    <h3>視覺顧問</h3>
+                    <p>支援校內各處室與部門的視覺需求，確保對外輸出品質的一致性。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="gallery-section">
+            <h2 class="section-title">設計典藏</h2>
+            <div class="portfolio-box">
+                <p>我們在此彙整了歷屆學生活動的視覺精華。從海報到標準字，每一份設計都是為了記錄斗中校園的獨特氛圍。</p>
+                <div class="coming-soon">作品集正在整理中...</div>
+            </div>
+        </section>
+    </div>
+
+    <footer>&copy; 2026 國立斗六高級中學學生會美宣組.</footer>
+
+    <script>
+        const glow = document.getElementById('cursor-glow');
+        let mx = 0, my = 0, bx = 0, by = 0;
+        document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+        function anim() {
+            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
+            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
+            requestAnimationFrame(anim);
+        }
+        anim();
+    </script>
+</body>
+</html>

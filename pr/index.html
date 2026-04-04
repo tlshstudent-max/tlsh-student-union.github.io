@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公關組 | 斗六高中學生會</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="pr-page">
+    <div id="cursor-glow"></div>
+    
+    <header class="page-header">
+        <a href="../index.html" class="back-link">← 返回石澗大廳</a>
+        <div class="header-content">
+            <h1>公關組</h1>
+            <p class="motto">對外連結，爭取權益，建立斗中品牌價值</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="zen-section">
+            <h2 class="section-title">核心業務</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>特約商店洽談</h3>
+                    <p>開發校園周邊特約商家，為全體同學爭取實質的消費優惠。</p>
+                </div>
+                <div class="card">
+                    <h3>校際交流</h3>
+                    <p>聯繫他校學生會，辦理跨校論壇與觀摩，拓展斗中影響力。</p>
+                </div>
+                <div class="card">
+                    <h3>贊助接洽</h3>
+                    <p>與企業及校友聯繫，為校內大型活動籌措穩定資源。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h2 class="section-title">對外聯繫</h2>
+            <div class="contact-box">
+                <p>若有合作意向或公關需求，請洽公關部長信箱或透過本站留言。我們重視每一次的對外合作機會。</p>
+                <div class="email-tag">Email: pr@tlsh-su.edu.tw</div>
+            </div>
+        </section>
+    </div>
+
+    <footer>&copy; 2026 國立斗六高級中學學生會公關組.</footer>
+
+    <script>
+        const glow = document.getElementById('cursor-glow');
+        let mx = 0, my = 0, bx = 0, by = 0;
+        document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+        function anim() {
+            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
+            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
+            requestAnimationFrame(anim);
+        }
+        anim();
+    </script>
+</body>
+</html>

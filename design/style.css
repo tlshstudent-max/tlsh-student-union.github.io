@@ -1,0 +1,78 @@
+/* 美宣組專屬：視覺實驗室裝潢 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;400&display=swap');
+
+body {
+    background-color: #030303;
+    /* 延續大廳的黑曜石深邃感 */
+    background-image: radial-gradient(circle at center, #121212 0%, #030303 100%);
+    background-attachment: fixed;
+    margin: 0;
+    color: #D1D1D1;
+    font-family: "PingFang TC", sans-serif;
+    letter-spacing: 0.15em; /* 更寬的字距展現設計感 */
+}
+
+body {
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 100px 100px;
+}
+#cursor-glow {
+    position: fixed; width: 600px; height: 600px; z-index: 1; pointer-events: none;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.04) 0%, transparent 60%);
+    transform: translate(-50%, -50%); mix-blend-mode: color-dodge;
+}
+
+/* 美宣組頂欄：追求極致的留白與幾何線條 */
+.page-header {
+    padding: 160px 24px 120px;
+    text-align: center;
+    border-bottom: 1px solid #222;
+}
+
+.page-header h1 {
+    font-size: 3.5rem;
+    font-weight: 100; /* 極細體的靈魂 */
+    letter-spacing: 25px;
+    color: #FFF;
+    text-indent: 25px;
+}
+
+.back-link { color: #333; text-decoration: none; font-size: 0.7rem; letter-spacing: 3px; transition: 0.5s; }
+.back-link:hover { color: #FFF; }
+
+.container { max-width: 1100px; margin: 0 auto; padding-bottom: 150px; position: relative; z-index: 2; }
+
+.section-title {
+    font-size: 0.8rem; color: #FFF; margin: 100px 0 50px; 
+    font-weight: 200; letter-spacing: 8px; display: flex; align-items: center;
+    opacity: 0.5;
+}
+.section-title::after { content: ""; flex: 1; height: 1px; background: #222; margin-left: 30px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 60px; }
+
+
+/* 讓卡片邊緣變得銳利、高對比 */
+.card { border: 0.5px solid #333; transition: 0.3s; }
+.card:hover { border-color: #FFF; background: #FFF; color: #000; }
+/* 極簡設計卡片 */
+.card {
+    background: transparent; padding: 60px 40px; border: 1px solid #1A1A1A;
+    transition: all 1s cubic-bezier(0.19, 1, 0.22, 1);
+}
+.card:hover { border-color: #FFF; background: #080808; transform: translateY(-5px); }
+.card h3 { color: #EEE; font-size: 1.2rem; margin-bottom: 25px; font-weight: 300; letter-spacing: 5px; }
+.card p { color: #555; font-size: 0.85rem; line-height: 2.5; transition: 0.5s; }
+.card:hover p { color: #AAA; }
+
+/* 設計典藏區塊 */
+.portfolio-box {
+    border: 1px solid #1A1A1A; padding: 100px; text-align: center;
+    background-image: linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+    background-size: 40px 40px; /* 模擬設計格線稿 */
+}
+.coming-soon { margin-top: 40px; color: #333; font-size: 0.7rem; letter-spacing: 10px; }
+
+footer { text-align: center; padding: 120px; color: #1A1A1A; font-size: 0.7rem; }

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>斗六高中學生會 | 禪意石澗</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="home-page">
+    <div id="cursor-glow"></div>
+    <header>
+        <h1>斗六高中學生會</h1>
+        <div class="subtitle">凝靜 · 凝聚 · 向心力</div>
+    </header>
+
+    <div class="container">
+        <h2>行政部門中心</h2>
+        <div class="grid">
+            <a href="president/index.html" class="card"><h3>正副會長室</h3><p>核心決策與校務溝通窗口。</p></a>
+            <a href="activities/index.html" class="card"><h3>活動組</h3><p>策劃校園生活，創造共同回憶。</p></a>
+            <a href="pr/index.html" class="card"><h3>公關組</h3><p>對外連結，爭取權益與合作。</p></a>
+            <a href="rights/index.html" class="card"><h3>學權組</h3><p>守護同學基本權益與申訴管道。</p></a>
+            <a href="design/index.html" class="card"><h3>美宣組</h3><p>視覺設計，打造斗中品牌美學。</p></a>
+            <a href="docs/index.html" class="card"><h3>文書組</h3><p>會議紀錄公開與檔案管理。</p></a>
+        </div>
+
+        <h2>最新動態</h2>
+        <div id="announcement-grid" class="grid">
+            <p class="loading-text">正在從石澗中讀取最新訊息...</p>
+        </div>
+    </div>
+
+    <footer>&copy; 2026 國立斗六高級中學學生會.</footer>
+
+    <script>
+        const spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQQ7BWI3HaxcFZFKNmSBirSF1d3fQ1VDFhat9xn6HgteL6eSHSAVqggtq4CMPB5YF5_0sVRl-Ij4eZm/pub?output=csv';
+        async function loadAnnouncements() {
+            try {
+                const response = await fetch(spreadsheetUrl);
+                const data = await response.text();
+                const rows = data.split('\n').filter(row => row.trim() !== '').slice(1);
+                const container = document.getElementById('announcement-grid');
+                container.innerHTML = ''; 
+                rows.forEach(row => {
+                    const cols = row.split(',');
+                    if (cols.length >= 2) {
+                        const type = (cols[5] || 'info').trim().toLowerCase();
+                        container.innerHTML += `
+                            <a href="${cols[4] || '#'}" class="card">
+                                <span class="category-tag tag-${type}">[${cols[0]}] ${cols[3]}</span>
+                                <h3>${cols[1]}</h3><p>${cols[2]}</p>
+                            </a>`;
+                    }
+                });
+            } catch (e) { console.error(e); }
+        }
+        const glow = document.getElementById('cursor-glow');
+        let mx = 0, my = 0, bx = 0, by = 0;
+        document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+        function anim() {
+            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
+            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
+            requestAnimationFrame(anim);
+        }
+        anim(); loadAnnouncements();
+    </script>
+</body>
+</html>

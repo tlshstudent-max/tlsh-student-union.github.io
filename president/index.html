@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正副會長室 | 斗六高中學生會</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="office-page">
+    <div id="cursor-glow"></div>
+    <header class="office-header">
+        <a href="../index.html" class="back-link">← 返回大廳</a>
+        <div class="header-content">
+            <h1>正副會長室</h1>
+            <p class="subtitle">願景 · 聽見 · 實踐</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="zen-section">
+            <h2 class="section-title">會長寄語</h2>
+            <div class="antique-quote">
+                <p>「每一位斗中人的聲音，都是石澗中清澈的水滴。我們在此匯集，不是為了改變世界，而是為了讓身處的校園變得更值得被愛。」</p>
+                <cite>— 學生會會長</cite>
+            </div>
+        </section>
+
+        <section id="feedback">
+            <h2 class="section-title">意見回饋</h2>
+            <div class="zen-box">
+                <p class="box-desc">你的建議將直接傳達至會長室。請像投石入水般，留下你的聲音。</p>
+                <form action="https://formspree.io/f/xldgqypq" method="POST" class="zen-form">
+                    <div class="form-group"><label>你的稱呼</label><input type="text" name="name" required></div>
+                    <div class="form-group"><label>水滴訊息</label><textarea name="message" rows="5" required></textarea></div>
+                    <button type="submit" class="submit-btn"><span>匯集成水</span></button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const glow = document.getElementById('cursor-glow');
+        let mx = 0, my = 0, bx = 0, by = 0;
+        document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+        function anim() {
+            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
+            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
+            requestAnimationFrame(anim);
+        }
+        anim();
+    </script>
+</body>
+</html>

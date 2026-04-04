@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>學權組 | 斗六高中學生會</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="rights-page">
+    <div id="cursor-glow"></div>
+    
+    <header class="page-header">
+        <a href="../index.html" class="back-link">← 返回石澗大廳</a>
+        <div class="header-content">
+            <h1>學權組</h1>
+            <p class="motto">守護同學權益，建立公平、透明、有尊嚴的校園環境</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="zen-section">
+            <h2 class="section-title">核心業務</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>法規維護</h3>
+                    <p>審視校內各項規章，確保學生權益符合現行教育法規與人權標準。</p>
+                </div>
+                <div class="card">
+                    <h3>申訴管道</h3>
+                    <p>建立匿名且高效的意見反映機制，處理同學在校園生活中遇到的不公對待。</p>
+                </div>
+                <div class="card">
+                    <h3>校務參與</h3>
+                    <p>出席校務會議與各項委員會，代表學生表達真實需求與改進建議。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="appeal-section">
+            <h2 class="section-title">權益申訴入口</h2>
+            <div class="appeal-box">
+                <p>如果你感到權益受損，或有任何改善校園的建議，請在此留下訊息。我們將啟動標準作業流程，確保你的聲音被聽見。</p>
+                <a href="#" class="appeal-btn">前往正式申訴表單</a>
+            </div>
+        </section>
+    </div>
+
+    <footer>&copy; 2026 國立斗六高級中學學生會學權組.</footer>
+
+    <script>
+        const glow = document.getElementById('cursor-glow');
+        let mx = 0, my = 0, bx = 0, by = 0;
+        document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+        function anim() {
+            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
+            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
+            requestAnimationFrame(anim);
+        }
+        anim();
+    </script>
+</body>
+</html>

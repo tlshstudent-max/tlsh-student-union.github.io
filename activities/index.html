@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活動組 | 斗六高中學生會</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="activities-page">
+    <div id="cursor-glow"></div>
+    <header class="page-header">
+        <a href="../index.html" class="back-link">← 返回大廳</a>
+        <div class="header-content">
+            <h1>活動組</h1>
+            <p class="motto">創造校園共同回憶，點燃青春火花</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="zen-section">
+            <h2 class="section-title">近期活動</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>年度舞會</h3>
+                    <p>燈光與音樂交織的夜晚，我們在石澗中起舞。</p>
+                </div>
+                <div class="card">
+                    <h3>校慶園遊會</h3>
+                    <p>攤位設計與創意競賽，展現斗中活力。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="zen-section">
+            <h2 class="section-title">組員名單與職掌</h2>
+            <div class="card" style="width: 100%;">
+                <p>活動組致力於豐富同學的課後生活。目前內容正在由活動部長整理中，敬請期待更多的照片展示！</p>
+            </div>
+        </section>
+    </div>
+
+    <footer>&copy; 2026 國立斗六高級中學學生會.</footer>
+
+    <script>
+        const glow = document.getElementById('cursor-glow');
+        let mx = 0, my = 0, bx = 0, by = 0;
+        document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+        function anim() {
+            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
+            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
+            requestAnimationFrame(anim);
+        }
+        anim();
+    </script>
+</body>
+</html>

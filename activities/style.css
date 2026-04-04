@@ -1,0 +1,68 @@
+/* 活動組專屬：藝廊風格設計圖 */
+:root {
+    --bg-dark: #0A0A0A;
+    --activities-accent: #E0E0E0; /* 較亮的銀灰色 */
+    --zen-warm: #C5B358;
+}
+
+body {
+    background-color: var(--bg-dark);
+    background-image: radial-gradient(circle at center, #161616 0%, #0D0D0D 100%);
+    background-attachment: fixed;
+    margin: 0;
+    color: #D1D1D1;
+    font-family: "PingFang TC", sans-serif;
+    letter-spacing: 0.1em;
+}
+
+/* 加入到 body 的背景中 */
+body {
+    background-image: 
+        repeating-linear-gradient(45deg, rgba(197, 179, 88, 0.02) 0, rgba(197, 179, 88, 0.02) 1px, transparent 0, transparent 50%),
+        radial-gradient(circle at center, #111 0%, #030303 100%);
+    background-size: 30px 30px, 100% 100%;
+}
+/* 卡片邊緣加入琥珀光澤 */
+.card:hover { border-color: #D4AF37; box-shadow: 0 0 30px rgba(212, 175, 55, 0.1); }
+#cursor-glow {
+    position: fixed; width: 1000px; height: 1000px; z-index: 1; pointer-events: none;
+    background: radial-gradient(circle, rgba(197, 179, 88, 0.04) 0%, rgba(197, 179, 88, 0) 70%);
+    transform: translate(-50%, -50%); mix-blend-mode: soft-light; 
+}
+
+/* 活動組特有的標題區 */
+.page-header {
+    background-color: #1A1A1A; /* 深灰沉穩底色 */
+    padding: 140px 24px;
+    text-align: center;
+    border-bottom: 2px solid #222;
+}
+
+.page-header h1 {
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: 15px;
+    color: var(--activities-accent);
+}
+
+.back-link { position: absolute; top: 40px; left: 40px; color: #555; text-decoration: none; font-size: 0.8rem; }
+
+.container { max-width: 1000px; margin: 0 auto; padding-bottom: 100px; position: relative; z-index: 2; }
+
+h2.section-title {
+    font-size: 1.1rem; color: var(--zen-warm); margin: 80px 0 30px; 
+    letter-spacing: 4px; display: flex; align-items: center;
+}
+h2.section-title::after { content: ""; flex: 1; height: 1px; background: #222; margin-left: 20px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+
+.card {
+    background: #121212; padding: 40px; border: 1px solid #1A1A1A;
+    transition: 0.5s;
+}
+.card:hover { border-color: #333; transform: translateY(-5px); }
+.card h3 { color: #EEE; font-size: 1.2rem; margin-bottom: 15px; }
+.card p { color: #666; font-size: 0.9rem; line-height: 2; }
+
+footer { text-align: center; padding: 100px; color: #333; font-size: 0.8rem; }

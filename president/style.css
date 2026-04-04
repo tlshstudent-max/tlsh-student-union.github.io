@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;700&display=swap');
+
+:root {
+    --zen-warm: #C5B358;
+    --classical-blue: #1A2A44; /* 古典墨藍 */
+}
+
+body {
+    background-color: #0A0A0A;
+    background-image: radial-gradient(circle at center, #161616 0%, #0D0D0D 100%);
+    background-attachment: fixed;
+    margin: 0;
+    color: #D1D1D1;
+    font-family: "PingFang TC", "Noto Sans TC", sans-serif;
+    letter-spacing: 0.08em;
+}
+
+#cursor-glow {
+    position: fixed; width: 1000px; height: 1000px; z-index: 1; pointer-events: none;
+    background: radial-gradient(circle, rgba(197, 179, 88, 0.04) 0%, rgba(197, 179, 88, 0) 70%);
+    transform: translate(-50%, -50%); mix-blend-mode: soft-light; 
+}
+
+/* 會長室專屬大面積藍頂欄 */
+.office-header {
+    background-color: var(--classical-blue);
+    padding: 160px 24px;
+    text-align: center;
+    border-bottom: 8px solid #000;
+}
+
+.office-header h1 {
+    font-family: "Noto Serif TC", serif;
+    font-size: 3.8rem;
+    font-weight: 200;
+    letter-spacing: 18px;
+    color: #FFFFFF;
+}
+
+.back-link { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.8rem; }
+.container { max-width: 850px; margin: 0 auto; padding-bottom: 100px; position: relative; z-index: 2; }
+
+/* 宋體引用區 */
+.antique-quote {
+    padding: 60px;
+    background: rgba(26,42,68,0.2);
+    border-left: 4px solid var(--zen-warm);
+    margin: 40px 0;
+}
+
+.antique-quote p {
+    font-family: "Noto Serif TC", serif;
+    font-size: 1.5rem;
+    line-height: 2.2;
+    font-style: italic;
+}
+
+/* 石材材質按鈕 */
+.submit-btn {
+    background-color: #141414;
+    border: 1px solid var(--zen-warm);
+    color: var(--zen-warm);
+    padding: 15px 50px;
+    letter-spacing: 5px;
+    cursor: pointer;
+    transition: 0.5s;
+}
+.submit-btn:hover { background: var(--zen-warm); color: #000; }
+/* --- 會長室表單極簡化：石板溝槽質感 --- */
+
+.zen-form {
+    margin-top: 50px;
+}
+
+.form-group {
+    margin-bottom: 35px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block; /* 讓標題自己站一行 */
+    color: var(--zen-warm);
+    font-size: 0.9rem;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    opacity: 0.8;
+}
+
+/* 核心：將輸入框變透明、深色化 */
+.zen-form input, 
+.zen-form textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03); /* 極淡透明白，模擬磨砂感 */
+    border: 1px solid #1A1A1A; /* 與卡片邊框一致 */
+    border-radius: 0; /* 保持銳利線條 */
+    padding: 15px;
+    color: #D1D1D1;
+    font-family: inherit;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+    outline: none;
+}
+
+/* 點擊時的「滲透光」效果 */
+.zen-form input:focus, 
+.zen-form textarea:focus {
+    background: rgba(26, 42, 68, 0.2); /* 注入一點會長室的古典藍 */
+    border-color: var(--zen-warm);
+    box-shadow: 0 0 15px rgba(197, 179, 88, 0.1);
+}
+
+/* 調整送出按鈕的邊距 */
+.submit-btn {
+    margin-top: 20px;
+    width: auto;
+    display: inline-block;
+}
