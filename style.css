@@ -1,15 +1,14 @@
-/* 斗六高中學生會 - 禪意石澗 (會長原創校正版) */
+/* 斗六高中學生會 - 禪意石澗 (會長原創 + 公告區完美修復版) */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;400&display=swap');
 
 :root {
     --bg-void: #030303; 
     --zen-gold: #C5B358;
-    --gold-glow: rgba(197, 179, 88, 0.25); /* 📍 注入金光的關鍵色 */
+    --gold-glow: rgba(197, 179, 88, 0.25);
 }
 
 body {
     background-color: var(--bg-void);
-    /* 📍 100% 恢復會長的三層深淵石材背景 */
     background-image: 
         radial-gradient(circle at center, transparent 0%, var(--bg-void) 95%),
         url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E"),
@@ -22,7 +21,6 @@ body {
     overflow-x: hidden;
 }
 
-/* 📍 恢復：滑鼠跟隨金光 (確保絕對可見) */
 #cursor-glow {
     position: fixed; width: 900px; height: 900px; z-index: 1; pointer-events: none;
     background: radial-gradient(circle, rgba(197, 179, 88, 0.08) 0%, rgba(197, 179, 88, 0) 65%);
@@ -30,114 +28,83 @@ body {
     mix-blend-mode: screen;
 }
 
-/* --- 📍 頁首校正：確保招牌絕對置中 --- */
+/* --- 📍 頁首校正：確保標題絕對置中 --- */
 header { 
-    width: 100%; 
-    padding: 180px 24px 100px; 
-    text-align: center; 
-    box-sizing: border-box; /* 確保 padding 不會撐破寬度 */
-    position: relative;
-    z-index: 10;
+    width: 100%; padding: 180px 24px 100px; text-align: center; 
+    box-sizing: border-box; position: relative; z-index: 10;
 }
 
 header h1 {
-    font-size: 3.5rem; 
-    font-weight: 200; 
-    letter-spacing: 25px; 
-    color: #FFFFFF;
-    text-indent: 25px; /* 📍 補償右側間距，讓文字真正居中 */
-    text-shadow: 0 0 30px rgba(255,255,255,0.1);
-    margin: 0 auto;
-    display: inline-block; /* 配合 text-align: center */
+    font-size: 3.5rem; font-weight: 200; letter-spacing: 25px; color: #FFFFFF;
+    text-indent: 25px; text-shadow: 0 0 30px rgba(255,255,255,0.1);
+    margin: 0 auto; display: inline-block;
 }
 
-.subtitle {
-    margin-top: 25px;
-    opacity: 0.6;
-    letter-spacing: 12px;
-    font-size: 0.9rem;
-}
+.subtitle { margin-top: 25px; opacity: 0.6; letter-spacing: 12px; font-size: 0.9rem; }
 
-/* --- 📍 內容容器：確保不貼邊的高級感 --- */
-.container { 
-    max-width: 1100px; 
-    margin: 0 auto; 
-    padding: 0 30px 120px; 
-    position: relative; 
-    z-index: 10; 
-    box-sizing: border-box;
-}
+/* --- 📍 內容容器 --- */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 30px 120px; position: relative; z-index: 10; box-sizing: border-box; }
 
-/* --- 📍 行政部門卡片：物理浮力與金芒回歸 --- */
-.dept-grid { 
+/* --- 📍 部門與公告網格統整 --- */
+.dept-grid, .news-grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
     gap: 40px; 
 }
 
-.dept-card {
+/* 📍 修正：把原本消失的公告卡片樣式補回來，並鎖定顏色 */
+.dept-card, .news-card, .card {
     background: #0D0D0D; 
-    padding: 60px 45px; 
+    padding: 50px 40px; 
     border: 1px solid #181818;
     cursor: pointer;
-    transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); /* 📍 保持平滑動效 */
+    text-decoration: none !important; /* 📍 徹底消除藍色底線 */
+    color: #D1D1D1 !important;        /* 📍 徹底消除紫色文字 */
+    transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
     position: relative;
     overflow: hidden;
+    display: block;
 }
 
-/* 📍 修正：靠近時的「浮石彈起」與「金芒散發」 */
-.dept-card:hover {
-    transform: translateY(-15px); /* 📍 顯著浮動幅度 */
+/* 📍 修正：公告卡片的特殊處理（讓連結看起來不像連結） */
+#announcement-grid a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.dept-card:hover, .news-card:hover, .card:hover {
+    transform: translateY(-15px); 
     background: #111;
     border-color: var(--zen-gold);
-    /* 📍 散發金光特效 (兩層陰影：深度與光芒) */
-    box-shadow: 
-        0 20px 50px rgba(0, 0, 0, 0.9), 
-        0 0 30px var(--gold-glow); 
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px var(--gold-glow); 
 }
 
-.dept-card h3 { 
-    color: #FFFFFF; font-size: 1.4rem; font-weight: 300; 
+.dept-card h3, .news-card h3, .card h3 { 
+    color: #FFFFFF !important; font-size: 1.4rem; font-weight: 300; 
     margin-bottom: 20px; letter-spacing: 5px; transition: 0.4s;
 }
-.dept-card:hover h3 { color: var(--zen-gold); }
+.dept-card:hover h3, .news-card:hover h3, .card:hover h3 { color: var(--zen-gold) !important; }
 
-.dept-card p { color: #666; line-height: 2.2; font-size: 0.9rem; transition: 0.4s; }
-.dept-card:hover p { color: #aaa; }
-
-/* 📍 修正：左上角返回鍵 (絕不變紫) */
-.top-nav { position: absolute; top: 40px; left: 40px; z-index: 20; }
-.back-link, .back-link:visited { 
-    color: #555 !important; 
-    text-decoration: none !important; 
-    font-size: 0.8rem; 
-    letter-spacing: 3px; 
-    transition: 0.5s; 
+/* 公告標籤樣式 */
+.category-tag {
+    font-size: 0.75rem; color: var(--zen-gold);
+    border: 1px solid rgba(197, 179, 88, 0.3);
+    padding: 4px 12px; margin-bottom: 20px;
+    display: inline-block; letter-spacing: 2px;
 }
+
+/* 📍 修正：左上角返回鍵 */
+.top-nav { position: absolute; top: 40px; left: 40px; z-index: 20; }
+.back-link, .back-link:visited { color: #555 !important; text-decoration: none !important; font-size: 0.8rem; letter-spacing: 3px; transition: 0.5s; }
 .back-link:hover { color: var(--zen-gold) !important; }
 
 /* 金色小標題 */
-.section-title.gold-title {
-    font-size: 1rem; color: var(--zen-gold); margin: 80px 0 40px; 
-    letter-spacing: 6px; display: flex; align-items: center; opacity: 0.8;
-}
-.section-title.gold-title::after { 
-    content: ""; flex: 1; height: 1px; 
-    background: linear-gradient(to right, #222, transparent); margin-left: 20px; 
-}
+.section-title.gold-title { font-size: 1rem; color: var(--zen-gold); margin: 80px 0 40px; letter-spacing: 6px; display: flex; align-items: center; opacity: 0.8; }
+.section-title.gold-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, #222, transparent); margin-left: 20px; }
 
-/* 📱 手機響應式修正：保持比例不溢出 */
+/* 📱 手機響應式修正 */
 @media (max-width: 768px) {
-    header { padding: 120px 20px 60px; }
-    header h1 { 
-        font-size: 1.8rem; 
-        letter-spacing: 8px; 
-        text-indent: 8px; /* 📍 縮減間距防止橫向爆出 */
-    }
-    .subtitle { letter-spacing: 5px; font-size: 0.75rem; }
-    .container { padding: 0 24px 80px; }
-    .dept-grid { grid-template-columns: 1fr; gap: 25px; }
-    .dept-card { padding: 45px 30px; }
-    .dept-card:hover { transform: translateY(-8px); }
-    .top-nav { top: 25px; left: 25px; }
+    header h1 { font-size: 1.8rem; letter-spacing: 8px; text-indent: 8px; }
+    .dept-grid, .news-grid { grid-template-columns: 1fr; gap: 25px; }
+    .dept-card, .news-card, .card { padding: 45px 30px; }
 }
