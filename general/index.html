@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>總務組 | 斗六高中學生會</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="general-page">
+    <div id="cursor-glow"></div>
+    
+    <header class="page-header">
+        <a href="../index.html" class="back-link">← 返回石澗大廳</a>
+        <div class="header-content">
+            <h1>總務組</h1>
+            <p class="motto">資源整合，校園守護，建立學生會穩定運作基礎</p>
+        </div>
+    </header>
 
+    <div class="container">
+        <section class="zen-section">
+            <h2 class="section-title">核心業務</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>經費核銷與預算</h3>
+                    <p>辦理各項活動經費審核與支出核銷，確保學生會每一分預算都能發揮最大效益。</p>
+                </div>
+                <div class="card">
+                    <h3>物資管理與租借</h3>
+                    <p>負責學生會器材與物資之維護與清點，並提供班級與社團行政資源之借用支持。</p>
+                </div>
+                <div class="card">
+                    <h3>校園空間與庶務</h3>
+                    <p>協助規劃學生會辦公空間使用，並與校方總務處維持溝通，優化校園硬體設施。</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <h2 class="section-title">行政聯繫</h2>
+            <div class="contact-box">
+                <p>若有經費申請、器材借用或校園報修相關建議，請洽總務部長信箱或至會長室留言版反映。</p>
+                <div class="email-tag">Email: general@tlsh-su.edu.tw</div>
+            </div>
+        </section>
+    </div>
+
+    <footer>&copy; 2026 國立斗六高級中學學生會總務組.</footer>
+
+    <script>
+        const glow = document.getElementById('cursor-glow');
+        let mx = 0, my = 0, bx = 0, by = 0;
+        document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+        function anim() {
+            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
+            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
+            requestAnimationFrame(anim);
+        }
+        anim();
+    </script>
+</body>
+</html>
