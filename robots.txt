@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tlshstudent-max.github.io/tlsh-student-union.github.io/sitemap.xml
