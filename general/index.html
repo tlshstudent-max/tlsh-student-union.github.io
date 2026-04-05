@@ -4,58 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>總務組 | 斗六高中學生會</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
 </head>
-<body class="general-page">
+<body>
     <div id="cursor-glow"></div>
-    
-    <header class="page-header">
+
+    <div class="top-nav">
         <a href="../index.html" class="back-link">← 返回石澗大廳</a>
+    </div>
+
+    <header class="page-header centered-header">
         <div class="header-content">
             <h1>總務組</h1>
-            <p class="motto">資源整合，校園守護，建立學生會穩定運作基礎</p>
+            <p class="subtitle">資源整合 · 經費核銷 · 庶務管理</p>
         </div>
     </header>
 
-    <div class="container">
-        <section class="zen-section">
-            <h2 class="section-title">核心業務</h2>
-            <div class="grid">
-                <div class="card">
-                    <h3>經費核銷與預算</h3>
-                    <p>辦理各項活動經費審核與支出核銷，確保學生會每一分預算都能發揮最大效益。</p>
-                </div>
-                <div class="card">
-                    <h3>物資管理與租借</h3>
-                    <p>負責學生會器材與物資之維護與清點，並提供班級與社團行政資源之借用支持。</p>
-                </div>
-                <div class="card">
-                    <h3>校園空間與庶務</h3>
-                    <p>協助規劃學生會辦公空間使用，並與校方總務處維持溝通，優化校園硬體設施。</p>
-                </div>
-            </div>
-        </section>
-
+    <main class="container">
         <section class="info-section">
-            <h2 class="section-title">行政聯繫</h2>
-            <div class="contact-box">
-                <p>若有經費申請、器材借用或校園報修相關建議，請洽總務部長信箱或至會長室留言版反映。</p>
-                <div class="email-tag">Email: general@tlsh-su.edu.tw</div>
+            <h2 class="section-title gold-title"><span>/ </span>核心業務</h2>
+            
+            <div class="card-grid">
+                <div class="info-card">
+                    <h3>經費核銷</h3>
+                    <p>各項活動經費审核、核銷單據處理與預算控制。</p>
+                </div>
+                <div class="info-card">
+                    <h3>物資管理</h3>
+                    <p>行政物資採購、保管、借用登記與維護。</p>
+                </div>
+                <div class="info-card">
+                    <h3>校園庶務</h3>
+                    <p>校園空間規劃協助，以及與校方總務處之對接溝通。</p>
+                </div>
             </div>
         </section>
-    </div>
+    </main>
 
-    <footer>&copy; 2026 國立斗六高級中學學生會總務組.</footer>
+    <footer class="centered-footer">&copy; 2026 國立斗六高級中學學生會總務組.</footer>
 
     <script>
         const glow = document.getElementById('cursor-glow');
         let mx = 0, my = 0, bx = 0, by = 0;
         document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
-        function anim() {
-            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
-            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
-            requestAnimationFrame(anim);
-        }
+        function anim() { bx += (mx - bx) * 0.08; by += (my - by) * 0.08; glow.style.left = bx + 'px'; glow.style.top = by + 'px'; requestAnimationFrame(anim); }
         anim();
     </script>
 </body>
