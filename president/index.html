@@ -4,54 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>正副會長室 | 斗六高中學生會</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="office-page">
     <div id="cursor-glow"></div>
     
-    <div class="top-nav">
+    <header class="office-header">
         <a href="../index.html" class="back-link">← 返回石澗大廳</a>
-    </div>
-
-    <header class="page-header">
-        <h1>正副會長室</h1>
-        <p class="subtitle">願景 · 聽見 · 實踐</p>
+        <div class="header-content">
+            <h1>正副會長室</h1>
+            <p class="office-subtitle">願景 · 聽見 · 實踐</p>
+        </div>
     </header>
 
     <main class="container">
         
         <section class="zen-section">
             <h2 class="section-title gold-title"><span>/ </span>會長寄語</h2>
-            <div class="card" style="border-left: 2px solid var(--zen-gold); padding: 40px;">
-                <p style="color: #fff; line-height: 2.2; font-style: italic; font-size: 1.1rem;">
-                    「每一位斗中人的聲音，都是石澗中清澈的水滴。我們在此匯集，不是為了改變世界，而是為了讓身處的校園變得更值得被愛。」
-                </p>
-                <p style="text-align: right; color: var(--zen-gold); margin-top: 20px; letter-spacing: 3px;">— 學生會會長</p>
+            <div class="antique-quote">
+                <p>「每一位斗中人的聲音，都是石澗中清澈的水滴。我們在此匯集，不是為了改變世界，而是為了讓身處的校園變得更值得被愛。」</p>
+                <cite>— 學生會會長</cite>
             </div>
         </section>
 
         <section id="feedback">
             <h2 class="section-title gold-title"><span>/ </span>意見回饋</h2>
             <div class="card">
-                <p style="color: #666; margin-bottom: 30px; letter-spacing: 2px;">你的建議將直接傳達至會長室。請像投石入水般，留下你的聲音。</p>
+                <p class="box-desc">你的建議將直接傳達至會長室。請像投石入水般，留下你的聲音。</p>
                 
-                <div id="fs-status" style="margin-bottom: 20px; font-size: 0.9rem; letter-spacing: 2px; text-align: center; min-height: 24px;">
-                    <span data-fs-success style="display:none; color: var(--zen-gold);">✨ 訊息已匯集成水，成功傳達至會長室。</span>
-                    <span data-fs-error style="display:none; color: #ff6b6b;">⚠️ 傳送失敗，請稍後再試。</span>
+                <div id="fs-status" style="min-height: 30px; margin-bottom: 20px; text-align: center;">
+                    <span data-fs-success style="display:none; color: var(--zen-warm);">✨ 訊息已匯集成水，沈入石澗。</span>
                 </div>
 
-                <form id="my-form" style="display: flex; flex-direction: column; gap: 25px;">
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <label style="font-size: 0.8rem; color: #555; letter-spacing: 2px;">如何稱呼您？</label>
-                        <input type="text" name="name" required style="background: #111; border: 1px solid #222; padding: 15px; color: #fff; font-family: inherit;">
+                <form id="my-form" class="zen-form">
+                    <div class="form-group">
+                        <label>如何稱呼您？</label>
+                        <input type="text" name="name" required placeholder="例如：某同學">
                     </div>
                     
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <label style="font-size: 0.8rem; color: #555; letter-spacing: 2px;">水滴訊息</label>
-                        <textarea name="message" rows="5" required style="background: #111; border: 1px solid #222; padding: 15px; color: #fff; font-family: inherit; resize: none;"></textarea>
+                    <div class="form-group">
+                        <label>水滴訊息</label>
+                        <textarea name="message" rows="5" required placeholder="請留下您的建議..."></textarea>
                     </div>
                     
-                    <button type="submit" id="submit-btn" style="background: transparent; border: 1px solid var(--zen-gold); color: var(--zen-gold); padding: 18px; cursor: pointer; letter-spacing: 5px; transition: 0.5s;">
+                    <button type="submit" id="submit-btn" class="submit-btn">
                         <span>匯集成水</span>
                     </button>
                 </form>
@@ -59,7 +55,7 @@
         </section>
     </main>
 
-    <footer class="centered-footer">&copy; 2026 國立斗六高級中學學生會.</footer>
+    <footer class="centered-footer">&copy; 2026 國立斗六高級中學學生會會長室.</footer>
 
     <script src="https://unpkg.com/@formspree/ajax@1" defer></script>
     <script>
@@ -74,7 +70,7 @@
         }
         anim();
 
-        // 2. Formspree AJAX 初始化 (修正重複嵌套)
+        // 2. Formspree AJAX 邏輯 (保留會長的石落水鳴動效)
         window.formspree = window.formspree || function () { (formspree.q = formspree.q || []).push(arguments); };
         formspree('initForm', { 
             formElement: '#my-form', 
@@ -85,14 +81,11 @@
                 const successMsg = status.querySelector('[data-fs-success]');
                 const btn = document.getElementById('submit-btn');
 
-                // 觸發「石落水鳴」特效
                 btn.style.opacity = '0.5';
                 btn.innerText = '已匯流';
-                
                 form.style.transition = 'opacity 0.8s';
                 form.style.opacity = '0.3';
                 form.style.pointerEvents = 'none';
-
                 successMsg.style.display = 'block';
 
                 setTimeout(() => {
@@ -101,6 +94,7 @@
                     form.style.pointerEvents = 'auto';
                     btn.style.opacity = '1';
                     btn.innerText = '匯集成水';
+                    successMsg.style.display = 'none';
                 }, 5000);
             }
         });
