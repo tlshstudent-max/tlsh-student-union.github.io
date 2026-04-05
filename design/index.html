@@ -4,48 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>美宣組 | 斗六高中學生會</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body class="design-page">
     <div id="cursor-glow"></div>
     
-    <header class="page-header">
+    <div class="top-nav">
         <a href="../index.html" class="back-link">← 返回石澗大廳</a>
-        <div class="header-content">
-            <h1>美宣組</h1>
-            <p class="motto">用視覺與創意，定義屬於斗中的美學印記</p>
-        </div>
+    </div>
+
+    <header class="page-header">
+        <h1>美宣組</h1>
+        <p class="subtitle">定義斗中視覺美學 · 創造創意印記</p>
     </header>
 
-    <div class="container">
+    <main class="container">
+        
         <section class="zen-section">
-            <h2 class="section-title">核心業務</h2>
-            <div class="grid">
-                <div class="card">
+            <h2 class="section-title gold-title"><span>/ </span>核心業務</h2>
+            
+            <div class="card-grid">
+                <div class="info-card">
                     <h3>品牌識別</h3>
-                    <p>統籌學生會視覺形象，包括標誌應用、字體規範與標準色設定。</p>
+                    <p>統籌學生會視覺形象，包括標誌應用、字體規範與標準色設定，確保每一份對外輸出都具有「石澗」質感。</p>
                 </div>
-                <div class="card">
+                <div class="info-card">
                     <h3>宣傳設計</h3>
-                    <p>製作活動海報、社群媒體圖文與周邊產品，提升活動曝光質感。</p>
+                    <p>製作活動海報、社群媒體圖文與周邊產品。我們不只是做圖，而是在記錄斗中人的共同回憶。</p>
                 </div>
-                <div class="card">
+                <div class="info-card">
                     <h3>視覺顧問</h3>
-                    <p>支援校內各處室與部門的視覺需求，確保對外輸出品質的一致性。</p>
+                    <p>支援校內各處室與行政組別的視覺需求，確保學生會對外輸出品質的一致性與專業感。</p>
                 </div>
             </div>
         </section>
 
         <section class="gallery-section">
-            <h2 class="section-title">設計典藏</h2>
-            <div class="portfolio-box">
-                <p>我們在此彙整了歷屆學生活動的視覺精華。從海報到標準字，每一份設計都是為了記錄斗中校園的獨特氛圍。</p>
-                <div class="coming-soon">作品集正在整理中...</div>
+            <h2 class="section-title gold-title"><span>/ </span>設計典藏</h2>
+            <div class="info-card" style="border-style: dashed; opacity: 0.8;">
+                <p style="color: #fff; margin-bottom: 20px;">我們在此彙整了歷屆學生活動的視覺精華。從海報到標準字，每一份設計都是為了記錄校園的獨特氛圍。</p>
+                <div style="color: var(--zen-gold); letter-spacing: 5px; font-size: 0.8rem;">作品集正在石澗中整理中...</div>
             </div>
         </section>
-    </div>
+        
+    </main>
 
-    <footer>&copy; 2026 國立斗六高級中學學生會美宣組.</footer>
+    <footer class="centered-footer">&copy; 2026 國立斗六高級中學學生會美宣組.</footer>
 
     <script>
         const glow = document.getElementById('cursor-glow');
