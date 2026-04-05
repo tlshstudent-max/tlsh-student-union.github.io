@@ -1,18 +1,19 @@
-/* 斗六高中學生會 - 禪意石澗 (標準黑曜石版) */
+/* 斗六高中學生會 - 禪意石澗 (交互強化版) */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;400&display=swap');
 
 :root {
     --bg-void: #030303; 
     --zen-gold: #C5B358;
+    --gold-glow: rgba(197, 179, 88, 0.2); /* 📍 注入金光的關鍵色 */
 }
 
 body {
     background-color: var(--bg-void);
-    /* 📍 大廳專用：純粹黑曜石背景 */
+    /* 📍 恢復：三層深淵石材背景 */
     background-image: 
         radial-gradient(circle at center, transparent 0%, var(--bg-void) 95%),
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.07'/%3E%3C/svg%3E"),
-        radial-gradient(circle at 50% 30%, #111 0%, var(--bg-void) 70%);
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E"),
+        radial-gradient(circle at 50% 30%, #161616 0%, var(--bg-void) 75%);
     background-attachment: fixed;
     margin: 0;
     font-family: "PingFang TC", "Noto Sans TC", sans-serif;
@@ -21,26 +22,83 @@ body {
     overflow-x: hidden;
 }
 
-/* 📍 修正：強制返回鍵不變紫，維持專業灰/金 */
-.top-nav { position: absolute; top: 40px; left: 40px; z-index: 20; }
-.back-link, .back-link:visited { color: #666 !important; text-decoration: none; font-size: 0.8rem; letter-spacing: 3px; transition: 0.5s; border-bottom: 1px solid transparent; }
-.back-link:hover { color: var(--zen-gold) !important; border-bottom: 1px solid var(--zen-gold); }
+/* 📍 恢復：滑鼠跟隨金光 (提升 Z-Index 確保可見) */
+#cursor-glow {
+    position: fixed; width: 800px; height: 800px; z-index: 1; pointer-events: none;
+    background: radial-gradient(circle, rgba(197, 179, 88, 0.08) 0%, rgba(197, 179, 88, 0) 65%);
+    transform: translate(-50%, -50%);
+    mix-blend-mode: screen;
+}
 
-/* 通用容器與標題 */
-.page-header { padding: 150px 24px 80px; text-align: center; }
-.page-header h1 { font-size: 3.5rem; font-weight: 200; letter-spacing: 25px; color: #FFFFFF; text-indent: 25px; }
-.container { max-width: 1100px; margin: 0 auto; padding: 0 30px 120px; box-sizing: border-box; position: relative; z-index: 10; }
-.section-title.gold-title { font-size: 1rem; color: var(--zen-gold); margin: 80px 0 40px; font-weight: 300; letter-spacing: 6px; display: flex; align-items: center; }
-.section-title.gold-title span { margin-right: 10px; }
+/* --- 📍 行政部門卡片：注入浮動力與金光 --- */
+.dept-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 40px; 
+    position: relative;
+    z-index: 10; /* 確保在光暈上方 */
+}
+
+.dept-card {
+    background: #0D0D0D; 
+    padding: 60px 45px; 
+    border: 1px solid #181818;
+    cursor: pointer;
+    transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); /* 📍 平滑物理動效 */
+    position: relative;
+    overflow: hidden;
+}
+
+/* 📍 修正：靠近時的「浮動」與「金光散發」 */
+.dept-card:hover {
+    transform: translateY(-12px); /* 向上浮動 */
+    background: #111;
+    border-color: var(--zen-gold);
+    /* 📍 散發金光特效 */
+    box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.8), 
+        0 0 25px var(--gold-glow); 
+}
+
+/* 卡片內文字 */
+.dept-card h3 { 
+    color: #FFFFFF; 
+    font-size: 1.4rem; 
+    font-weight: 300; 
+    margin-bottom: 20px; 
+    letter-spacing: 5px;
+    transition: 0.4s;
+}
+.dept-card:hover h3 {
+    color: var(--zen-gold); /* 標題變金 */
+}
+
+.dept-card p { 
+    color: #666; 
+    line-height: 2.2; 
+    font-size: 0.9rem; 
+    transition: 0.4s;
+}
+.dept-card:hover p { color: #aaa; }
+
+/* 標頭美學 */
+header { padding: 180px 24px 100px; text-align: center; }
+header h1 {
+    font-size: 3.5rem; font-weight: 200; letter-spacing: 25px; color: #FFFFFF;
+    text-indent: 25px; text-shadow: 0 0 30px rgba(255,255,255,0.1);
+}
+
+/* 金色小標題 */
+.section-title.gold-title {
+    font-size: 1rem; color: var(--zen-gold); margin: 80px 0 40px; 
+    letter-spacing: 6px; display: flex; align-items: center; opacity: 0.8;
+}
 .section-title.gold-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, #222, transparent); margin-left: 20px; }
 
-/* 通用網格與卡片 */
-.grid, .card-grid, .dept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; }
-.card, .info-card, .dept-card { background: rgba(13, 13, 13, 0.8); padding: 50px 40px; border: 1px solid #181818; }
-
-/* 📱 手機響應式修正 */
+/* 📱 手機響應式修正：保持比例不溢出 */
 @media (max-width: 768px) {
-    .page-header h1 { font-size: 1.8rem; letter-spacing: 8px; text-indent: 8px; }
-    .container { padding: 0 20px 80px; }
-    .grid, .card-grid, .dept-grid { grid-template-columns: 1fr; }
+    header h1 { font-size: 1.8rem; letter-spacing: 8px; text-indent: 8px; }
+    .dept-grid { grid-template-columns: 1fr; gap: 25px; }
+    .dept-card { padding: 40px 30px; }
+    .dept-card:hover { transform: translateY(-5px); } /* 手機版浮動幅度縮小 */
 }
