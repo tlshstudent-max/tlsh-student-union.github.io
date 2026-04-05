@@ -1,126 +1,175 @@
-/* 總務組專屬樣式 - 承襲石澗美學 */
+/* TLSH Student Union - 主樣式表 */
+/* 承襲「石澗」美學：沉浸、禪意、專業 */
+
 :root {
     --bg-color: #0a0a0a;
     --card-bg: rgba(255, 255, 255, 0.03);
-    --accent-gold: #C5B358;
+    /* 📍 定義會長指定的金色 */
+    --gold-color: #c5a059; 
     --text-gray: #a0a0a0;
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 
 body {
     background-color: var(--bg-color);
     color: #ffffff;
-    font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+    font-family: var(--font-family);
     margin: 0;
     line-height: 1.6;
     overflow-x: hidden;
+    position: relative;
+    min-height: 100vh;
 }
+
+/* --- 全站通用元件 --- */
 
 /* 滑鼠光暈 */
 #cursor-glow {
     position: fixed;
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(197, 179, 88, 0.05) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
     transform: translate(-50%, -50%);
 }
 
 .container {
-    max-width: 900px;
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 100px 20px;
+    padding: 0 20px 100px 20px;
     position: relative;
     z-index: 1;
 }
 
-/* 頁首樣式 */
-.page-header {
-    text-align: center;
-    margin-bottom: 80px;
+h1, h2, h3 {
+    font-weight: 300;
+    letter-spacing: 5px;
+    margin: 0;
+}
+
+/* --- 首頁 Grid 樣式 --- */
+
+.dept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 50px;
+}
+
+.dept-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 40px;
+    cursor: pointer;
+    transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.dept-card:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.dept-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+}
+
+.dept-card p {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+}
+
+/* --- 內部部門頁面樣式 (承襲活動組排版) --- */
+
+/* 📍 修正點：返回鍵在左上角 */
+.top-nav {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    z-index: 10;
 }
 
 .back-link {
     color: var(--text-gray);
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     letter-spacing: 2px;
     transition: 0.3s;
 }
 
 .back-link:hover {
-    color: var(--accent-gold);
+    color: #ffffff;
 }
 
-h1 {
-    font-size: 2.5rem;
-    letter-spacing: 10px;
-    margin: 20px 0;
-    font-weight: 300;
+/* 置中頁首 */
+.centered-header {
+    text-align: center;
+    padding: 150px 20px 80px 20px;
 }
 
-.motto {
-    color: var(--text-gray);
-    letter-spacing: 3px;
-    font-size: 1rem;
-}
-
-/* 核心業務網格 */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
-    margin-top: 40px;
-}
-
-.card {
-    background: var(--card-bg);
-    border: 1px solid var(--glass-border);
-    padding: 30px;
-    border-radius: 4px;
-    transition: 0.5s;
-}
-
-.card:hover {
-    background: rgba(197, 179, 88, 0.05);
-    border-color: var(--accent-gold);
-}
-
-.card h3 {
-    color: var(--accent-gold);
-    font-size: 1.2rem;
+.centered-header h1 {
+    font-size: 3rem;
     margin-bottom: 15px;
-    font-weight: 400;
 }
 
-.card p {
+.centered-header .subtitle {
     color: var(--text-gray);
     font-size: 0.95rem;
+    letter-spacing: 3px;
 }
 
-/* 聯繫區塊 */
-.contact-box {
-    background: rgba(255, 255, 255, 0.02);
-    padding: 40px;
+/* 📍 修正點：金色小標題與小 / 的設計 */
+.section-title.gold-title {
+    color: var(--gold-color);
+    text-align: left;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    border: none;
+    letter-spacing: 3px;
+}
+
+.section-title.gold-title span {
+    font-size: 0.8em;
+    margin-right: 5px;
+    color: var(--gold-color);
+}
+
+/* 內部頁面的 Grid 樣式 */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.info-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 30px;
     border-radius: 4px;
-    text-align: center;
-    margin-top: 60px;
 }
 
-.email-tag {
-    display: inline-block;
-    margin-top: 20px;
-    padding: 10px 25px;
-    border: 1px solid var(--accent-gold);
-    color: var(--accent-gold);
-    font-size: 0.8rem;
-    letter-spacing: 2px;
+.info-card h3 {
+    color: #ffffff;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    letter-spacing: 3px;
 }
 
-footer {
+.info-card p {
+    color: var(--text-gray);
+    font-size: 0.85rem;
+    line-height: 1.8;
+    letter-spacing: 1px;
+}
+
+/* 置中頁尾 */
+.centered-footer {
     text-align: center;
-    padding: 50px;
+    padding: 50px 20px;
     color: #333;
     font-size: 0.8rem;
     letter-spacing: 2px;
