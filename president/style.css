@@ -1,18 +1,22 @@
+/* 斗六高中學生會 - 正副會長室 (古典墨藍響應版) */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;700&display=swap');
 
 :root {
     --zen-warm: #C5B358;
-    --classical-blue: #1A2A44; /* 古典墨藍 */
+    --classical-blue: #1A2A44; /* 會長指定的古典墨藍 */
+    --bg-dark: #0A0A0A;
 }
 
 body {
-    background-color: #0A0A0A;
+    background-color: var(--bg-dark);
+    /* 📍 保持會長原創：墨藍徑向漸層 */
     background-image: radial-gradient(circle at center, #161616 0%, #0D0D0D 100%);
     background-attachment: fixed;
     margin: 0;
     color: #D1D1D1;
     font-family: "PingFang TC", "Noto Sans TC", sans-serif;
     letter-spacing: 0.08em;
+    overflow-x: hidden; /* 防止手機左右晃動 */
 }
 
 #cursor-glow {
@@ -21,12 +25,13 @@ body {
     transform: translate(-50%, -50%); mix-blend-mode: soft-light; 
 }
 
-/* 會長室專屬大面積藍頂欄 */
+/* --- 📍 頂欄：古典墨藍區塊 --- */
 .office-header {
     background-color: var(--classical-blue);
     padding: 160px 24px;
     text-align: center;
     border-bottom: 8px solid #000;
+    position: relative;
 }
 
 .office-header h1 {
@@ -35,10 +40,44 @@ body {
     font-weight: 200;
     letter-spacing: 18px;
     color: #FFFFFF;
+    margin: 0;
+    text-indent: 18px;
 }
 
-.back-link { color: rgba(255,255,255,0.4); text-decoration: none; font-size: 0.8rem; }
-.container { max-width: 850px; margin: 0 auto; padding-bottom: 100px; position: relative; z-index: 2; }
+/* 📍 修正：讓返回鍵在藍底上依然優雅，且絕不變紫 */
+.back-link, .back-link:visited {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    color: rgba(255,255,255,0.4) !important;
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    transition: 0.4s;
+}
+.back-link:hover { color: var(--zen-warm) !important; }
+
+/* --- 📍 內容容器：高級感的左右留白 --- */
+.container {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 0 30px 100px; /* 📍 確保手機左右有 30px 留白 */
+    position: relative;
+    z-index: 2;
+    box-sizing: border-box;
+}
+
+/* 金色小標題 */
+.section-title.gold-title {
+    color: var(--zen-warm);
+    font-size: 1rem;
+    margin: 80px 0 30px;
+    letter-spacing: 5px;
+    display: flex;
+    align-items: center;
+}
+.section-title.gold-title span { margin-right: 10px; font-size: 1.2rem; }
+.section-title.gold-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, #222, transparent); margin-left: 20px; }
 
 /* 宋體引用區 */
 .antique-quote {
@@ -47,100 +86,70 @@ body {
     border-left: 4px solid var(--zen-warm);
     margin: 40px 0;
 }
-
 .antique-quote p {
     font-family: "Noto Serif TC", serif;
     font-size: 1.5rem;
     line-height: 2.2;
     font-style: italic;
+    color: #eee;
 }
 
-/* 石材材質按鈕 */
+/* --- 📍 表單與溝槽質感 --- */
+.zen-form { margin-top: 50px; }
+.form-group { margin-bottom: 35px; text-align: left; }
+.form-group label {
+    display: block;
+    color: var(--zen-warm);
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    opacity: 0.7;
+}
+
+.zen-form input, .zen-form textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid #1A1A1A;
+    padding: 18px;
+    color: #D1D1D1;
+    font-family: inherit;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: all 0.5s ease;
+    outline: none;
+}
+.zen-form input:focus, .zen-form textarea:focus {
+    background: rgba(26, 42, 68, 0.2);
+    border-color: var(--zen-warm);
+}
+
 .submit-btn {
     background-color: #141414;
     border: 1px solid var(--zen-warm);
     color: var(--zen-warm);
     padding: 15px 50px;
-    letter-spacing: 5px;
+    letter-spacing: 8px;
     cursor: pointer;
     transition: 0.5s;
+    font-size: 0.9rem;
 }
 .submit-btn:hover { background: var(--zen-warm); color: #000; }
-/* --- 會長室表單極簡化：石板溝槽質感 --- */
 
-.zen-form {
-    margin-top: 50px;
-}
+/* --- 📱 核心：手機版適配指令 (RWD) --- */
+@media (max-width: 768px) {
+    .office-header { padding: 100px 20px; }
+    
+    /* 📍 關鍵：防止標題在手機上橫向爆出 */
+    .office-header h1 {
+        font-size: 2.2rem;
+        letter-spacing: 8px;
+        text-indent: 8px;
+    }
 
-.form-group {
-    margin-bottom: 35px;
-    text-align: left;
-}
+    .container { padding: 0 20px 60px; } /* 手機版留白 */
 
-.form-group label {
-    display: block; /* 讓標題自己站一行 */
-    color: var(--zen-warm);
-    font-size: 0.9rem;
-    letter-spacing: 3px;
-    margin-bottom: 12px;
-    opacity: 0.8;
-}
+    .antique-quote { padding: 40px 25px; }
+    .antique-quote p { font-size: 1.2rem; }
 
-/* 核心：將輸入框變透明、深色化 */
-.zen-form input, 
-.zen-form textarea {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.03); /* 極淡透明白，模擬磨砂感 */
-    border: 1px solid #1A1A1A; /* 與卡片邊框一致 */
-    border-radius: 0; /* 保持銳利線條 */
-    padding: 15px;
-    color: #D1D1D1;
-    font-family: inherit;
-    font-size: 1rem;
-    letter-spacing: 1px;
-    transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-    outline: none;
-}
-
-/* 點擊時的「滲透光」效果 */
-.zen-form input:focus, 
-.zen-form textarea:focus {
-    background: rgba(26, 42, 68, 0.2); /* 注入一點會長室的古典藍 */
-    border-color: var(--zen-warm);
-    box-shadow: 0 0 15px rgba(197, 179, 88, 0.1);
-}
-
-/* 調整送出按鈕的邊距 */
-.submit-btn {
-    margin-top: 20px;
-    width: auto;
-    display: inline-block;
-}
-/* --- 意見回饋專屬動效 --- */
-
-/* 石頭落水：按鈕下沉 */
-.stone-drop {
-    transform: scale(0.95) translateY(5px) !important;
-    filter: brightness(0.8);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-/* 成功訊息：初始狀態隱藏並下壓 */
-#fs-status span {
-    display: none;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.8s ease;
-}
-
-/* 成功訊息：浮現狀態 */
-#fs-status span.show {
-    display: block !important;
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* 表單平滑過渡 */
-#my-form {
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    .back-link { top: 20px; left: 20px; }
 }
