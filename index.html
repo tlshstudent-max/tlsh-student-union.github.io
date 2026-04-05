@@ -7,26 +7,20 @@
     <meta name="google-site-verification" content="isDCzMKTR3bMkMgS9OM7eNX6Vs4Q6iKR34MLKT6R6hQ" />
     <title>國立斗六高中學生會 | 官方網站</title>
     
-    <meta name="description" content="國立斗六高中學生會官方網站。凝靜 · 凝聚 · 向心力。提供校園動態、學權申訴及行政資訊。">
-    <meta name="keywords" content="斗六高中, 斗中, 學生會, 斗中學生會, TLSH, 學生自治">
-    <link rel="canonical" href="https://tlshstudent-max.github.io/tlsh-student-union.github.io/">
-
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tlshstudent-max.github.io/tlsh-student-union.github.io/">
-    <meta property="og:title" content="國立斗六高中學生會 | 官方網站">
-    <meta property="og:image" content="https://tlshstudent-max.github.io/tlsh-student-union.github.io/og-image.png">
-
+    <meta name="description" content="國立斗六高中學生會官方網站。凝靜 · 凝聚 · 向心力。">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="home-page">
     <div id="cursor-glow"></div>
-
-    <header class="page-header centered-header">
+    
+    <header>
         <h1>斗六高中學生會</h1>
         <div class="subtitle">凝靜 · 凝聚 · 向心力</div>
     </header>
 
     <main class="container">
+        
+        <h2 class="section-title gold-title"><span>/ </span>行政部門</h2>
         
         <div class="dept-grid">
             <div class="dept-card" onclick="location.href='president/index.html'">
@@ -55,20 +49,17 @@
             </div>
             <div class="dept-card" onclick="location.href='general/index.html'">
                 <h3>總務組</h3>
-                <p>校園庶務管理，經費核銷與資源規劃。</p>
             </div>
         </div>
 
-        <section class="news-section">
-            <h2 class="section-title gold-title"><span>/ </span>最新動態</h2>
-            <div id="announcement-grid" class="grid">
-                <p class="loading-text">正在從石澗中讀取最新訊息...</p>
-            </div>
-        </section>
+        <h2 class="section-title gold-title"><span>/ </span>最新動態</h2>
+        <div id="announcement-grid" class="news-grid">
+            <p class="loading-text">正在從石澗中讀取最新訊息...</p>
+        </div>
 
     </main>
 
-    <footer class="centered-footer">&copy; 2026 國立斗六高級中學學生會.</footer>
+    <footer>&copy; 2026 國立斗六高級中學學生會.</footer>
 
     <script>
         // Google Sheets 公告系統 (保持原樣)
@@ -85,8 +76,8 @@
                     if (cols.length >= 2) {
                         const type = (cols[5] || 'info').trim().toLowerCase();
                         container.innerHTML += `
-                            <a href="${cols[4] || '#'}" class="card">
-                                <span class="category-tag tag-${type}">[${cols[0]}] ${cols[3]}</span>
+                            <a href="${cols[4] || '#'}" class="news-card">
+                                <span class="category-tag">[${cols[0]}] ${cols[3]}</span>
                                 <h3>${cols[1]}</h3><p>${cols[2]}</p>
                             </a>`;
                     }
@@ -94,15 +85,10 @@
             } catch (e) { console.error(e); }
         }
 
-        // 滑鼠光暈
         const glow = document.getElementById('cursor-glow');
         let mx = 0, my = 0, bx = 0, by = 0;
         document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
-        function anim() {
-            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
-            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
-            requestAnimationFrame(anim);
-        }
+        function anim() { bx += (mx - bx) * 0.08; by += (my - by) * 0.08; glow.style.left = bx + 'px'; glow.style.top = by + 'px'; requestAnimationFrame(anim); }
         anim(); loadAnnouncements();
     </script>
 </body>
