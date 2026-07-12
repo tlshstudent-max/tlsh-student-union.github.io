@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>公關組 | 斗六高中學生會</title>
+    <meta name="description" content="斗六高中學生會公關組：特約商店、校際交流、贊助與合作聯繫。">
+    <link rel="canonical" href="https://tlshstudent-max.github.io/tlsh-student-union.github.io/pr/">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../shared.css">
 </head>
 <body class="pr-page">
     <div id="cursor-glow"></div>
@@ -45,18 +48,7 @@
         </section>
     </div>
 
-    <footer>&copy; 2026 國立斗六高級中學學生會公關組.</footer>
-
-    <script>
-        const glow = document.getElementById('cursor-glow');
-        let mx = 0, my = 0, bx = 0, by = 0;
-        document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
-        function anim() {
-            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
-            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
-            requestAnimationFrame(anim);
-        }
-        anim();
-    </script>
+    <footer>&copy; 2026 國立斗六高級中學學生會公關組 · <a href="../privacy.html">隱私權說明</a></footer>
+    <script src="../main.js"></script>
 </body>
 </html>

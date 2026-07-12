@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>學權組 | 斗六高中學生會</title>
+    <meta name="description" content="斗六高中學生會學權組：學生權益、法規維護、校務參與與申訴資訊。">
+    <link rel="canonical" href="https://tlshstudent-max.github.io/tlsh-student-union.github.io/rights/">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../shared.css">
 </head>
 <body class="rights-page">
     <div id="cursor-glow"></div>
@@ -40,23 +43,12 @@
             <h2 class="section-title">權益申訴入口</h2>
             <div class="appeal-box">
                 <p>如果你感到權益受損，或有任何改善校園的建議，請在此留下訊息。我們將啟動標準作業流程，確保你的聲音被聽見。</p>
-                <a href="#" class="appeal-btn">前往正式申訴表單</a>
+                <a href="../president/index.html#feedback" class="appeal-btn">前往意見回饋入口</a>
             </div>
         </section>
     </div>
 
-    <footer>&copy; 2026 國立斗六高級中學學生會學權組.</footer>
-
-    <script>
-        const glow = document.getElementById('cursor-glow');
-        let mx = 0, my = 0, bx = 0, by = 0;
-        document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
-        function anim() {
-            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
-            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
-            requestAnimationFrame(anim);
-        }
-        anim();
-    </script>
+    <footer>&copy; 2026 國立斗六高級中學學生會學權組 · <a href="../privacy.html">隱私權說明</a></footer>
+    <script src="../main.js"></script>
 </body>
 </html>

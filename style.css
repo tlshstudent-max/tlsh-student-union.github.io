@@ -24,7 +24,10 @@ body {
 #cursor-glow {
     position: fixed; width: 900px; height: 900px; z-index: 1; pointer-events: none;
     background: radial-gradient(circle, rgba(197, 179, 88, 0.08) 0%, rgba(197, 179, 88, 0) 65%);
-    transform: translate(-50%, -50%);
+    left: 0; top: 0; opacity: 0;
+    transform: translate3d(50vw, 30vh, 0) translate(-50%, -50%);
+    transition: opacity 0.5s ease;
+    will-change: transform;
     mix-blend-mode: screen;
 }
 
@@ -79,6 +82,12 @@ header h1 {
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px var(--gold-glow); 
 }
 
+.dept-card:focus-visible, .news-card:focus-visible, .card:focus-visible,
+.back-link:focus-visible, footer a:focus-visible {
+    outline: 2px solid var(--zen-gold);
+    outline-offset: 5px;
+}
+
 .dept-card h3, .news-card h3, .card h3 { 
     color: #FFFFFF !important; font-size: 1.4rem; font-weight: 300; 
     margin-bottom: 20px; letter-spacing: 5px; transition: 0.4s;
@@ -93,6 +102,20 @@ header h1 {
     display: inline-block; letter-spacing: 2px;
 }
 
+.status-text { grid-column: 1 / -1; text-align: center; color: #888; padding: 35px 20px; }
+.error-text { color: #D6A6A6; border: 1px solid rgba(214, 166, 166, 0.25); }
+
+footer { text-align: center; padding: 60px 24px 80px; color: #555; font-size: 0.78rem; }
+footer a { color: #777; text-decoration: none; }
+footer a:hover { color: var(--zen-gold); }
+
+.privacy-content { max-width: 850px; }
+.privacy-content .card { cursor: default; line-height: 2; }
+.privacy-content .card:hover { transform: none; }
+.privacy-content h2 { color: var(--zen-gold); font-size: 1rem; margin: 36px 0 12px; letter-spacing: 4px; }
+.privacy-content h2:first-child { margin-top: 0; }
+.privacy-updated { margin-top: 45px; color: #666; font-size: 0.82rem; }
+
 /* 📍 修正：左上角返回鍵 */
 .top-nav { position: absolute; top: 40px; left: 40px; z-index: 20; }
 .back-link, .back-link:visited { color: #555 !important; text-decoration: none !important; font-size: 0.8rem; letter-spacing: 3px; transition: 0.5s; }
@@ -104,7 +127,16 @@ header h1 {
 
 /* 📱 手機響應式修正 */
 @media (max-width: 768px) {
+    header { padding: 110px 20px 55px; }
     header h1 { font-size: 1.8rem; letter-spacing: 8px; text-indent: 8px; }
+    .subtitle { letter-spacing: 5px; line-height: 1.8; }
+    .container { padding: 0 20px 70px; }
     .dept-grid, .news-grid { grid-template-columns: 1fr; gap: 25px; }
-    .dept-card, .news-card, .card { padding: 45px 30px; }
+    .dept-card, .news-card, .card { padding: 36px 26px; }
+    .dept-card:hover, .news-card:hover, .card:hover { transform: translateY(-6px); }
+    .section-title.gold-title { margin-top: 58px; letter-spacing: 4px; }
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    #cursor-glow { display: none; }
 }

@@ -1,0 +1,62 @@
+/* 跨部門共用：互動、響應式、安全留白與可及性 */
+*, *::before, *::after { box-sizing: border-box; }
+
+#cursor-glow {
+    left: 0 !important;
+    top: 0 !important;
+    opacity: 0;
+    transform: translate3d(50vw, 30vh, 0) translate(-50%, -50%);
+    transition: opacity 0.5s ease;
+    will-change: transform;
+}
+
+.container {
+    width: 100%;
+    padding-left: 30px !important;
+    padding-right: 30px !important;
+}
+
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--zen-warm, #C5B358);
+    outline-offset: 5px;
+}
+
+footer a { color: #777; text-decoration: none; }
+footer a:hover { color: var(--zen-warm, #C5B358); }
+.form-privacy { color: #777; font-size: 0.78rem; line-height: 1.8; }
+.form-privacy a { color: var(--zen-warm, #C5B358); }
+
+@media (max-width: 1024px) {
+    .page-header, .office-header { padding-top: 110px; padding-bottom: 80px; }
+    .grid, .card-grid { gap: 28px; }
+}
+
+@media (max-width: 768px) {
+    .page-header, .office-header { padding: 96px 20px 64px; }
+    .page-header h1, .office-header h1 {
+        font-size: clamp(2rem, 10vw, 2.5rem);
+        letter-spacing: 8px;
+        text-indent: 8px;
+        overflow-wrap: anywhere;
+    }
+    .motto, .subtitle, .office-subtitle { line-height: 1.9; letter-spacing: 3px; }
+    .container { padding: 0 20px 70px !important; }
+    .grid, .card-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 22px; }
+    .card, .info-card, .appeal-box, .contact-box { padding: 32px 24px !important; }
+    .archive-item { align-items: flex-start; flex-wrap: wrap; gap: 12px; padding: 24px 0; }
+    .archive-item .title { flex-basis: calc(100% - 110px); margin-left: 12px; }
+    .archive-item .download-link { margin-left: auto; }
+    footer { padding: 64px 20px !important; line-height: 1.8; }
+}
+
+@media (max-width: 380px) {
+    .container { padding-left: 16px !important; padding-right: 16px !important; }
+    .card, .info-card, .appeal-box, .contact-box { padding: 28px 20px !important; }
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    #cursor-glow { display: none; }
+    .card:hover, .info-card:hover, .dept-card:hover, .news-card:hover {
+        transform: translateY(-4px) !important;
+    }
+}

@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>活動組 | 斗六高中學生會</title>
+    <meta name="description" content="斗六高中學生會活動組：校園活動、企劃成果與近期活動資訊。">
+    <link rel="canonical" href="https://tlshstudent-max.github.io/tlsh-student-union.github.io/activities/">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../shared.css">
 </head>
 <body class="activities-page">
     <div id="cursor-glow"></div>
@@ -39,18 +42,7 @@
         </section>
     </div>
 
-    <footer>&copy; 2026 國立斗六高級中學學生會.</footer>
-
-    <script>
-        const glow = document.getElementById('cursor-glow');
-        let mx = 0, my = 0, bx = 0, by = 0;
-        document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
-        function anim() {
-            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
-            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
-            requestAnimationFrame(anim);
-        }
-        anim();
-    </script>
+    <footer>&copy; 2026 國立斗六高級中學學生會 · <a href="../privacy.html">隱私權說明</a></footer>
+    <script src="../main.js"></script>
 </body>
 </html>
