@@ -6,9 +6,30 @@
     <meta name="google-site-verification" content="E0OfVb66bJgJqKYjAYjmmMTUpmGrsdBT3daEgUH3_PA" />
     <meta name="google-site-verification" content="isDCzMKTR3bMkMgS9OM7eNX6Vs4Q6iKR34MLKT6R6hQ" />
     <title>國立斗六高中學生會 | 官方網站</title>
-    
     <meta name="description" content="國立斗六高中學生會官方網站。凝靜 · 凝聚 · 向心力。">
+    <meta name="theme-color" content="#030303">
+    <link rel="canonical" href="https://tlshstudent-max.github.io/tlsh-student-union.github.io/">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_TW">
+    <meta property="og:site_name" content="國立斗六高中學生會">
+    <meta property="og:title" content="國立斗六高中學生會">
+    <meta property="og:description" content="凝靜 · 凝聚 · 向心力。學生自治、活動公告、權益申訴與公開文件的數位入口。">
+    <meta property="og:url" content="https://tlshstudent-max.github.io/tlsh-student-union.github.io/">
     <link rel="stylesheet" href="style.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "國立斗六高級中學學生會",
+      "alternateName": "斗六高中學生會",
+      "url": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/",
+      "parentOrganization": {
+        "@type": "HighSchool",
+        "name": "國立斗六高級中學",
+        "url": "https://www.tlsh.ylc.edu.tw/"
+      }
+    }
+    </script>
 </head>
 <body class="home-page">
     <div id="cursor-glow"></div>
@@ -23,73 +44,134 @@
         <h2 class="section-title gold-title"><span>/ </span>行政部門</h2>
         
         <div class="dept-grid">
-            <div class="dept-card" onclick="location.href='president/index.html'">
+            <a class="dept-card" href="president/index.html">
                 <h3>正副會長室</h3>
                 <p>核心決策與校務溝通窗口。</p>
-            </div>
-            <div class="dept-card" onclick="location.href='activities/index.html'">
+            </a>
+            <a class="dept-card" href="activities/index.html">
                 <h3>活動組</h3>
                 <p>策劃校園生活，創造共同回憶。</p>
-            </div>
-            <div class="dept-card" onclick="location.href='pr/index.html'">
+            </a>
+            <a class="dept-card" href="pr/index.html">
                 <h3>公關組</h3>
                 <p>對外連結，爭取權益與合作。</p>
-            </div>
-            <div class="dept-card" onclick="location.href='rights/index.html'">
+            </a>
+            <a class="dept-card" href="rights/index.html">
                 <h3>學權組</h3>
                 <p>守護同學基本權益與申訴管道。</p>
-            </div>
-            <div class="dept-card" onclick="location.href='design/index.html'">
+            </a>
+            <a class="dept-card" href="design/index.html">
                 <h3>美宣組</h3>
                 <p>視覺設計，打造斗中品牌美學。</p>
-            </div>
-            <div class="dept-card" onclick="location.href='docs/index.html'">
+            </a>
+            <a class="dept-card" href="docs/index.html">
                 <h3>文書組</h3>
                 <p>會議紀錄公開與檔案管理。</p>
-            </div>
-            <div class="dept-card" onclick="location.href='general/index.html'">
+            </a>
+            <a class="dept-card" href="general/index.html">
                 <h3>總務組</h3>
-            </div>
+                <p>資源整合、經費核銷與庶務管理。</p>
+            </a>
         </div>
 
         <h2 class="section-title gold-title"><span>/ </span>最新動態</h2>
-        <div id="announcement-grid" class="news-grid">
+        <div id="announcement-grid" class="news-grid" aria-live="polite" aria-busy="true">
             <p class="loading-text">正在從石澗中讀取最新訊息...</p>
         </div>
 
     </main>
 
-    <footer>&copy; 2026 國立斗六高級中學學生會.</footer>
+    <footer>&copy; 2026 國立斗六高級中學學生會 · <a href="privacy.html">隱私權說明</a></footer>
 
     <script>
-        // Google Sheets 公告系統 (保持原樣)
         const spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQQ7BWI3HaxcFZFKNmSBirSF1d3fQ1VDFhat9xn6HgteL6eSHSAVqggtq4CMPB5YF5_0sVRl-Ij4eZm/pub?output=csv';
-        async function loadAnnouncements() {
-            try {
-                const response = await fetch(spreadsheetUrl);
-                const data = await response.text();
-                const rows = data.split('\n').filter(row => row.trim() !== '').slice(1);
-                const container = document.getElementById('announcement-grid');
-                container.innerHTML = ''; 
-                rows.forEach(row => {
-                    const cols = row.split(',');
-                    if (cols.length >= 2) {
-                        const type = (cols[5] || 'info').trim().toLowerCase();
-                        container.innerHTML += `
-                            <a href="${cols[4] || '#'}" class="news-card">
-                                <span class="category-tag">[${cols[0]}] ${cols[3]}</span>
-                                <h3>${cols[1]}</h3><p>${cols[2]}</p>
-                            </a>`;
-                    }
-                });
-            } catch (e) { console.error(e); }
+
+        function parseCsv(text) {
+            const rows = [];
+            let row = [];
+            let field = '';
+            let quoted = false;
+
+            for (let i = 0; i < text.length; i += 1) {
+                const char = text[i];
+                const next = text[i + 1];
+                if (char === '"' && quoted && next === '"') {
+                    field += '"';
+                    i += 1;
+                } else if (char === '"') {
+                    quoted = !quoted;
+                } else if (char === ',' && !quoted) {
+                    row.push(field);
+                    field = '';
+                } else if ((char === '\n' || char === '\r') && !quoted) {
+                    if (char === '\r' && next === '\n') i += 1;
+                    row.push(field);
+                    if (row.some(value => value.trim())) rows.push(row);
+                    row = [];
+                    field = '';
+                } else {
+                    field += char;
+                }
+            }
+            row.push(field);
+            if (row.some(value => value.trim())) rows.push(row);
+            return rows;
         }
 
-        const glow = document.getElementById('cursor-glow');
-        let mx = 0, my = 0, bx = 0, by = 0;
-        document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
-        function anim() { bx += (mx - bx) * 0.08; by += (my - by) * 0.08; glow.style.left = bx + 'px'; glow.style.top = by + 'px'; requestAnimationFrame(anim); }
-        anim(); loadAnnouncements();
+        function safeAnnouncementUrl(value) {
+            if (!value || value.trim() === '#') return '#';
+            try {
+                const url = new URL(value.trim(), window.location.href);
+                return ['http:', 'https:'].includes(url.protocol) ? url.href : '#';
+            } catch {
+                return '#';
+            }
+        }
+
+        function createAnnouncement(cols) {
+            const link = document.createElement('a');
+            link.className = 'news-card';
+            link.href = safeAnnouncementUrl(cols[4]);
+
+            const tag = document.createElement('span');
+            tag.className = 'category-tag';
+            tag.textContent = `[${(cols[0] || '公告').trim()}] ${(cols[3] || '').trim()}`;
+
+            const title = document.createElement('h3');
+            title.textContent = (cols[1] || '未命名公告').trim();
+
+            const summary = document.createElement('p');
+            summary.textContent = (cols[2] || '').trim();
+            link.append(tag, title, summary);
+            return link;
+        }
+
+        async function loadAnnouncements() {
+            const container = document.getElementById('announcement-grid');
+            try {
+                const response = await fetch(spreadsheetUrl);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.text();
+                const rows = parseCsv(data).slice(1).filter(cols => cols.length >= 2 && cols[1].trim());
+                container.replaceChildren(...rows.map(createAnnouncement));
+                if (!rows.length) {
+                    const empty = document.createElement('p');
+                    empty.className = 'status-text';
+                    empty.textContent = '目前沒有最新公告。';
+                    container.append(empty);
+                }
+            } catch (error) {
+                console.error('公告讀取失敗：', error);
+                const status = document.createElement('p');
+                status.className = 'status-text error-text';
+                status.textContent = '公告暫時無法載入，請稍後再試。';
+                container.replaceChildren(status);
+            } finally {
+                container.setAttribute('aria-busy', 'false');
+            }
+        }
+        loadAnnouncements();
     </script>
+    <script src="main.js"></script>
 </body>
 </html>

@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>正副會長室 | 斗六高中學生會</title>
+    <meta name="description" content="斗六高中學生會正副會長室：核心願景、校務溝通與意見回饋。">
+    <link rel="canonical" href="https://tlshstudent-max.github.io/tlsh-student-union.github.io/president/">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../shared.css">
 </head>
 <body class="office-page">
     <div id="cursor-glow"></div>
@@ -37,14 +40,15 @@
                 </div>
 
                 <form id="my-form" class="zen-form">
+                    <p class="form-privacy">送出前請閱讀<a href="../privacy.html">隱私權說明</a>；請勿填寫非必要的敏感個人資料。</p>
                     <div class="form-group">
-                        <label>如何稱呼您？</label>
-                        <input type="text" name="name" required placeholder="例如：某同學">
+                        <label for="feedback-name">如何稱呼您？</label>
+                        <input id="feedback-name" type="text" name="name" autocomplete="name" required placeholder="例如：某同學">
                     </div>
                     
                     <div class="form-group">
-                        <label>水滴訊息</label>
-                        <textarea name="message" rows="5" required placeholder="請留下您的建議..."></textarea>
+                        <label for="feedback-message">水滴訊息</label>
+                        <textarea id="feedback-message" name="message" rows="5" required placeholder="請留下您的建議..."></textarea>
                     </div>
                     
                     <button type="submit" id="submit-btn" class="submit-btn">
@@ -55,22 +59,11 @@
         </section>
     </main>
 
-    <footer class="centered-footer">&copy; 2026 國立斗六高級中學學生會會長室.</footer>
+    <footer class="centered-footer">&copy; 2026 國立斗六高級中學學生會會長室 · <a href="../privacy.html">隱私權說明</a></footer>
 
     <script src="https://unpkg.com/@formspree/ajax@1" defer></script>
     <script>
-        // 1. 光暈動畫
-        const glow = document.getElementById('cursor-glow');
-        let mx = 0, my = 0, bx = 0, by = 0;
-        document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
-        function anim() {
-            bx += (mx - bx) * 0.08; by += (my - by) * 0.08;
-            glow.style.left = bx + 'px'; glow.style.top = by + 'px';
-            requestAnimationFrame(anim);
-        }
-        anim();
-
-        // 2. Formspree AJAX 邏輯 (保留會長的石落水鳴動效)
+        // Formspree AJAX 邏輯（保留會長室的石落水鳴動效）
         window.formspree = window.formspree || function () { (formspree.q = formspree.q || []).push(arguments); };
         formspree('initForm', { 
             formElement: '#my-form', 
@@ -99,5 +92,6 @@
             }
         });
     </script>
+    <script src="../main.js"></script>
 </body>
 </html>
