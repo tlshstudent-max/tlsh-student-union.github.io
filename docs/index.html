@@ -20,7 +20,7 @@
         </div>
     </header>
 
-    <div class="container">
+    <main class="container">
         <section class="zen-section">
             <h2 class="section-title">行政核心</h2>
             <div class="grid">
@@ -40,23 +40,49 @@
         </section>
 
         <section class="archive-section">
-            <h2 class="section-title">檔案庫</h2>
-            <div class="archive-list">
-                <div class="archive-item">
-                    <span class="date">2026.02.10</span>
-                    <span class="title">第一學期第二次全體幹部會議紀錄</span>
-                    <span class="download-link is-pending" aria-label="檔案尚在整理中">整理中</span>
+            <div class="archive-heading">
+                <div>
+                    <h2 class="section-title">公開文件庫</h2>
+                    <p class="archive-intro">從會議紀錄到自治法規，讓每一份正式文件都能被查找、閱讀與追溯。</p>
                 </div>
-                <div class="archive-item">
-                    <span class="date">2026.01.15</span>
-                    <span class="title">斗六高中學生會組織章程 (最新修訂版)</span>
-                    <span class="download-link is-pending" aria-label="檔案尚在整理中">整理中</span>
+                <span id="document-count" class="document-count" aria-live="polite"></span>
+            </div>
+
+            <div class="archive-controls" aria-label="文件篩選工具">
+                <div class="control-group search-group">
+                    <label for="document-search">搜尋文件</label>
+                    <input id="document-search" type="search" placeholder="輸入名稱、說明或類別" autocomplete="off">
+                </div>
+                <div class="control-group">
+                    <label for="category-filter">文件類別</label>
+                    <select id="category-filter">
+                        <option value="">全部類別</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="year-filter">學年度</label>
+                    <select id="year-filter">
+                        <option value="">全部年度</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="sort-order">排列方式</label>
+                    <select id="sort-order">
+                        <option value="newest">日期：新到舊</option>
+                        <option value="oldest">日期：舊到新</option>
+                    </select>
                 </div>
             </div>
+
+            <div id="archive-status" class="archive-status" role="status" aria-live="polite">
+                正在從石澗檔案庫讀取公開文件…
+            </div>
+            <div id="archive-list" class="archive-list" aria-busy="true"></div>
         </section>
-    </div>
+    </main>
 
     <footer>&copy; 2026 國立斗六高級中學學生會文書組 · <a href="../privacy.html">隱私權說明</a></footer>
     <script src="../main.js"></script>
+    <script src="documents.js"></script>
 </body>
 </html>
