@@ -1,6 +1,4 @@
 /* 公關組專屬：墨石商務裝潢 */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;400&display=swap');
-
 body {
     background-color: #030303;
     /* 延續大廳的黑曜石深邃感 */
@@ -65,5 +63,6 @@ body {
     line-height: 2.5; color: #888;
 }
 .email-tag { margin-top: 30px; color: #C5B358; font-family: monospace; letter-spacing: 2px; }
+.email-tag a { color: inherit; }
 
 footer { text-align: center; padding: 100px; color: #222; font-size: 0.7rem; }

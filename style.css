@@ -1,11 +1,13 @@
 /* 斗六高中學生會 - 禪意石澗 (會長原創 + 公告區完美修復版) */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;400&display=swap');
-
 :root {
     --bg-void: #030303; 
     --zen-gold: #C5B358;
     --gold-glow: rgba(197, 179, 88, 0.25);
 }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
 
 body {
     background-color: var(--bg-void);
@@ -15,11 +17,25 @@ body {
         radial-gradient(circle at 50% 30%, #161616 0%, var(--bg-void) 75%);
     background-attachment: fixed;
     margin: 0;
-    font-family: "PingFang TC", "Noto Sans TC", sans-serif;
+    font-family: "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
     color: #D1D1D1;
     letter-spacing: 0.12em;
     overflow-x: hidden;
 }
+
+.skip-link {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 100;
+    padding: 12px 16px;
+    background: #C5B358;
+    color: #050505;
+    text-decoration: none;
+    transform: translateY(-160%);
+    transition: transform 0.2s ease;
+}
+.skip-link:focus { transform: translateY(0); }
 
 #cursor-glow {
     position: fixed; width: 900px; height: 900px; z-index: 1; pointer-events: none;
@@ -45,6 +61,27 @@ header h1 {
 
 .subtitle { margin-top: 25px; opacity: 0.6; letter-spacing: 12px; font-size: 0.9rem; }
 
+.home-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin: 44px auto 0;
+}
+.home-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 8px 2px;
+    color: #A4A4A4;
+    border-bottom: 1px solid transparent;
+    font-size: 0.78rem;
+    letter-spacing: 3px;
+    text-decoration: none;
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+.home-nav a:hover { color: var(--zen-gold); border-bottom-color: var(--zen-gold); }
+
 /* --- 📍 內容容器 --- */
 .container { max-width: 1100px; margin: 0 auto; padding: 0 30px 120px; position: relative; z-index: 10; box-sizing: border-box; }
 
@@ -68,6 +105,8 @@ header h1 {
     overflow: hidden;
     display: block;
 }
+
+.dept-card p, .news-card p { color: #9B9B9B; line-height: 1.9; }
 
 /* 📍 修正：公告卡片的特殊處理（讓連結看起來不像連結） */
 #announcement-grid a {
@@ -102,11 +141,30 @@ header h1 {
     display: inline-block; letter-spacing: 2px;
 }
 
+.news-date {
+    display: block;
+    margin-top: 26px;
+    color: #8A8A8A;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+}
+
+.section-heading-row { position: relative; }
+.sync-status {
+    margin: -28px 0 28px;
+    color: #8A8A8A;
+    font-size: 0.74rem;
+    line-height: 1.8;
+    text-align: right;
+}
+.sync-status.is-warning { color: #D6B58A; }
+
 .status-text { grid-column: 1 / -1; text-align: center; color: #888; padding: 35px 20px; }
 .error-text { color: #D6A6A6; border: 1px solid rgba(214, 166, 166, 0.25); }
 
-footer { text-align: center; padding: 60px 24px 80px; color: #555; font-size: 0.78rem; }
-footer a { color: #777; text-decoration: none; }
+footer { text-align: center; padding: 60px 24px 80px; color: #7E7E7E; font-size: 0.78rem; }
+footer a { color: #9A9A9A; text-decoration: none; }
 footer a:hover { color: var(--zen-gold); }
 
 .privacy-content { max-width: 850px; }
@@ -114,11 +172,13 @@ footer a:hover { color: var(--zen-gold); }
 .privacy-content .card:hover { transform: none; }
 .privacy-content h2 { color: var(--zen-gold); font-size: 1rem; margin: 36px 0 12px; letter-spacing: 4px; }
 .privacy-content h2:first-child { margin-top: 0; }
-.privacy-updated { margin-top: 45px; color: #666; font-size: 0.82rem; }
+.privacy-content p { color: #A0A0A0; }
+.privacy-content a { color: var(--zen-gold); }
+.privacy-updated { margin-top: 45px; color: #8A8A8A; font-size: 0.82rem; }
 
 /* 📍 修正：左上角返回鍵 */
 .top-nav { position: absolute; top: 40px; left: 40px; z-index: 20; }
-.back-link, .back-link:visited { color: #555 !important; text-decoration: none !important; font-size: 0.8rem; letter-spacing: 3px; transition: 0.5s; }
+.back-link, .back-link:visited { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 0; color: #858585 !important; text-decoration: none !important; font-size: 0.8rem; letter-spacing: 3px; transition: 0.5s; }
 .back-link:hover { color: var(--zen-gold) !important; }
 
 /* 金色小標題 */
@@ -127,6 +187,7 @@ footer a:hover { color: var(--zen-gold); }
 
 /* 📱 手機響應式修正 */
 @media (max-width: 768px) {
+    body { background-attachment: scroll; }
     header { padding: 110px 20px 55px; }
     header h1 { font-size: 1.8rem; letter-spacing: 8px; text-indent: 8px; }
     .subtitle { letter-spacing: 5px; line-height: 1.8; }
@@ -135,8 +196,22 @@ footer a:hover { color: var(--zen-gold); }
     .dept-card, .news-card, .card { padding: 36px 26px; }
     .dept-card:hover, .news-card:hover, .card:hover { transform: translateY(-6px); }
     .section-title.gold-title { margin-top: 58px; letter-spacing: 4px; }
+    .home-nav { margin-top: 32px; gap: 4px 18px; }
+    .sync-status { margin-top: -20px; text-align: left; }
 }
 
-@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+@media (hover: none), (pointer: coarse) {
     #cursor-glow { display: none; }
+    .dept-card:hover, .news-card:hover, .card:hover { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    #cursor-glow { display: none; }
+    .dept-card:hover, .news-card:hover, .card:hover { transform: none; }
 }

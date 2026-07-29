@@ -1,6 +1,4 @@
 /* 斗六高中學生會 - 正副會長室 (古典墨藍響應版) */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@200;700&display=swap');
-
 :root {
     --zen-warm: #C5B358;
     --classical-blue: #1A2A44; /* 會長指定的古典墨藍 */
@@ -96,6 +94,17 @@ body {
 
 /* --- 📍 表單與溝槽質感 --- */
 .zen-form { margin-top: 50px; }
+.form-status {
+    min-height: 34px;
+    margin: 0 0 20px;
+    color: #A0A0A0;
+    font-size: 0.84rem;
+    line-height: 1.8;
+    text-align: center;
+}
+.form-status.is-success { color: var(--zen-warm); }
+.form-status.is-error { color: #E4A8A8; }
+.honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .form-group { margin-bottom: 35px; text-align: left; }
 .form-group label {
     display: block;
@@ -116,11 +125,12 @@ body {
     font-size: 1rem;
     box-sizing: border-box;
     transition: all 0.5s ease;
-    outline: none;
 }
 .zen-form input:focus, .zen-form textarea:focus {
     background: rgba(26, 42, 68, 0.2);
     border-color: var(--zen-warm);
+    outline: 2px solid rgba(197, 179, 88, 0.78);
+    outline-offset: 2px;
 }
 
 .submit-btn {
@@ -134,6 +144,7 @@ body {
     font-size: 0.9rem;
 }
 .submit-btn:hover { background: var(--zen-warm); color: #000; }
+.submit-btn:disabled { cursor: wait; opacity: 0.6; }
 
 /* --- 📱 核心：手機版適配指令 (RWD) --- */
 @media (max-width: 768px) {
