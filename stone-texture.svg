@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1280" viewBox="0 0 1280 1280">
+  <defs>
+    <filter id="stone-structure" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.004 0.018" numOctaves="4" seed="31"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="0.34" intercept="0.33"/>
+        <feFuncG type="linear" slope="0.33" intercept="0.32"/>
+        <feFuncB type="linear" slope="0.31" intercept="0.31"/>
+        <feFuncA type="linear" slope="0.32"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="stone-grain" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.42" numOctaves="2" seed="17"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="0.18" intercept="0.40"/>
+        <feFuncG type="linear" slope="0.17" intercept="0.39"/>
+        <feFuncB type="linear" slope="0.15" intercept="0.38"/>
+        <feFuncA type="linear" slope="0.075"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+  <rect width="1280" height="1280" fill="#050606"/>
+  <rect width="1280" height="1280" filter="url(#stone-structure)" opacity="0.27"/>
+  <rect width="1280" height="1280" filter="url(#stone-grain)" opacity="0.62"/>
+</svg>

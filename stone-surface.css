@@ -1,0 +1,51 @@
+/* 共用石澗材質：霧面玄武岩、細砂目與克制的月光 */
+body {
+    background-color: #050606 !important;
+    background-image:
+        radial-gradient(ellipse 86% 58% at 48% -10%, rgba(220, 218, 204, 0.065) 0%, rgba(146, 143, 132, 0.022) 44%, transparent 72%),
+        radial-gradient(ellipse 58% 46% at 8% 74%, rgba(197, 179, 88, 0.018) 0%, transparent 70%),
+        linear-gradient(116deg, rgba(255, 255, 255, 0.012) 0%, transparent 34%, rgba(0, 0, 0, 0.20) 72%, rgba(255, 255, 255, 0.006) 100%),
+        url("stone-texture.svg?v=20260729") !important;
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat !important;
+    background-position: center top, left center, center, center top !important;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 1280px 1280px !important;
+    background-attachment: fixed, fixed, fixed, fixed !important;
+    background-blend-mode: screen, screen, normal, normal;
+}
+
+#cursor-glow {
+    width: 640px !important;
+    height: 460px !important;
+    border-radius: 50%;
+    background:
+        radial-gradient(ellipse at center,
+            rgba(237, 235, 220, 0.052) 0%,
+            rgba(209, 202, 169, 0.026) 24%,
+            rgba(197, 179, 88, 0.010) 42%,
+            transparent 72%) !important;
+    filter: blur(14px);
+    mix-blend-mode: screen !important;
+    opacity: 0 !important;
+    transition: opacity 0.75s ease !important;
+}
+
+#cursor-glow.is-active {
+    opacity: 0.72 !important;
+}
+
+@media (max-width: 768px) {
+    body {
+        background-attachment: scroll, scroll, scroll, scroll !important;
+        background-size: 160% 100%, 150% 100%, 100% 100%, 920px 920px !important;
+    }
+
+    #cursor-glow {
+        display: none !important;
+    }
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    #cursor-glow {
+        display: none !important;
+    }
+}

@@ -1,6 +1,4 @@
 (() => {
-    const dataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEU3zPSLHP7riuOfJrG3jurKybYQRV3ecfPQfdUItMZvX-2H2oYyZUxJGQVCILoCL4IWDuPildQFAT/pub?gid=20260713&single=true&output=csv';
-
     const elements = {
         list: document.getElementById('archive-list'),
         status: document.getElementById('archive-status'),
@@ -11,61 +9,16 @@
         sort: document.getElementById('sort-order'),
     };
 
+    if (!elements.list || !window.StudentUnionData) return;
     let documents = [];
 
-    function parseCsv(text) {
-        const rows = [];
-        let row = [];
-        let field = '';
-        let quoted = false;
-
-        for (let index = 0; index < text.length; index += 1) {
-            const char = text[index];
-            const next = text[index + 1];
-            if (char === '"' && quoted && next === '"') {
-                field += '"';
-                index += 1;
-            } else if (char === '"') {
-                quoted = !quoted;
-            } else if (char === ',' && !quoted) {
-                row.push(field);
-                field = '';
-            } else if ((char === '\n' || char === '\r') && !quoted) {
-                if (char === '\r' && next === '\n') index += 1;
-                row.push(field);
-                if (row.some(value => value.trim())) rows.push(row);
-                row = [];
-                field = '';
-            } else {
-                field += char;
-            }
-        }
-        row.push(field);
-        if (row.some(value => value.trim())) rows.push(row);
-        return rows;
-    }
-
-    function safeHttpsUrl(value) {
-        try {
-            const url = new URL(value.trim());
-            return url.protocol === 'https:' ? url.href : null;
-        } catch {
-            return null;
-        }
-    }
-
-    function normalizeDate(value) {
-        const normalized = value.trim().replaceAll('.', '-').replaceAll('/', '-');
-        const timestamp = Date.parse(normalized);
-        return Number.isNaN(timestamp) ? null : { label: normalized, timestamp };
-    }
-
     function rowToDocument(cols) {
-        const url = safeHttpsUrl(cols[5] || '');
-        const date = normalizeDate(cols[0] || '');
+        const url = StudentUnionData.safeHttpsUrl(cols[5] || '');
+        const date = StudentUnionData.normalizeDate(cols[0] || '');
         if (!url || !date || !(cols[3] || '').trim()) return null;
         return {
             date: date.label,
+            isoDate: date.iso,
             timestamp: date.timestamp,
             year: (cols[1] || '').trim(),
             category: (cols[2] || '其他公開文件').trim(),
@@ -92,7 +45,7 @@
         meta.className = 'document-meta';
         const date = document.createElement('time');
         date.className = 'date';
-        date.dateTime = item.date;
+        date.dateTime = item.isoDate;
         date.textContent = item.date;
         const year = document.createElement('span');
         year.className = 'document-year';
@@ -146,9 +99,7 @@
 
     async function loadDocuments() {
         try {
-            const response = await fetch(dataUrl, { cache: 'no-store' });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const rows = parseCsv(await response.text());
+            const rows = await StudentUnionData.fetchRows();
             documents = rows.slice(1).map(rowToDocument).filter(Boolean);
             appendOptions(elements.category, [...new Set(documents.map(item => item.category))].sort());
             appendOptions(elements.year, [...new Set(documents.map(item => item.year).filter(Boolean))].sort((a, b) => b.localeCompare(a, 'zh-TW', { numeric: true })));

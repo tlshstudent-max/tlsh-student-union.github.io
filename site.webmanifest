@@ -1,0 +1,18 @@
+{
+  "name": "國立斗六高中學生會",
+  "short_name": "斗中學生會",
+  "description": "學生自治、活動公告、權益回饋與公開文件的數位入口。",
+  "lang": "zh-TW",
+  "start_url": "/tlsh-student-union.github.io/",
+  "display": "standalone",
+  "background_color": "#030303",
+  "theme_color": "#030303",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

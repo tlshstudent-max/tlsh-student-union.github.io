@@ -7,6 +7,7 @@
     let currentX = targetX;
     let currentY = targetY;
     let frameId = 0;
+    let isActive = false;
 
     const render = () => {
         currentX += (targetX - currentX) * 0.1;
@@ -23,9 +24,20 @@
     document.addEventListener('pointermove', (event) => {
         targetX = event.clientX;
         targetY = event.clientY;
+        if (!isActive) {
+            glow.classList.add('is-active');
+            isActive = true;
+        }
         if (!frameId) frameId = requestAnimationFrame(render);
     }, { passive: true });
 
-    glow.style.opacity = '1';
-    render();
+    document.addEventListener('pointerleave', () => {
+        glow.classList.remove('is-active');
+        isActive = false;
+    });
+
+    window.addEventListener('blur', () => {
+        glow.classList.remove('is-active');
+        isActive = false;
+    });
 })();

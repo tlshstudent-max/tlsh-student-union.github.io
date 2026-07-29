@@ -10,7 +10,7 @@
 本專案採用純粹且高效的開發模式，確保在任何裝置上皆能展現穩定質感：
 * **前端基底**：HTML5 / CSS3 (黑曜石深邃質感佈局)
 * **動態渲染**：原生 JavaScript (暖金禪意光影追蹤)
-* **資料同步**：Google Sheets API (最新動態自動讀取系統)
+* **資料同步**：學生會 Google Sheets 公開資料層（公告與文件自動讀取）
 * **託管平台**：GitHub Pages
 
 ## 📂 石澗大樓構造
@@ -24,7 +24,9 @@
 * `docs/`：**文書組** — 行政檔案庫、會議紀錄與法規彙編。
 
 ## 💡 維護備忘錄
-* **公告更新**：直接編輯關聯的 [Google 試算表](https://docs.google.com/spreadsheets/d/1vQQ7BWI3HaxcFZFKNmSBirSF1d3fQ1VDFhat9xn6HgteL6eSHSAVqggtq4CMPB5YF5_0sVRl-Ij4eZm/edit) 即可即時更新大廳動態。
+* **公告更新**：在學生會的 [公開資料 Google 試算表](https://docs.google.com/spreadsheets/d/1SBd3jZVA38dv0TSuS-LyKIsSzmGWI9Zyo_7zH5pDNPU/edit) 編輯「最新動態管理」，審核後將狀態改為「公開」。
+* **文件更新**：在同一份試算表的「公開文件目錄」填寫資料；網站只讀取狀態為「公開」的安全欄位。
+* **交接說明**：完整步驟位於試算表的「操作說明」分頁，不需要修改網站程式碼。
 * **風格調整**：全局樣式鎖定於根目錄的 `style.css`；各組專屬裝潢請至該資料夾下的 `style.css` 進行微調。
 
 ---

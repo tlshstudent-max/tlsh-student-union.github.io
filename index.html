@@ -8,42 +8,76 @@
     <title>國立斗六高中學生會 | 官方網站</title>
     <meta name="description" content="國立斗六高中學生會官方網站。凝靜 · 凝聚 · 向心力。">
     <meta name="theme-color" content="#030303">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <link rel="canonical" href="https://tlshstudent-max.github.io/tlsh-student-union.github.io/">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="zh_TW">
     <meta property="og:site_name" content="國立斗六高中學生會">
     <meta property="og:title" content="國立斗六高中學生會">
     <meta property="og:description" content="凝靜 · 凝聚 · 向心力。學生自治、活動公告、權益申訴與公開文件的數位入口。">
     <meta property="og:url" content="https://tlshstudent-max.github.io/tlsh-student-union.github.io/">
+    <meta property="og:image" content="https://tlshstudent-max.github.io/tlsh-student-union.github.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="斗六高中學生會，凝靜、凝聚、向心力">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="國立斗六高中學生會">
+    <meta name="twitter:description" content="學生自治、活動公告、權益回饋與公開文件的數位入口。">
+    <meta name="twitter:image" content="https://tlshstudent-max.github.io/tlsh-student-union.github.io/og-image.png">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="stone-surface.css?v=20260729">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "國立斗六高級中學學生會",
-      "alternateName": "斗六高中學生會",
-      "url": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/",
-      "parentOrganization": {
-        "@type": "HighSchool",
-        "name": "國立斗六高級中學",
-        "url": "https://www.tlsh.ylc.edu.tw/"
-      }
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/#organization",
+          "name": "國立斗六高級中學學生會",
+          "alternateName": "斗六高中學生會",
+          "url": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/",
+          "logo": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/favicon.svg",
+          "email": "tlsh.student@gmail.com",
+          "parentOrganization": {
+            "@type": "HighSchool",
+            "name": "國立斗六高級中學",
+            "url": "https://www.tlsh.ylc.edu.tw/"
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/#website",
+          "name": "國立斗六高中學生會官方網站",
+          "url": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/",
+          "inLanguage": "zh-TW",
+          "publisher": { "@id": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/#organization" }
+        }
+      ]
     }
     </script>
 </head>
 <body class="home-page">
-    <div id="cursor-glow"></div>
+    <a class="skip-link" href="#main-content">跳至主要內容</a>
+    <div id="cursor-glow" aria-hidden="true"></div>
     
     <header>
         <h1>斗六高中學生會</h1>
         <div class="subtitle">凝靜 · 凝聚 · 向心力</div>
+        <nav class="home-nav" aria-label="主要導覽">
+            <a href="#departments">行政部門</a>
+            <a href="#announcements">最新動態</a>
+            <a href="docs/index.html">公開文件</a>
+            <a href="president/index.html#feedback">意見回饋</a>
+        </nav>
     </header>
 
-    <main class="container">
-        
-        <h2 class="section-title gold-title"><span>/ </span>行政部門</h2>
-        
-        <div class="dept-grid">
+    <main id="main-content" class="container">
+        <section id="departments" aria-labelledby="departments-title">
+            <h2 id="departments-title" class="section-title gold-title"><span>/ </span>行政部門</h2>
+            <div class="dept-grid">
             <a class="dept-card" href="president/index.html">
                 <h3>正副會長室</h3>
                 <p>核心決策與校務溝通窗口。</p>
@@ -72,106 +106,30 @@
                 <h3>總務組</h3>
                 <p>資源整合、經費核銷與庶務管理。</p>
             </a>
-        </div>
+            </div>
+        </section>
 
-        <h2 class="section-title gold-title"><span>/ </span>最新動態</h2>
-        <div id="announcement-grid" class="news-grid" aria-live="polite" aria-busy="true">
-            <p class="loading-text">正在從石澗中讀取最新訊息...</p>
-        </div>
-
+        <section id="announcements" aria-labelledby="announcements-title">
+            <div class="section-heading-row">
+                <h2 id="announcements-title" class="section-title gold-title"><span>/ </span>最新動態</h2>
+                <p id="announcement-status" class="sync-status" role="status" aria-live="polite">正在同步公開消息…</p>
+            </div>
+            <div id="announcement-grid" class="news-grid" aria-live="polite" aria-busy="true">
+                <a class="news-card" href="https://tlshstudent-max.github.io/tlsh-student-union.github.io/">
+                    <span class="category-tag">學生會公告</span>
+                    <h3>斗中學生會官網正式上線！</h3>
+                    <p>這是我們邁向數位轉型的第一步，未來所有資訊都將在此同步。</p>
+                    <time class="news-date" datetime="2026-02-09">2026.02.09</time>
+                </a>
+            </div>
+            <noscript><p class="status-text">啟用 JavaScript 後即可讀取最新公告；上方仍保留最近同步內容。</p></noscript>
+        </section>
     </main>
 
     <footer>&copy; 2026 國立斗六高級中學學生會 · <a href="privacy.html">隱私權說明</a></footer>
 
-    <script>
-        const spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQQ7BWI3HaxcFZFKNmSBirSF1d3fQ1VDFhat9xn6HgteL6eSHSAVqggtq4CMPB5YF5_0sVRl-Ij4eZm/pub?output=csv';
-
-        function parseCsv(text) {
-            const rows = [];
-            let row = [];
-            let field = '';
-            let quoted = false;
-
-            for (let i = 0; i < text.length; i += 1) {
-                const char = text[i];
-                const next = text[i + 1];
-                if (char === '"' && quoted && next === '"') {
-                    field += '"';
-                    i += 1;
-                } else if (char === '"') {
-                    quoted = !quoted;
-                } else if (char === ',' && !quoted) {
-                    row.push(field);
-                    field = '';
-                } else if ((char === '\n' || char === '\r') && !quoted) {
-                    if (char === '\r' && next === '\n') i += 1;
-                    row.push(field);
-                    if (row.some(value => value.trim())) rows.push(row);
-                    row = [];
-                    field = '';
-                } else {
-                    field += char;
-                }
-            }
-            row.push(field);
-            if (row.some(value => value.trim())) rows.push(row);
-            return rows;
-        }
-
-        function safeAnnouncementUrl(value) {
-            if (!value || value.trim() === '#') return '#';
-            try {
-                const url = new URL(value.trim(), window.location.href);
-                return ['http:', 'https:'].includes(url.protocol) ? url.href : '#';
-            } catch {
-                return '#';
-            }
-        }
-
-        function createAnnouncement(cols) {
-            const link = document.createElement('a');
-            link.className = 'news-card';
-            link.href = safeAnnouncementUrl(cols[4]);
-
-            const tag = document.createElement('span');
-            tag.className = 'category-tag';
-            tag.textContent = `[${(cols[0] || '公告').trim()}] ${(cols[3] || '').trim()}`;
-
-            const title = document.createElement('h3');
-            title.textContent = (cols[1] || '未命名公告').trim();
-
-            const summary = document.createElement('p');
-            summary.textContent = (cols[2] || '').trim();
-            link.append(tag, title, summary);
-            return link;
-        }
-
-        async function loadAnnouncements() {
-            const container = document.getElementById('announcement-grid');
-            try {
-                const response = await fetch(spreadsheetUrl);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.text();
-                const rows = parseCsv(data).slice(1).filter(cols => cols.length >= 2 && cols[1].trim());
-                container.replaceChildren(...rows.map(createAnnouncement));
-                if (!rows.length) {
-                    const empty = document.createElement('p');
-                    empty.className = 'status-text';
-                    empty.textContent = '目前沒有最新公告。';
-                    container.append(empty);
-                }
-            } catch (error) {
-                console.error('公告讀取失敗：', error);
-                const status = document.createElement('p');
-                status.className = 'status-text error-text';
-                status.textContent = '公告暫時無法載入，請稍後再試。';
-                container.replaceChildren(status);
-            } finally {
-                container.setAttribute('aria-busy', 'false');
-            }
-        }
-        loadAnnouncements();
-    </script>
-    <script src="main.js"></script>
+    <script src="public-data.js"></script>
+    <script src="announcements.js"></script>
+    <script src="main.js?v=20260729"></script>
 </body>
 </html>
