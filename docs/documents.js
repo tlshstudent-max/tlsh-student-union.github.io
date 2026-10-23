@@ -1,3 +1,4 @@
+import { fetchDocuments } from '../public-data.js';
 (() => {
     const elements = {
         list: document.getElementById('archive-list'),
@@ -9,24 +10,8 @@
         sort: document.getElementById('sort-order'),
     };
 
-    if (!elements.list || !window.StudentUnionData) return;
+    if (!elements.list) return;
     let documents = [];
-
-    function rowToDocument(cols) {
-        const url = StudentUnionData.safeHttpsUrl(cols[5] || '');
-        const date = StudentUnionData.normalizeDate(cols[0] || '');
-        if (!url || !date || !(cols[3] || '').trim()) return null;
-        return {
-            date: date.label,
-            isoDate: date.iso,
-            timestamp: date.timestamp,
-            year: (cols[1] || '').trim(),
-            category: (cols[2] || '其他公開文件').trim(),
-            title: cols[3].trim(),
-            description: (cols[4] || '').trim(),
-            url,
-        };
-    }
 
     function appendOptions(select, values) {
         values.forEach(value => {
@@ -98,16 +83,23 @@
     }
 
     async function loadDocuments() {
+        elements.list.setAttribute('aria-busy', 'true');
         try {
-            const rows = await StudentUnionData.fetchRows();
-            documents = rows.slice(1).map(rowToDocument).filter(Boolean);
+            documents = await fetchDocuments();
+            elements.category.replaceChildren(new Option('全部類別', ''));
+            elements.year.replaceChildren(new Option('全部年度', ''));
             appendOptions(elements.category, [...new Set(documents.map(item => item.category))].sort());
             appendOptions(elements.year, [...new Set(documents.map(item => item.year).filter(Boolean))].sort((a, b) => b.localeCompare(a, 'zh-TW', { numeric: true })));
             render();
         } catch (error) {
             console.error('公開文件載入失敗：', error);
             elements.status.className = 'archive-status is-error';
-            elements.status.textContent = '文件庫暫時無法讀取。請稍後再試，或聯絡學生會文書組。';
+            elements.status.textContent = '文件庫暫時無法讀取。請重試，或聯絡學生會文書組。';
+            const retry = document.createElement('button');
+            retry.className = 'button button-secondary';
+            retry.textContent = '重新載入';
+            retry.addEventListener('click', () => { retry.disabled = true; loadDocuments(); });
+            elements.status.append(' ', retry);
             elements.count.textContent = '';
         } finally {
             elements.list.setAttribute('aria-busy', 'false');

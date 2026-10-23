@@ -58,23 +58,49 @@
       ]
     }
     </script>
+    <link rel="stylesheet" href="ui.css">
+    <script type="module" src="navigation.js"></script>
 </head>
 <body class="home-page">
     <a class="skip-link" href="#main-content">跳至主要內容</a>
     <div id="cursor-glow" aria-hidden="true"></div>
     
-    <header>
-        <h1>斗六高中學生會</h1>
-        <div class="subtitle">凝靜 · 凝聚 · 向心力</div>
-        <nav class="home-nav" aria-label="主要導覽">
-            <a href="#departments">行政部門</a>
-            <a href="#announcements">最新動態</a>
-            <a href="docs/index.html">公開文件</a>
-            <a href="president/index.html#feedback">意見回饋</a>
-        </nav>
+    <header class="home-hero">
+        <div class="hero-copy">
+            <p class="eyebrow">TLSH STUDENT UNION · 斗六高中學生會</p>
+            <h1>凝聚每一個聲音，<br>讓校園<span>更好。</span></h1>
+            <p class="hero-description">從日常的建議，到共同的改變。<br>在這裡掌握學生會消息，了解自治進度，讓你的聲音被聽見。</p>
+            <div class="hero-actions">
+                <a class="button button-primary" href="#announcements">查看最新消息 <span aria-hidden="true">↘</span></a>
+                <a class="button button-secondary" href="president/index.html#feedback">我想反映意見 <span aria-hidden="true">↗</span></a>
+            </div>
+            <p class="hero-note">公開資訊，免登入就能閱讀。</p>
+        </div>
+        <aside class="hero-directory" aria-label="常用服務">
+            <p class="eyebrow">為同學，從這裡開始</p>
+            <a href="activities/index.html"><span class="directory-number">01</span><span><strong>校園活動</strong><small>了解活動與學生會企劃</small></span><span aria-hidden="true">↗</span></a>
+            <a href="docs/index.html"><span class="directory-number">02</span><span><strong>公開文件</strong><small>查找會議紀錄與自治法規</small></span><span aria-hidden="true">↗</span></a>
+            <a href="rights/index.html"><span class="directory-number">03</span><span><strong>學生權益</strong><small>認識權益與意見反映管道</small></span><span aria-hidden="true">↗</span></a>
+            <div class="directory-footer"><span class="status-dot" aria-hidden="true"></span>凝靜 · 凝聚 · 向心力</div>
+        </aside>
     </header>
 
     <main id="main-content" class="container">
+        <section id="announcements" aria-labelledby="announcements-title">
+            <div class="section-heading-row">
+                <h2 id="announcements-title" class="section-title gold-title"><span>/ </span>最新消息</h2>
+                <p id="announcement-status" class="sync-status" role="status" aria-live="polite">正在讀取公開消息…</p>
+            </div>
+            <div id="announcement-grid" class="news-grid" aria-live="polite" aria-busy="true">
+                <a class="news-card" href="https://tlshstudent-max.github.io/tlsh-student-union.github.io/">
+                    <span class="category-tag">學生會公告</span>
+                    <h3>斗中學生會官網正式上線！</h3>
+                    <p>這是我們邁向數位轉型的第一步，未來所有資訊都將在此同步。</p>
+                    <time class="news-date" datetime="2026-02-09">2026.02.09</time>
+                </a>
+            </div>
+            <noscript><p class="status-text">啟用 JavaScript 後即可讀取最新公告；上方為網站預設公告。</p></noscript>
+        </section>
         <section id="departments" aria-labelledby="departments-title">
             <h2 id="departments-title" class="section-title gold-title"><span>/ </span>行政部門</h2>
             <div class="dept-grid">
@@ -109,27 +135,11 @@
             </div>
         </section>
 
-        <section id="announcements" aria-labelledby="announcements-title">
-            <div class="section-heading-row">
-                <h2 id="announcements-title" class="section-title gold-title"><span>/ </span>最新動態</h2>
-                <p id="announcement-status" class="sync-status" role="status" aria-live="polite">正在同步公開消息…</p>
-            </div>
-            <div id="announcement-grid" class="news-grid" aria-live="polite" aria-busy="true">
-                <a class="news-card" href="https://tlshstudent-max.github.io/tlsh-student-union.github.io/">
-                    <span class="category-tag">學生會公告</span>
-                    <h3>斗中學生會官網正式上線！</h3>
-                    <p>這是我們邁向數位轉型的第一步，未來所有資訊都將在此同步。</p>
-                    <time class="news-date" datetime="2026-02-09">2026.02.09</time>
-                </a>
-            </div>
-            <noscript><p class="status-text">啟用 JavaScript 後即可讀取最新公告；上方仍保留最近同步內容。</p></noscript>
-        </section>
     </main>
 
-    <footer>&copy; 2026 國立斗六高級中學學生會 · <a href="privacy.html">隱私權說明</a></footer>
+    <footer class="site-footer"><div><strong>斗六高中學生會</strong><p>讓參與更容易，讓自治被看見。</p></div><div><a href="privacy.html">隱私權說明</a><a href="admin/index.html">幹部登入</a><p>&copy; 2026 國立斗六高級中學學生會</p></div></footer>
 
-    <script src="public-data.js"></script>
-    <script src="announcements.js"></script>
+    <script type="module" src="announcements.js"></script>
     <script src="main.js?v=20260729"></script>
 </body>
 </html>

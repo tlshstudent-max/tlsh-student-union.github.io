@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>公告內容 | 斗六高中學生會</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="stone-surface.css">
+    <link rel="stylesheet" href="ui.css">
+    <script type="module" src="navigation.js"></script>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">跳至主要內容</a>
+    <main id="main-content" class="article-shell">
+        <a class="button button-secondary" href="index.html#announcements">← 返回最新消息</a>
+        <p id="article-status" role="status">正在讀取公告…</p>
+        <article id="article" hidden>
+            <p class="eyebrow" id="article-category"></p>
+            <h1 id="article-title"></h1>
+            <time id="article-date"></time>
+            <p id="article-summary"></p>
+            <div class="article-body" id="article-body"></div>
+            <p><a id="article-link" class="button button-secondary" target="_blank" rel="noopener noreferrer" hidden>開啟相關連結 ↗</a></p>
+        </article>
+    </main>
+    <script type="module" src="article.js"></script>
+</body>
+</html>
