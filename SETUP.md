@@ -1,8 +1,10 @@
 # 幹部後台啟用與交接
 
+第一次啟用可先看 [免費後台簡短操作版](START-HERE.md)。它使用單一私人初始化檔，合併建表、首位管理員授權及既有資料搬移。下方則保留分開手動執行的詳細方式；若已執行合併初始化檔，略過第 1 節的建表、第 3 節與第 4 節，接續 Google 登入及網站連線設定。
+
 ## 目前狀態
 
-官網仍可直接由 GitHub Pages 發布。`site-config.js` 預設留白時，公告及文件繼續讀取原有 Google Sheets 公開 CSV；後台會顯示尚未啟用，沒有模擬登入或預設密碼。
+官網仍可直接由 GitHub Pages 發布。目前 `site-config.js` 已填入專案公開連線資訊，`publicDataSource: 'sheets'` 讓公告及文件繼續讀取原有 Google Sheets 公開 CSV。建立資料表、Google 登入及搬移資料後，再切換公開資料來源。缺少 URL 或公開金鑰時，後台會顯示尚未啟用，沒有模擬登入或預設密碼。
 
 後台程式、資料庫遷移與自動測試已隨儲存庫提供。真正的 Google 登入、遠端資料寫入與正式站發布，必須在以下設定完成後驗證。
 
@@ -67,12 +69,13 @@ node scripts/import-sheet.js /tmp/tlsh-public.csv /tmp/tlsh-import.sql
 export const siteConfig = Object.freeze({
     supabaseUrl: 'https://你的專案.supabase.co',
     supabasePublishableKey: '你的公開publishable金鑰',
+    publicDataSource: 'supabase', // 僅在資料搬移及權限驗證完成後切換。
 });
 ```
 
 請勿放入 service_role、Supabase secret key、Google client secret 或資料庫密碼。若雲端開發環境採限制網路，需允許該專案的確切主機名稱；不要關閉 TLS 驗證。
 
-**切換後，官網只讀取 Supabase 中已發布的內容**，不會在後端失敗時自動重新公開舊試算表內容，避免已下架公告再次出現。沒有設定 Supabase 時，原有試算表讀取方式持續可用。
+**設定為 `publicDataSource: 'supabase'` 後，官網只讀取 Supabase 中已發布的內容**，不會在後端失敗時自動重新公開舊試算表內容，避免已下架公告再次出現。設定為 `'sheets'` 或尚未提供完整連線資訊時，公開頁面仍使用原有試算表。後台登入使用獨立的連線資訊，讓管理員可在切換公開資料前先驗證工作台。
 
 ## 6. 本機開發與驗證
 

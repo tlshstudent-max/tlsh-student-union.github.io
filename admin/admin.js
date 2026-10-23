@@ -21,7 +21,7 @@ function displayError(error) {
     if (error?.code === '42501') return '目前帳號沒有這項操作權限。若權限剛有異動，請重新登入。';
     if (error?.code === '23514' && error.message?.includes('administrator')) return '必須保留至少一位啟用中的管理員。請先授權另一位管理員，再調整此帳號。';
     if (error?.code === '23514' || error?.code === '22023') return '資料格式不符，請檢查必填欄位與網址。';
-    if (error?.code === '42P01' || error?.code === 'PGRST202') return '管理系統尚未完成啟用，請聯絡學生會管理員。';
+    if (['42P01', 'PGRST202', 'PGRST205'].includes(error?.code)) return '管理系統尚未完成啟用，請聯絡學生會管理員。';
     return '操作未完成，請確認網路連線後再試。未儲存的內容仍保留在畫面中。';
 }
 

@@ -1,6 +1,7 @@
 import { siteConfig } from './site-config.js';
 
 export const isConfigured = Boolean(siteConfig.supabaseUrl && siteConfig.supabasePublishableKey);
+export const usesSupabaseForContent = isConfigured && siteConfig.publicDataSource !== 'sheets';
 let clientPromise;
 
 export function getClient() {
