@@ -8,10 +8,20 @@ import { fetchDocuments } from '../public-data.js';
         category: document.getElementById('category-filter'),
         year: document.getElementById('year-filter'),
         sort: document.getElementById('sort-order'),
+        controls: document.getElementById('archive-controls'),
+        filterCount: document.getElementById('active-filter-count'),
     };
 
     if (!elements.list) return;
     let documents = [];
+    let loading = false;
+
+    function resetFilters() {
+        elements.search.value = elements.category.value = elements.year.value = '';
+        elements.sort.value = 'newest';
+        render();
+    }
+    document.getElementById('reset-document-filters').addEventListener('click', resetFilters);
 
     function appendOptions(select, values) {
         values.forEach(value => {
@@ -65,6 +75,7 @@ import { fetchDocuments } from '../public-data.js';
     }
 
     function render() {
+        if (loading) return;
         const query = elements.search.value.trim().toLocaleLowerCase('zh-TW');
         const category = elements.category.value;
         const year = elements.year.value;
@@ -77,12 +88,27 @@ import { fetchDocuments } from '../public-data.js';
             .sort((a, b) => (a.timestamp - b.timestamp) * direction);
 
         elements.list.replaceChildren(...filtered.map(createDocumentItem));
-        elements.count.textContent = `${filtered.length} 份公開文件`;
+        elements.controls.hidden = !documents.length;
+        elements.count.textContent = documents.length ? `${filtered.length} 份公開文件` : '';
+        const active = Number(Boolean(category)) + Number(Boolean(year)) + Number(elements.sort.value !== 'newest');
+        elements.filterCount.textContent = active ? `已套用 ${active} 項` : '';
         elements.status.className = 'archive-status';
-        elements.status.textContent = filtered.length ? '' : '目前沒有符合條件的公開文件。';
+        elements.status.textContent = !documents.length ? '目前尚無公開文件，正式文件將於整理完成後上架。'
+            : filtered.length ? '' : '目前沒有符合條件的公開文件。';
+        if (documents.length && !filtered.length) {
+            const reset = document.createElement('button');
+            reset.className = 'button button-secondary'; reset.textContent = '清除搜尋與篩選';
+            reset.addEventListener('click', resetFilters); elements.status.append(' ', reset);
+        }
     }
 
     async function loadDocuments() {
+        if (loading) return;
+        loading = true;
+        documents = []; elements.list.replaceChildren(); elements.controls.hidden = true;
+        elements.count.textContent = '';
+        elements.status.className = 'archive-status';
+        elements.status.textContent = '正在讀取公開文件…';
         elements.list.setAttribute('aria-busy', 'true');
         try {
             documents = await fetchDocuments();
@@ -90,6 +116,7 @@ import { fetchDocuments } from '../public-data.js';
             elements.year.replaceChildren(new Option('全部年度', ''));
             appendOptions(elements.category, [...new Set(documents.map(item => item.category))].sort());
             appendOptions(elements.year, [...new Set(documents.map(item => item.year).filter(Boolean))].sort((a, b) => b.localeCompare(a, 'zh-TW', { numeric: true })));
+            loading = false;
             render();
         } catch (error) {
             console.error('公開文件載入失敗：', error);
@@ -102,14 +129,13 @@ import { fetchDocuments } from '../public-data.js';
             elements.status.append(' ', retry);
             elements.count.textContent = '';
         } finally {
+            loading = false;
             elements.list.setAttribute('aria-busy', 'false');
         }
     }
 
-    [elements.search, elements.category, elements.year, elements.sort].forEach(control => {
-        control.addEventListener('input', render);
-        control.addEventListener('change', render);
-    });
+    elements.search.addEventListener('input', render);
+    [elements.category, elements.year, elements.sort].forEach(control => control.addEventListener('change', render));
 
     loadDocuments();
 })();
