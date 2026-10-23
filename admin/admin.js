@@ -25,15 +25,41 @@ function displayError(error) {
     return '操作未完成，請確認網路連線後再試。未儲存的內容仍保留在畫面中。';
 }
 
-function showLogin(message, hasSession = false) {
+function showLogin(message, session = null, state = '') {
+    const hasSession = Boolean(session?.user);
     member = null; contents = []; sessionUser = null;
     $('dashboard').hidden = true;
     $('login-panel').hidden = false;
     $('google-login').hidden = hasSession;
     $('google-login').disabled = !isConfigured;
     $('login-signout').hidden = !hasSession;
+    $('login-identity').hidden = !hasSession;
+    $('login-identity').textContent = hasSession ? `目前登入：${session.user.email || 'Google 帳號'}` : '';
     if (dialog.open) { dirty = false; dialog.close(); }
-    notice('login-status', message);
+    notice('login-status', message, state);
+}
+
+function loginError(error) {
+    const codes = [error?.code, error?.details?.code, error?.details?.error];
+    if (codes.includes('callback_session_missing')) return '未能接收這次登入驗證。請在同一個瀏覽器，從下方按鈕重新登入，並允許本站儲存登入資料。';
+    if (['flow_state_expired', 'flow_state_not_found', 'bad_code_verifier', 'pkce_code_verifier_not_found'].some(code => codes.includes(code))) return '登入驗證已失效。請在同一個瀏覽器，從下方按鈕重新登入，不要重複開啟舊的登入連結。';
+    if (codes.includes('access_denied')) return 'Google 尚未完成授權。請重新登入；若 Google 顯示測試使用者限制，請聯絡管理員加入測試名單。';
+    return 'Google 登入未完成，請重新嘗試。若持續發生，請管理員檢查 Supabase 的 Google 登入與回呼網址設定。';
+}
+
+// Keep callback credentials out of the address bar after processing, including failures.
+const callbackKeys = ['code', 'sb_flow_id', 'error', 'error_code', 'error_description', 'access_token', 'refresh_token', 'provider_token', 'provider_refresh_token', 'expires_in', 'expires_at', 'token_type', 'type'];
+const callbackMarkers = ['code', 'error', 'error_code', 'error_description', 'access_token'];
+function callbackParameters(url) {
+    const hash = new URLSearchParams(url.hash.slice(1));
+    return callbackMarkers.some(key => url.searchParams.has(key) || hash.has(key));
+}
+function clearCallbackParameters() {
+    const url = new URL(location.href), hash = new URLSearchParams(url.hash.slice(1));
+    const authHash = callbackMarkers.some(key => hash.has(key));
+    for (const key of callbackKeys) { url.searchParams.delete(key); if (authHash) hash.delete(key); }
+    if (authHash) url.hash = hash.toString();
+    history.replaceState(history.state, '', url.href);
 }
 
 async function enterSession(session) {
@@ -44,7 +70,7 @@ async function enterSession(session) {
             .eq('email', session.user.email.toLowerCase()).maybeSingle().abortSignal(AbortSignal.timeout(12000));
         if (current !== generation) return;
         if (error) throw error;
-        if (!data?.active) { showLogin('這個帳號尚未獲授權，或已停用。請聯絡學生會管理員。', true); return; }
+        if (!data?.active) { showLogin('這個帳號尚未獲授權，或已停用。請聯絡學生會管理員。', session); return; }
         member = data; sessionUser = session.user;
         $('login-panel').hidden = true;
         $('dashboard').hidden = false;
@@ -58,25 +84,33 @@ async function enterSession(session) {
         notice('dashboard-status', '');
         await loadContent();
     } catch (error) {
-        if (current === generation) showLogin(displayError(error), true);
+        if (current === generation) showLogin(displayError(error), session, 'error');
     }
 }
 
 // Callbacks must not await Supabase operations while the SDK auth lock is held.
 async function initialize() {
     if (!isConfigured) { showLogin('後台尚未啟用。公開網站可正常瀏覽，幹部登入將於設定完成後開放。'); return; }
+    const hasCallback = callbackParameters(new URL(location.href));
+    let restoredSession = null;
     try {
         client = await getClient();
+        // getSession() waits for initialization but does not return callback exchange errors.
+        const { error: callbackError } = await client.auth.initialize();
         const { data, error } = await client.auth.getSession();
         if (error) throw error;
-        await enterSession(data.session);
+        restoredSession = data.session;
         client.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_OUT') { generation += 1; showLogin('你已安全登出。'); }
             else if (event === 'SIGNED_IN' && session?.user?.id !== sessionUser?.id) {
                 setTimeout(() => enterSession(session), 0);
             }
         });
-    } catch { showLogin('無法完成登入，請重新嘗試，或聯絡學生會管理員。', true); }
+        if (callbackError) throw callbackError;
+        if (hasCallback && !restoredSession) throw Object.assign(new Error(), { code: 'callback_session_missing' });
+        await enterSession(restoredSession);
+    } catch (error) { showLogin(loginError(error), restoredSession, 'error'); }
+    finally { if (hasCallback) clearCallbackParameters(); }
 }
 
 $('google-login').addEventListener('click', async () => {

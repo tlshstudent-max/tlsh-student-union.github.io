@@ -111,6 +111,7 @@ for(const member of [null,{...admin,active:false}]) test(`${member ? 'disabled' 
     await expect(page.locator('#login-status')).toContainText('尚未獲授權');
     await expect(page.locator('#dashboard')).toBeHidden();
     await expect(page.locator('#login-signout')).toBeVisible();
+    await expect(page.locator('#login-identity')).toContainText(member?.email || 'outsider@example.com');
 });
 
 test('signout clears the session and stays signed out after reload',async({page})=>{
@@ -141,6 +142,64 @@ test('Google login uses PKCE and returns to admin under the repository base path
     expect(url.searchParams.get('redirect_to')).toBe('http://127.0.0.1:8010/project/admin/');
     expect(url.searchParams.get('code_challenge')).toBeTruthy();
     expect(url.searchParams.get('code_challenge_method')).toBe('s256');
+});
+
+test('Google callback exchanges the code and opens the authorized workspace',async({page})=>{
+    const mock=await backend(page,admin,{session:false});
+    await page.goto('/admin/');
+    await page.evaluate(()=>localStorage.setItem('sb-school-auth-token-code-verifier',JSON.stringify('test-pkce-verifier')));
+    const now=Math.floor(Date.now()/1000);
+    const user={id:'00000000-0000-4000-8000-000000000001',email:admin.email,aud:'authenticated',role:'authenticated',app_metadata:{provider:'google'},user_metadata:{},created_at:new Date().toISOString()};
+    const token=Buffer.from(JSON.stringify({alg:'HS256',typ:'JWT'})).toString('base64url')+'.'+Buffer.from(JSON.stringify({sub:user.id,email:user.email,exp:now+3600,iat:now,aud:'authenticated',role:'authenticated'})).toString('base64url')+'.test-signature';
+    let exchange;
+    await page.route('https://school.supabase.co/auth/v1/token?grant_type=pkce',async route=>{
+        exchange=route.request().postDataJSON();
+        await route.fulfill({contentType:'application/json',headers:{'Access-Control-Allow-Origin':'*'},body:JSON.stringify({access_token:token,refresh_token:'test-refresh',expires_in:3600,token_type:'bearer',user})});
+    });
+    await page.goto('/admin/?code=test-callback-code');
+    await expect(page.locator('#dashboard')).toBeVisible();
+    expect(exchange).toMatchObject({auth_code:'test-callback-code',code_verifier:'test-pkce-verifier'});
+    expect(mock.calls.some(call=>call.path==='/rest/v1/staff_members')).toBe(true);
+    await expect(page).toHaveURL(/\/admin\/$/);
+    await page.reload();
+    await expect(page.locator('#dashboard')).toBeVisible();
+});
+
+test('provider callback errors are explained without exposing returned details',async({page})=>{
+    await backend(page,null,{session:false});
+    await page.goto('/admin/?keep=value#error=access_denied&error_description=private-provider-details');
+    await expect(page.locator('#login-status')).toContainText('Google 尚未完成授權');
+    await expect(page.locator('#google-login')).toBeEnabled();
+    await expect(page.locator('#login-signout')).toBeHidden();
+    await expect(page.locator('body')).not.toContainText('private-provider-details');
+    await expect(page).toHaveURL(/\/admin\/\?keep=value$/);
+    const retry=page.waitForRequest(request=>request.url().includes('/auth/v1/authorize'));
+    await page.locator('#google-login').click();
+    expect(new URL((await retry).url()).searchParams.get('redirect_to')).toBe('http://127.0.0.1:8010/admin/');
+});
+
+test('expired callback codes show a retry instead of a successful signed-out state',async({page})=>{
+    await backend(page,null,{session:false});
+    await page.goto('/admin/');
+    await page.evaluate(()=>localStorage.setItem('sb-school-auth-token-code-verifier',JSON.stringify('test-pkce-verifier')));
+    await page.route('https://school.supabase.co/auth/v1/token?grant_type=pkce',route=>route.fulfill({status:400,contentType:'application/json',headers:{'Access-Control-Allow-Origin':'*','Access-Control-Expose-Headers':'X-Supabase-Api-Version','X-Supabase-Api-Version':'2024-01-01'},body:JSON.stringify({code:'flow_state_expired',msg:'private-exchange-details'})}));
+    await page.goto('/admin/?code=expired-callback-code');
+    await expect(page.locator('#login-status')).toContainText('登入驗證已失效');
+    await expect(page.locator('#google-login')).toBeEnabled();
+    await expect(page.locator('#dashboard')).toBeHidden();
+    await expect(page).toHaveURL(/\/admin\/$/);
+});
+
+test('callback without a saved verifier explains how to restart in the same browser',async({page})=>{
+    await backend(page,null,{session:false});
+    let exchanges=0;
+    await page.route('https://school.supabase.co/auth/v1/token?grant_type=pkce',route=>{exchanges++;return route.abort();});
+    await page.goto('/admin/?code=callback-in-another-browser');
+    await expect(page.locator('#login-status')).toContainText('同一個瀏覽器');
+    await expect(page.locator('#google-login')).toBeEnabled();
+    await expect(page.locator('#dashboard')).toBeHidden();
+    expect(exchanges).toBe(0);
+    await expect(page).toHaveURL(/\/admin\/$/);
 });
 
 test('admin can save a draft, preview text safely, publish, archive, and authorize a member',async({page})=>{
