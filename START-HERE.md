@@ -10,7 +10,7 @@
 - [Google 登入供應商](https://supabase.com/dashboard/project/kcoqkxtormklcfxmfmdb/auth/providers)。
 - [登入回呼設定](https://supabase.com/dashboard/project/kcoqkxtormklcfxmfmdb/auth/url-configuration)。
 
-這些入口供專案擁有者操作。2026 年 10 月 23 日的公開 API 檢查已成功連線，但回報尚未建立 `content` 表，且 Google provider 尚未啟用。請完成下列步驟後實測，不能把填入連線資訊當成後台已啟用。
+這些入口供專案擁有者操作。使用者已完成私人初始化 SQL，2026 年 10 月 23 日的後續 API 檢查確認：已發布內容可讀（一則公告）、未公開內容查詢為空、匿名讀取幹部名單及修改紀錄皆被拒絕。不要重跑初始化。Google provider 已啟用，登入起始請求可轉往 Google，且 Google 回呼指向本次 Supabase 專案；管理員完成登入及發布操作仍待正式站實測。
 
 這次目標為每月 NT$0。專案及組織都選 Free，不升級、不選付費加購。免費額度、閒置暫停及最新方案條件，以建立當下的官方畫面為準；若畫面要求付費，先停止該步驟。文件繼續使用既有的 HTTPS 連結，第一版不另建檔案上傳服務。
 
@@ -55,12 +55,29 @@ node scripts/prepare-backend.js \
 
 依 [Google 登入設定](SETUP.md#2-啟用-google-登入) 建立 OAuth 設定，並在 Supabase 啟用 Google provider。
 
+本次 Google Cloud 專案由學生會官方帳號持有，ID 為 `tlsh-student-union-auth-512506`。測試模式時，將管理員已確認的 Google 信箱加入測試使用者。專案擁有者不會自動取得官網幹部權限。
+
+| 填寫位置 | 值 |
+| --- | --- |
+| Google 的 Authorized JavaScript origins | `https://tlshstudent-max.github.io` |
+| Google 的 Authorized redirect URIs | `https://kcoqkxtormklcfxmfmdb.supabase.co/auth/v1/callback` |
+| Supabase Authentication → URL Configuration → Site URL | `https://tlshstudent-max.github.io/tlsh-student-union.github.io/admin/` |
+| Supabase 的 Redirect URLs | `https://tlshstudent-max.github.io/tlsh-student-union.github.io/admin/` |
+
 兩種回呼地址用途不同：
 
 - **Google OAuth 的 Authorized redirect URI**：填 Supabase 顯示的 Callback URL，通常是 `https://專案代號.supabase.co/auth/v1/callback`。
 - **Supabase 的 Redirect URLs**：加入 `https://tlshstudent-max.github.io/tlsh-student-union.github.io/admin/`。
 
 Google client secret 只填在 Supabase 控制台，不放進網站程式或聊天。
+
+### 選完 Google 帳號後又回到登入畫面
+
+先到上方「登入回呼設定」，確認 **Site URL** 及 **Redirect URLs** 都是完整的 `https://tlshstudent-max.github.io/tlsh-student-union.github.io/admin/`，儲存後從官網登入按鈕重新開始。不要重開舊的回呼連結，也不要在登入途中切換瀏覽器、裝置或網站來源。
+
+後台會顯示授權失敗、驗證過期或未能保留登入驗證的說明。這些錯誤與「帳號尚未獲授權」不同：後者代表已有 Google 登入狀態，但不在啟用的幹部名單，畫面會顯示目前登入信箱，可按「登出並更換帳號」。請使用初始化時授權的管理員帳號。
+
+若需協助，只提供登入按鈕下方的說明文字，不要貼回呼網址、code、token 或 Google client secret。瀏覽器自動測試涵蓋回呼成功、驗證交換失敗及缺少本機驗證資料，但不能代替本人在正式站的 Google 登入測試。
 
 ## 4. 接上官網並驗證
 
