@@ -9,7 +9,7 @@
 - 第一次啟用免費後台：[START-HERE.md](START-HERE.md)，含單次初始化與第一位管理員設定。
 - 本機開發：`npm ci`、`npm run build`、`npm run dev`。
 - 自動驗證：`npm test`；瀏覽器流程：`npm run test:browser`。
-- `site-config.js` 已填入 Supabase 專案的公開連線資訊；`publicDataSource: 'sheets'` 暫時維持原有公開試算表。完成資料搬移、Google 登入與權限驗證後，再切換成 `'supabase'`。
+- `site-config.js` 已設定 `publicDataSource: 'supabase'`。合併部署後，公告與文件從幹部後台發布，官網只讀取已發布內容；原試算表保留為搬移前備份。
 
 ---
 
@@ -20,7 +20,7 @@
 本專案採用純粹且高效的開發模式，確保在任何裝置上皆能展現穩定質感：
 * **前端基底**：HTML5 / CSS3 (黑曜石深邃質感佈局)
 * **動態渲染**：原生 JavaScript (暖金禪意光影追蹤)
-* **資料同步**：學生會 Google Sheets 公開資料層（公告與文件自動讀取）
+* **內容管理**：Supabase 幹部後台（公告與文件草稿、發布及下架）
 * **託管平台**：GitHub Pages
 
 ## 📂 石澗大樓構造
@@ -34,10 +34,11 @@
 * `docs/`：**文書組** — 行政檔案庫、會議紀錄與法規彙編。
 
 ## 💡 維護備忘錄
-* **公告更新（後台啟用前）**：在學生會的 [公開資料 Google 試算表](https://docs.google.com/spreadsheets/d/1SBd3jZVA38dv0TSuS-LyKIsSzmGWI9Zyo_7zH5pDNPU/edit) 編輯「最新動態管理」，審核後將狀態改為「公開」。
-* **文件更新（後台啟用前）**：在同一份試算表的「公開文件目錄」填寫資料；網站讀取供公開使用的資料欄位。
-* **後台啟用後**：統一從幹部工作台管理公告與文件，試算表保留作為搬移前備份，不會與後台雙向同步。
-* **交接說明**：完整步驟位於試算表的「操作說明」分頁，不需要修改網站程式碼。
+
+* **公告與文件更新**：從 [幹部工作台](https://tlshstudent-max.github.io/tlsh-student-union.github.io/admin/) 新增內容，先存草稿確認，再將狀態改為「已發布」。發布後重新整理官網即可讀取。
+* **成員授權**：管理員在工作台的「成員與權限」新增或停用幹部，並分配公告、文件及發布權限。
+* **舊資料備份**：[原公開資料試算表](https://docs.google.com/spreadsheets/d/1SBd3jZVA38dv0TSuS-LyKIsSzmGWI9Zyo_7zH5pDNPU/edit) 保留作為搬移前備份，不會與後台雙向同步。
+* **交接說明**：帳號、資料來源及驗收步驟見 [SETUP.md](SETUP.md)。
 * **風格調整**：全局樣式鎖定於根目錄的 `style.css`；各組專屬裝潢請至該資料夾下的 `style.css` 進行微調。
 
 ---

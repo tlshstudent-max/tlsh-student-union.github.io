@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { siteConfig } from '../../site-config.js';
 
 const csv = 'date,year,category,title,description,url,status,news_date,news_category,news_title,news_summary,news_url\n2026-10-01,115,會議紀錄,公開會議紀錄,文件說明,https://example.com/file,公開,2026-10-01,學生會公告,校園測試消息,公告摘要,https://example.com/news';
 const id = '12345678-1234-4234-8234-123456789abc';
@@ -6,6 +7,8 @@ const article = { id, kind:'announcement', title:'第一則公告', summary:'公
 const admin = { email:'admin@example.com', role:'admin', active:true, edit_announcements:true, edit_documents:true, can_publish:true };
 
 test.beforeEach(async ({page}) => {
+    // Keep legacy/unconfigured scenarios independent of the production rollout setting.
+    await page.route('**/site-config.js',route=>route.fulfill({contentType:'text/javascript',body:"export const siteConfig = {supabaseUrl:'',supabasePublishableKey:''};"}));
     await page.route('https://docs.google.com/**', route => route.fulfill({ contentType:'text/csv', body:csv, headers:{'Access-Control-Allow-Origin':'*'} }));
     await page.route('https://fonts.googleapis.com/**', route=>route.abort());
     await page.route('https://fonts.gstatic.com/**', route=>route.abort());
@@ -267,6 +270,38 @@ test('configured public pages read only published backend content, including saf
     mock.setContents([]);
     await page.reload();
     await expect(page.locator('#article-status')).toContainText('未公開');
+});
+
+test('production configuration serves workspace announcements and documents to signed-out visitors',async({page})=>{
+    await page.unroute('**/site-config.js');
+    const requests=[],sheetRequests=[];
+    let unavailable=false;
+    const published=[
+        {...article,status:'published',title:'後台發布的正式消息'},
+        {...article,id:'12345678-1234-4234-8234-123456789abd',kind:'document',status:'published',title:'後台發布的會議紀錄',academic_year:'115',url:'https://example.com/meeting'},
+    ];
+    await page.route('https://docs.google.com/**',route=>{sheetRequests.push(route.request().url());return route.abort();});
+    await page.route(`${siteConfig.supabaseUrl}/**`,route=>{
+        const request=route.request(),url=new URL(request.url());
+        requests.push(url);
+        if(unavailable) return route.fulfill({status:503,contentType:'application/json',body:'{"message":"temporarily unavailable"}'});
+        const data=url.pathname==='/rest/v1/content' && url.searchParams.get('status')==='eq.published'
+            ? published.filter(item=>`eq.${item.kind}`===url.searchParams.get('kind')) : [];
+        return route.fulfill({contentType:'application/json',headers:{'Access-Control-Allow-Origin':'*'},body:JSON.stringify(data)});
+    });
+    await page.goto('/');
+    await expect(page.locator('.news-card h3')).toHaveText('後台發布的正式消息');
+    await page.goto('/docs/');
+    await expect(page.locator('.archive-item')).toHaveCount(1);
+    await expect(page.locator('.archive-item')).toContainText('後台發布的會議紀錄');
+    unavailable=true;
+    await page.reload();
+    // Allow the SDK's transient-error retries and the public reader's 12-second timeout.
+    await expect(page.locator('#archive-status')).toContainText('暫時無法讀取',{timeout:15000});
+    await expect(page.locator('.archive-item')).toHaveCount(0);
+    expect(sheetRequests).toEqual([]);
+    expect(requests.length).toBeGreaterThanOrEqual(3);
+    expect(requests.every(url=>url.pathname==='/rest/v1/content' && url.searchParams.get('status')==='eq.published')).toBe(true);
 });
 
 test('offline data gets an honest fallback and document retry recovers',async({page})=>{

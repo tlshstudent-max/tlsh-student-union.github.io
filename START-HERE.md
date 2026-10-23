@@ -2,7 +2,7 @@
 
 先維持簡單架構：**現有 GitHub Pages 官網＋一個 Supabase Free 專案＋Google 幹部登入**。學生免登入，幹部只有管理員與編輯者兩種角色。管理員擁有全部權限，可授權及停用其他幹部；編輯者按公告、文件及發布權限分工。
 
-目前已建立的專案是 `kcoqkxtormklcfxmfmdb`，程式已填入它的 Project URL 與 anon 公開金鑰。公開資料目前仍設定為 `publicDataSource: 'sheets'`，待建表、管理員授權及內容搬移驗證後，再切換成 `'supabase'`。以下是這個專案的操作入口：
+目前已建立的專案是 `kcoqkxtormklcfxmfmdb`，程式已填入它的 Project URL 與 anon 公開金鑰。`publicDataSource: 'supabase'` 讓官網公告與文件讀取幹部後台的已發布內容，這項變更合併部署後才會在正式站生效。以下是這個專案的操作入口：
 
 - [專案首頁](https://supabase.com/dashboard/project/kcoqkxtormklcfxmfmdb)。
 - [SQL Editor](https://supabase.com/dashboard/project/kcoqkxtormklcfxmfmdb/sql/new)：新專案執行私人初始化檔；若已執行過，不要重跑。
@@ -10,7 +10,7 @@
 - [Google 登入供應商](https://supabase.com/dashboard/project/kcoqkxtormklcfxmfmdb/auth/providers)。
 - [登入回呼設定](https://supabase.com/dashboard/project/kcoqkxtormklcfxmfmdb/auth/url-configuration)。
 
-這些入口供專案擁有者操作。使用者已完成私人初始化 SQL，2026 年 10 月 23 日的後續 API 檢查確認：已發布內容可讀（一則公告）、未公開內容查詢為空、匿名讀取幹部名單及修改紀錄皆被拒絕。不要重跑初始化。Google provider 已啟用，登入起始請求可轉往 Google，且 Google 回呼指向本次 Supabase 專案；管理員完成登入及發布操作仍待正式站實測。
+這些入口供專案擁有者操作。使用者已完成私人初始化 SQL，並於 2026 年 10 月 24 日確認正式站 Google 登入成功。同日公開 API 核對確認：原試算表的一則公開公告已完整搬移，匿名讀取幹部名單及修改紀錄皆被拒絕。不要重跑初始化。草稿、發布與下架的正式站操作仍待下方驗收。
 
 這次目標為每月 NT$0。專案及組織都選 Free，不升級、不選付費加購。免費額度、閒置暫停及最新方案條件，以建立當下的官方畫面為準；若畫面要求付費，先停止該步驟。文件繼續使用既有的 HTTPS 連結，第一版不另建檔案上傳服務。
 
@@ -71,6 +71,8 @@ node scripts/prepare-backend.js \
 
 Google client secret 只填在 Supabase 控制台，不放進網站程式或聊天。
 
+Client ID 與 Client Secret 是不同的值：用戶端 ID 通常以 `.apps.googleusercontent.com` 結尾；用戶端密碼通常以 `GOCSPX-` 開頭。兩者必須來自同一個 Google OAuth 用戶端。若紀錄出現 `invalid_client`、`The provided client secret is invalid`，請核對 Supabase 的 Client Secret 欄位是否誤貼了 Client ID，並使用 Google 複製按鈕取得有效密鑰。
+
 ### 選完 Google 帳號後又回到登入畫面
 
 先到上方「登入回呼設定」，確認 **Site URL** 及 **Redirect URLs** 都是完整的 `https://tlshstudent-max.github.io/tlsh-student-union.github.io/admin/`，儲存後從官網登入按鈕重新開始。不要重開舊的回呼連結，也不要在登入途中切換瀏覽器、裝置或網站來源。
@@ -81,7 +83,9 @@ Google client secret 只填在 Supabase 控制台，不放進網站程式或聊�
 
 ## 4. 接上官網並驗證
 
-本次專案已填入 Project URL 與舊版 anon 公開金鑰。先核對資料已搬移完整、權限及幹部登入正確，再將 `site-config.js` 的 `publicDataSource` 改成 `'supabase'` 並發布網站。切換後就統一使用後台內容；設定為 `'sheets'` 時，公開頁面仍顯示原有試算表，供設定期間維持服務。
+本次專案已填入 Project URL 與舊版 anon 公開金鑰，並將 `publicDataSource` 設成 `'supabase'`。合併部署後，公開頁面統一顯示後台的已發布內容；新增公告及文件在幹部工作台操作，試算表保留為搬移前備份。設定為 `'sheets'` 是舊資料來源模式，不能用它確認後台發布的結果。
+
+先新增一筆「草稿」並儲存，確認工作台顯示儲存成功。測試發布時，使用一則已確認可公開的正式內容，將狀態改為「已發布」並儲存，再重新整理官網核對結果。只有已發布內容會公開，日期不會延後發布時間。
 
 最後使用第一位管理員的 Google 帳號登入 `/admin/`，確認：
 
