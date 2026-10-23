@@ -6,6 +6,7 @@
 網站提供免登入的公開資訊與 `/admin/` 幹部工作台。後台支援 Google 登入、管理員／編輯者授權、公告與文件草稿、預覽、發布、下架及修改紀錄；需先設定 Supabase 才能使用真實登入與儲存。
 
 - 完整設定、資料搬移、測試及交接：[SETUP.md](SETUP.md)。
+- 第一次啟用免費後台：[START-HERE.md](START-HERE.md)，含單次初始化與第一位管理員設定。
 - 本機開發：`npm ci`、`npm run build`、`npm run dev`。
 - 自動驗證：`npm test`；瀏覽器流程：`npm run test:browser`。
 - `site-config.js` 預設留白，官網持續讀取原有公開試算表。完成資料搬移與權限設定後，才填入 Supabase Project URL 與公開 publishable key。
