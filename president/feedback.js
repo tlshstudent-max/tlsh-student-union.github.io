@@ -38,7 +38,7 @@
             clearTimeout(timeout);
             button.disabled = false;
             button.removeAttribute('aria-busy');
-            button.textContent = '匯集成水';
+            button.textContent = '送出意見';
         }
     });
 })();

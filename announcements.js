@@ -1,27 +1,16 @@
+import { fetchAnnouncements } from './public-data.js';
 (() => {
     const container = document.getElementById('announcement-grid');
     const status = document.getElementById('announcement-status');
-    if (!container || !window.StudentUnionData) return;
-
-    function rowToAnnouncement(cols) {
-        const title = (cols[9] || '').trim();
-        if (!title) return null;
-        const date = StudentUnionData.normalizeDate(cols[7] || '');
-        return {
-            date,
-            category: (cols[8] || '學生會公告').trim(),
-            title,
-            summary: (cols[10] || '').trim(),
-            url: StudentUnionData.safeHttpsUrl(cols[11] || ''),
-        };
-    }
+    if (!container) return;
 
     function createAnnouncement(item) {
-        const card = document.createElement(item.url ? 'a' : 'article');
+        const href = item.id && item.body ? `announcement.html?id=${encodeURIComponent(item.id)}` : item.url;
+        const card = document.createElement(href ? 'a' : 'article');
         card.className = 'news-card';
-        if (item.url) {
-            card.href = item.url;
-            if (new URL(item.url).origin !== window.location.origin) {
+        if (href) {
+            card.href = href;
+            if (new URL(href, location.href).origin !== window.location.origin) {
                 card.target = '_blank';
                 card.rel = 'noopener noreferrer';
             }
@@ -50,13 +39,11 @@
 
     async function loadAnnouncements() {
         try {
-            const rows = await StudentUnionData.fetchRows();
-            const announcements = rows.slice(1)
-                .map(rowToAnnouncement)
-                .filter(Boolean)
+            const announcements = (await fetchAnnouncements())
                 .sort((a, b) => (b.date?.timestamp || 0) - (a.date?.timestamp || 0));
 
             if (!announcements.length) {
+                container.replaceChildren();
                 status.textContent = '目前沒有最新公告。';
                 return;
             }
@@ -65,7 +52,7 @@
             status.textContent = `已同步 ${announcements.length} 則公開消息`;
         } catch (error) {
             console.error('公告讀取失敗：', error);
-            status.textContent = '即時更新暫時無法讀取，以下保留最近同步內容。';
+            status.textContent = '暫時無法更新。下方為網站預設公告，日期請以各則公告標示為準。';
             status.classList.add('is-warning');
         } finally {
             container.setAttribute('aria-busy', 'false');
