@@ -10,7 +10,7 @@
 - [Google 登入供應商](https://supabase.com/dashboard/project/kcoqkxtormklcfxmfmdb/auth/providers)。
 - [登入回呼設定](https://supabase.com/dashboard/project/kcoqkxtormklcfxmfmdb/auth/url-configuration)。
 
-這些入口供專案擁有者操作。2026 年 10 月 23 日的公開 API 檢查已成功連線，但回報尚未建立 `content` 表，且 Google provider 尚未啟用。請完成下列步驟後實測，不能把填入連線資訊當成後台已啟用。
+這些入口供專案擁有者操作。使用者已完成私人初始化 SQL，2026 年 10 月 23 日的後續 API 檢查確認：已發布內容可讀（一則公告）、未公開內容查詢為空、匿名讀取幹部名單及修改紀錄皆被拒絕。不要重跑初始化。Google provider 仍未啟用；管理員登入及發布操作還要在 OAuth 設定完成後實測。
 
 這次目標為每月 NT$0。專案及組織都選 Free，不升級、不選付費加購。免費額度、閒置暫停及最新方案條件，以建立當下的官方畫面為準；若畫面要求付費，先停止該步驟。文件繼續使用既有的 HTTPS 連結，第一版不另建檔案上傳服務。
 
@@ -54,6 +54,21 @@ node scripts/prepare-backend.js \
 ## 3. 啟用 Google 幹部登入
 
 依 [Google 登入設定](SETUP.md#2-啟用-google-登入) 建立 OAuth 設定，並在 Supabase 啟用 Google provider。
+
+本次專案可直接使用以下資料：
+
+| 填寫位置 | 值 |
+| --- | --- |
+| Google Cloud OAuth 專案名稱（建議） | tlsh-student-union-auth |
+| OAuth 用戶端類型 | Web application／網頁應用程式 |
+| Google 的 Authorized JavaScript origins | `https://tlshstudent-max.github.io` |
+| Google 的 Authorized redirect URIs | `https://kcoqkxtormklcfxmfmdb.supabase.co/auth/v1/callback` |
+| Supabase Authentication → URL Configuration → Site URL | `https://tlshstudent-max.github.io/tlsh-student-union.github.io/admin/` |
+| Supabase 的 Redirect URLs | `https://tlshstudent-max.github.io/tlsh-student-union.github.io/admin/` |
+
+以第一位管理員的 Google 帳號操作 [Google Cloud 建立專案](https://console.cloud.google.com/projectcreate)。這裡只需要 OAuth 設定，不啟用付費運算服務或計費方案。專案建立後，在 Google Auth Platform 設定應用程式名稱、聯絡信箱與 External 使用對象。測試模式時，將管理員已確認的 Google 信箱加入測試使用者。
+
+建立 Web application 用戶端並填入上表的 Google 網址後，將 Google 產生的 **Client ID** 及 **Client secret** 填入 Supabase 的 Google provider，啟用並儲存。Client secret 只填入 Supabase 控制台，勿傳到聊天或提交到 GitHub。
 
 兩種回呼地址用途不同：
 
