@@ -86,10 +86,23 @@ test('mobile navigation and key pages fit narrow viewports',async({page})=>{
 });
 
 test('unconfigured admin is honest and cannot simulate a login',async({page})=>{
+    await page.route('**/site-config.js',route=>route.fulfill({contentType:'text/javascript',body:"export const siteConfig = {supabaseUrl:'',supabasePublishableKey:''};"}));
     await page.goto('/admin/');
     await expect(page.locator('#login-status')).toContainText('後台尚未啟用');
     await expect(page.locator('#google-login')).toBeDisabled();
     await expect(page.locator('#dashboard')).toBeHidden();
+});
+
+test('staged backend configuration preserves the public Sheets feed while allowing staff login setup',async({page})=>{
+    const mock=await backend(page,null,{session:false});
+    await page.route('**/site-config.js',route=>route.fulfill({contentType:'text/javascript',body:"export const siteConfig = {supabaseUrl:'https://school.supabase.co',supabasePublishableKey:'sb_publishable_browser_test',publicDataSource:'sheets'};"}));
+    await page.goto('/');
+    await expect(page.locator('.news-card h3')).toHaveText('校園測試消息');
+    await page.goto('/docs/');
+    await expect(page.locator('.archive-item')).toHaveCount(1);
+    expect(mock.calls.some(call=>call.path==='/rest/v1/content')).toBe(false);
+    await page.goto('/admin/');
+    await expect(page.locator('#google-login')).toBeEnabled();
 });
 
 for(const member of [null,{...admin,active:false}]) test(`${member ? 'disabled' : 'nonstaff'} accounts cannot enter the workspace`,async({page})=>{

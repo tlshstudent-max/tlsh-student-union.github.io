@@ -2,6 +2,16 @@
 
 先維持簡單架構：**現有 GitHub Pages 官網＋一個 Supabase Free 專案＋Google 幹部登入**。學生免登入，幹部只有管理員與編輯者兩種角色。管理員擁有全部權限，可授權及停用其他幹部；編輯者按公告、文件及發布權限分工。
 
+目前已建立的專案是 `kcoqkxtormklcfxmfmdb`，程式已填入它的 Project URL 與 anon 公開金鑰。公開資料目前仍設定為 `publicDataSource: 'sheets'`，待建表、管理員授權及內容搬移驗證後，再切換成 `'supabase'`。以下是這個專案的操作入口：
+
+- [專案首頁](https://supabase.com/dashboard/project/kcoqkxtormklcfxmfmdb)。
+- [SQL Editor](https://supabase.com/dashboard/project/kcoqkxtormklcfxmfmdb/sql/new)：新專案執行私人初始化檔；若已執行過，不要重跑。
+- [API Keys](https://supabase.com/dashboard/project/kcoqkxtormklcfxmfmdb/settings/api-keys)：複製 publishable key，勿使用 secret / service_role key。
+- [Google 登入供應商](https://supabase.com/dashboard/project/kcoqkxtormklcfxmfmdb/auth/providers)。
+- [登入回呼設定](https://supabase.com/dashboard/project/kcoqkxtormklcfxmfmdb/auth/url-configuration)。
+
+這些入口供專案擁有者操作。2026 年 10 月 23 日的公開 API 檢查已成功連線，但回報尚未建立 `content` 表，且 Google provider 尚未啟用。請完成下列步驟後實測，不能把填入連線資訊當成後台已啟用。
+
 這次目標為每月 NT$0。專案及組織都選 Free，不升級、不選付費加購。免費額度、閒置暫停及最新方案條件，以建立當下的官方畫面為準；若畫面要求付費，先停止該步驟。文件繼續使用既有的 HTTPS 連結，第一版不另建檔案上傳服務。
 
 ## 1. 建立一個免費專案
@@ -54,7 +64,7 @@ Google client secret 只填在 Supabase 控制台，不放進網站程式或聊�
 
 ## 4. 接上官網並驗證
 
-取得 Supabase 的 **Project URL** 與 **publishable key（公開金鑰，或舊版 anon key）**，填入 `site-config.js` 後發布網站。先核對資料已搬移完整，因為切換後就統一使用後台內容。
+本次專案已填入 Project URL 與舊版 anon 公開金鑰。先核對資料已搬移完整、權限及幹部登入正確，再將 `site-config.js` 的 `publicDataSource` 改成 `'supabase'` 並發布網站。切換後就統一使用後台內容；設定為 `'sheets'` 時，公開頁面仍顯示原有試算表，供設定期間維持服務。
 
 最後使用第一位管理員的 Google 帳號登入 `/admin/`，確認：
 

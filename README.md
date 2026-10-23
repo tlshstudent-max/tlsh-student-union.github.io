@@ -9,7 +9,7 @@
 - 第一次啟用免費後台：[START-HERE.md](START-HERE.md)，含單次初始化與第一位管理員設定。
 - 本機開發：`npm ci`、`npm run build`、`npm run dev`。
 - 自動驗證：`npm test`；瀏覽器流程：`npm run test:browser`。
-- `site-config.js` 預設留白，官網持續讀取原有公開試算表。完成資料搬移與權限設定後，才填入 Supabase Project URL 與公開 publishable key。
+- `site-config.js` 已填入 Supabase 專案的公開連線資訊；`publicDataSource: 'sheets'` 暫時維持原有公開試算表。完成資料搬移、Google 登入與權限驗證後，再切換成 `'supabase'`。
 
 ---
 

@@ -1,5 +1,5 @@
 import { parseCsv, safeHttpsUrl, normalizeDate } from './lib/content.js';
-import { isConfigured, publishedContent } from './backend.js';
+import { usesSupabaseForContent, publishedContent } from './backend.js';
 export { safeHttpsUrl, normalizeDate };
 const dataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEU3zPSLHP7riuOfJrG3jurKybYQRV3ecfPQfdUItMZvX-2H2oYyZUxJGQVCILoCL4IWDuPildQFAT/pub?gid=20260713&single=true&output=csv';
 
@@ -10,7 +10,7 @@ export async function fetchRows() {
 }
 
 export async function fetchAnnouncements() {
-    if (isConfigured) return (await publishedContent('announcement')).map(item => ({
+    if (usesSupabaseForContent) return (await publishedContent('announcement')).map(item => ({
         ...item, date: normalizeDate(item.date), url: safeHttpsUrl(item.url),
     }));
     return (await fetchRows()).slice(1).filter(cols => (cols[9] || '').trim()).map(cols => ({
@@ -20,7 +20,7 @@ export async function fetchAnnouncements() {
 }
 
 export async function fetchDocuments() {
-    if (isConfigured) return (await publishedContent('document')).map(item => ({
+    if (usesSupabaseForContent) return (await publishedContent('document')).map(item => ({
         ...item, date: normalizeDate(item.date)?.label, isoDate: item.date,
         timestamp: normalizeDate(item.date)?.timestamp, year: item.academic_year, description: item.summary,
         url: safeHttpsUrl(item.url),
