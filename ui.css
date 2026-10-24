@@ -12,6 +12,19 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .sitebar-links a { display: inline-flex; align-items: center; min-height: 44px; color: #c6c7c0; text-decoration: none; font-size: 14px; white-space: nowrap; }
 .sitebar-links a:hover, .sitebar-links a[aria-current] { color: var(--ui-gold); }
 .sitebar-links .staff-link { border-left: 1px solid #393b33; padding-left: 25px; color: var(--ui-gold); }
+.urgent-banner { position: relative; z-index: 11; padding: 12px max(24px, calc((100vw - 1180px)/2)); border-bottom: 1px solid #885348; background: #301e1a; color: #ffe8df; overflow-wrap: anywhere; }
+.urgent-banner summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; cursor: pointer; }
+.urgent-banner summary strong { font-size: 16px; }
+.urgent-toggle-hint { flex-shrink: 0; font-size: 12px; color: #e5b9ac; }
+.urgent-banner ul { list-style: none; padding: 0; margin: 4px 0; }
+.urgent-banner li { padding: 12px 0; border-top: 1px solid #6a4339; }
+.urgent-banner a { color: #ffe0bd; text-underline-offset: 4px; }
+.urgent-title { font-size: 17px; font-weight: 600; }
+.urgent-summary { font-size: 14px; margin: 6px 0; white-space: pre-line; max-height: 5.25em; overflow: auto; }
+.urgent-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; font-size: 12px; color: #e6c5ba; }
+.urgent-meta a { display: inline-flex; align-items: center; min-height: 44px; }
+.urgent-error { font-size: 13px; margin: 4px 0; }
+.urgent-error button { min-height: 44px; padding: 4px 12px; border: 1px solid #a77967; border-radius: 3px; background: transparent; color: #ffe0bd; font: inherit; cursor: pointer; }
 .eyebrow { color: var(--ui-gold); font-size: 12px; letter-spacing: .15em; font-weight: 600; }
 .button { display: inline-flex; align-items: center; justify-content: center; gap: 24px; min-height: 48px; padding: 12px 22px; border: 1px solid var(--ui-line); border-radius: 3px; color: var(--ui-text); font: inherit; font-size: 15px; font-weight: 600; text-decoration: none; cursor: pointer; transition: background .18s ease, border-color .18s ease; }
 .button-primary { background: var(--ui-gold); border-color: var(--ui-gold); color: #181a15; }

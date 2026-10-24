@@ -1,8 +1,9 @@
 import { getClient, isConfigured } from '../backend.js';
-import { validateContent, mayEdit, mayPublish, safeHttpsUrl } from '../lib/content.js';
-import { createDraftStore } from '../lib/drafts.js';
+import { validateContent, mayEdit, mayPublish, safeHttpsUrl } from '../lib/content.js?v=urgent-1';
+import { createDraftStore } from '../lib/drafts.js?v=urgent-1';
 import { siteConfig } from '../site-config.js';
 import { departments, publication, contentHref } from '../lib/publication.js';
+import { taipeiInput, activeUrgent, urgentTimeLabel } from '../lib/urgent.js';
 
 const $ = id => document.getElementById(id);
 const form = $('content-form'), memberForm = $('member-form'), dialog = $('content-dialog');
@@ -10,7 +11,7 @@ const labels = { announcement: '公告', document: '公開文件', draft: '草�
 let client, member, sessionUser, contents = [], editing = null, dirty = false, saving = false, generation = 0;
 let draftStore = null, recoverableDraft = null;
 const categories = {
-    announcement: ['學生會公告', '校園活動', '學生權益', '行政公告'],
+    announcement: ['學生會公告', '校園活動', '學生權益', '行政公告', '緊急通告'],
     document: ['會議紀錄', '組織章程', '預算決算', '行政文件'],
 };
 for (const [value, { label }] of Object.entries(departments)) {
@@ -34,7 +35,7 @@ function element(tag, text, className) {
 }
 function field(name) { return form.elements.namedItem(name); }
 function categoryValue() { return field('category').value === '__custom__' ? $('custom-category').value : field('category').value; }
-function editorValues() { return { ...Object.fromEntries(new FormData(form)), category: categoryValue(), show_on_home:field('show_on_home').checked }; }
+function editorValues() { return { ...Object.fromEntries(new FormData(form)), category: categoryValue(), show_on_home:field('show_on_home').checked, is_urgent:field('is_urgent').checked, urgent_until:field('urgent_until').value }; }
 function setCategories(kind, value = categories[kind][0]) {
     field('category').replaceChildren(...categories[kind].map(text => new Option(text, text)), new Option('其他（自行輸入）', '__custom__'));
     const custom = !categories[kind].includes(value);
@@ -48,6 +49,7 @@ function saveLocalDraft() {
     if ($('draft-status').textContent !== message) notice('draft-status', message, saved ? '' : 'error');
 }
 function displayError(error) {
+    if (['42703', 'PGRST204'].includes(error?.code) && /is_urgent|urgent_until/.test(error.message || '')) return '緊急通告尚未啟用。請管理員在 Supabase 執行 003_urgent_notices.sql；目前的編輯文字仍保留。';
     if (['42703', 'PGRST204'].includes(error?.code)) return '發布位置設定尚未啟用。請管理員在 Supabase 執行 002_publication_locations.sql；目前的編輯文字仍保留。';
     if (error?.code === '42501') return '目前帳號沒有這項操作權限。若權限剛有異動，請重新登入。';
     if (error?.code === '23514' && error.message?.includes('administrator')) return '必須保留至少一位啟用中的管理員。請先授權另一位管理員，再調整此帳號。';
@@ -110,6 +112,7 @@ async function enterSession(session) {
         $('identity').textContent = `${member.email} · ${labels[member.role]}`;
         $('new-content').disabled = !mayEdit(member, 'announcement') && !mayEdit(member, 'document');
         $('new-minutes').disabled = !mayEdit(member, 'document');
+        $('new-urgent').disabled = !mayEdit(member, 'announcement');
         for (const panel of ['members-panel', 'audit-panel']) {
             document.querySelector(`[data-panel="${panel}"]`).hidden = member.role !== 'admin';
             $(panel).hidden = true;
@@ -228,6 +231,7 @@ function renderContent() {
         const row = element('article', undefined, 'content-row');
         const status = element('div');
         status.append(element('span', labels[item.status], `badge ${item.status}`));
+        if (item.is_urgent) status.append(element('span', activeUrgent(item) ? '緊急提示中' : item.status === 'draft' ? '緊急草稿' : '緊急提示已結束', 'badge urgent'));
         const body = element('div');
         body.append(element('p', `${departments[item.department].label} · ${labels[item.kind]} · ${item.category} · ${item.date}`, 'muted'), element('h3', item.title));
         const readonly = item.status === 'published' && !mayPublish(member);
@@ -242,6 +246,7 @@ for (const id of ['content-search', 'content-kind', 'content-status', 'content-d
 $('refresh-content').addEventListener('click', loadContent);
 $('new-content').addEventListener('click', () => openEditor());
 $('new-minutes').addEventListener('click', () => openEditor(null, { kind:'document',department:'docs',category:'會議紀錄' }));
+$('new-urgent').addEventListener('click', () => openEditor(null, { kind:'announcement',department:'union',category:'緊急通告',is_urgent:true }));
 
 function updatePreview() {
     $('preview-title').textContent = field('title').value || '尚未填寫標題';
@@ -252,6 +257,14 @@ function updatePreview() {
     $('preview-link').hidden = !url;
     if (url) $('preview-link').href = url; else $('preview-link').removeAttribute('href');
     const documentKind = field('kind').value === 'document';
+    $('urgency-settings').hidden = documentKind;
+    if (documentKind) field('is_urgent').checked = false;
+    const urgent = field('is_urgent').checked;
+    field('is_urgent').disabled = $('save-content').hidden || documentKind;
+    field('urgent_until').disabled = $('save-content').hidden || !urgent;
+    field('urgent_until').required = urgent;
+    $('urgent-deadline-row').hidden = !urgent;
+    if (urgent && field('urgent_until').value) $('preview-meta').textContent += ` · 全站緊急提示至 ${field('urgent_until').value.replace('T',' ')}（台灣時間）`;
     field('url').required = documentKind && !field('body').value.trim();
     $('body-label').textContent = documentKind ? '文件內文／會議紀錄（可直接輸入）' : '公告內文（選填）';
     $('url-label').textContent = documentKind ? '文件連結（已輸入內文時可不填）' : '相關連結（選填）';
@@ -261,6 +274,7 @@ function updatePreview() {
     if (field('department').value !== 'union' && !(documentKind && field('department').value === 'docs')) destinations.push(departments[field('department').value].label);
     if (documentKind) destinations.push('公開文件庫');
     if (field('show_on_home').checked) destinations.push('首頁最新消息');
+    if (urgent) destinations.push('全站頂端緊急通告');
     const hint = `設為「已發布」後顯示於：${destinations.join('、')}。`;
     if ($('publication-hint').textContent !== hint) $('publication-hint').textContent = hint;
     const custom = field('category').value === '__custom__';
@@ -281,6 +295,8 @@ function openEditor(item = null, defaults = {}) {
     field('kind').value = item?.kind || defaults.kind || (mayEdit(member, 'announcement') ? 'announcement' : 'document');
     field('department').value = item?.department || defaults.department || (field('kind').value === 'document' ? 'docs' : 'union');
     field('show_on_home').checked = item?.show_on_home ?? true;
+    field('is_urgent').checked = item?.is_urgent ?? defaults.is_urgent ?? false;
+    field('urgent_until').value = item?.urgent_until ? taipeiInput(item.urgent_until) : taipeiInput(Date.now() + 24 * 3600000);
     for (const option of field('kind').options) option.disabled = !mayEdit(member, option.value);
     for (const option of field('status').options) option.disabled = option.value === 'published' && !mayPublish(member);
     if (item) {
@@ -310,13 +326,16 @@ field('kind').addEventListener('change', () => {
     const isPreset = Object.values(categories).flat().includes(previous);
     setCategories(field('kind').value, isPreset ? categories[field('kind').value][0] : previous);
 });
+field('is_urgent').addEventListener('change', () => {
+    if (field('is_urgent').checked && !field('urgent_until').value) field('urgent_until').value = taipeiInput(Date.now() + 24 * 3600000);
+});
 form.addEventListener('input', () => { dirty = true; updatePreview(); saveLocalDraft(); });
 form.addEventListener('change', () => { dirty = true; updatePreview(); saveLocalDraft(); });
 $('restore-draft').addEventListener('click', () => {
     if (!recoverableDraft || !mayEdit(member, recoverableDraft.values.kind)) return;
     const draft = recoverableDraft;
     for (const [key, value] of Object.entries(draft.values)) {
-        if (key === 'show_on_home') field(key).checked = value;
+        if (key === 'show_on_home' || key === 'is_urgent') field(key).checked = value;
         else if (key !== 'category') field(key).value = value;
     }
     setCategories(draft.values.kind, draft.values.category);
@@ -355,7 +374,8 @@ form.addEventListener('submit', async event => {
         item = validateContent(editorValues());
         if (!mayEdit(member, item.kind) || (item.status === 'published' && !mayPublish(member))) throw new Error('你目前沒有編輯或發布這項內容的權限。');
     } catch (error) { notice('editor-status', error.message, 'error'); return; }
-    if (item.status === 'published' && !confirm('儲存後，這份內容會立即公開在官網。確定發布嗎？')) return;
+    const confirmation = item.is_urgent ? `這則緊急通告將顯示於全站頂端，提示至 ${urgentTimeLabel(item.urgent_until)}（台灣時間）。確定發布嗎？` : '儲存後，這份內容會立即公開在官網。確定發布嗎？';
+    if (item.status === 'published' && !confirm(confirmation)) return;
     const current = generation, localDraftStore = draftStore, draftId = editing?.id;
     const enabledControls = [...form.elements].filter(control => !control.disabled);
     saving = true;
@@ -363,7 +383,10 @@ form.addEventListener('submit', async event => {
     notice('editor-status', '正在儲存…');
     try {
         let query = client.from('content');
-        query = editing ? query.update(item).eq('id', editing.id).eq('version', editing.version) : query.insert(item);
+        // Ordinary saves remain usable before the additive urgent-notice migration is installed.
+        const payload = { ...item };
+        if (!item.is_urgent && !editing?.is_urgent) { delete payload.is_urgent; delete payload.urgent_until; }
+        query = editing ? query.update(payload).eq('id', editing.id).eq('version', editing.version) : query.insert(payload);
         const { data, error } = await query.select('id').maybeSingle().abortSignal(AbortSignal.timeout(12000));
         if (error) throw error;
         if (!data) {

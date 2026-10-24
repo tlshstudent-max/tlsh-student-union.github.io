@@ -24,6 +24,8 @@ create table public.content (
     category text not null check (length(btrim(category)) between 1 and 60),
     department text not null default 'union' check (department in ('union','president','activities','pr','rights','design','docs','general')),
     show_on_home boolean not null default true,
+    is_urgent boolean not null default false,
+    urgent_until timestamptz,
     date date not null check (date >= '1900-01-01' and date <= '9999-12-31'),
     academic_year text not null default '' check (length(academic_year) <= 20),
     url text check (url is null or (length(url) <= 2048 and url ~ '^https://[^[:space:]@/?#]+([/?#][^[:space:]]*)?$')),
@@ -31,10 +33,12 @@ create table public.content (
     version integer not null default 1,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
-    constraint content_document_source_check check (kind <> 'document' or url is not null or length(btrim(body)) > 0)
+    constraint content_document_source_check check (kind <> 'document' or url is not null or length(btrim(body)) > 0),
+    constraint content_urgent_notice_check check (not is_urgent or (kind = 'announcement' and urgent_until is not null and isfinite(urgent_until)))
 );
 create index content_public_listing on public.content (kind, status, date desc);
 create index content_department_listing on public.content (department, status, date desc);
+create index content_urgent_listing on public.content (status, is_urgent, urgent_until);
 
 create table public.audit_log (
     id bigint generated always as identity primary key,
@@ -157,8 +161,8 @@ using (private.is_admin());
 revoke all on public.staff_members, public.content, public.audit_log from anon, authenticated;
 grant select on public.content to anon, authenticated;
 grant select on public.staff_members, public.audit_log to authenticated;
-grant insert (kind, title, summary, body, category, department, show_on_home, date, academic_year, url, status),
-      update (kind, title, summary, body, category, department, show_on_home, date, academic_year, url, status)
+grant insert (kind, title, summary, body, category, department, show_on_home, is_urgent, urgent_until, date, academic_year, url, status),
+      update (kind, title, summary, body, category, department, show_on_home, is_urgent, urgent_until, date, academic_year, url, status)
 on public.content to authenticated;
 
 revoke all on function private.is_admin(), private.can_edit(text), private.can_publish(),

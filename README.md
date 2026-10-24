@@ -39,6 +39,7 @@
 * **公告與文件更新**：從 [幹部工作台](https://tlshstudent-max.github.io/tlsh-student-union.github.io/admin/) 新增內容，先存草稿確認，再將狀態改為「已發布」。發布後重新整理官網即可讀取。
 * **部門發布**：在「發布位置」選公關組、學權組等部門，可另外勾選是否列在首頁；類別不再決定新內容的發布位置。
 * **會議紀錄**：按「新增會議紀錄」，直接輸入紀錄內文或貼上文件連結。已發布文件都會收錄在公開文件庫，之後可從原項目編輯更新。
+* **緊急通告**：後台可設定台灣時間的結束時間，發布後顯示於全站頂端；可收合，更新後重新展開，到期自動移除提示並保留原公告。既有專案先執行 [003 緊急通告更新](supabase/migrations/003_urgent_notices.sql)，不需新增付費服務。
 * **已有專案升級**：先在 Supabase 執行 [002 發布位置更新](supabase/migrations/002_publication_locations.sql)，再部署這次程式，保留原資料及權限。
 * **成員授權**：管理員在工作台的「成員與權限」新增或停用幹部，並分配公告、文件及發布權限。
 * **舊資料備份**：[原公開資料試算表](https://docs.google.com/spreadsheets/d/1SBd3jZVA38dv0TSuS-LyKIsSzmGWI9Zyo_7zH5pDNPU/edit) 保留作為搬移前備份，不會與後台雙向同步。

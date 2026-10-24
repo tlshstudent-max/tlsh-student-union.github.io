@@ -62,6 +62,9 @@
 #view-published { margin-bottom: 12px; }
 #view-location { margin-bottom: 12px; }
 .department-filter { max-width: 360px; margin: 0 0 20px; }
+.button-urgent { color: #ffd8c7; border-color: #a06450; background: #39251e; }
+.badge.urgent { color: #ffd8c7; border-color: #a06450; margin-left: 6px; }
+#urgent-deadline-row { margin-top: 12px; }
 #publication-hint { margin: 0; }
 .admin-page .publication-field { margin: 0; min-width: 0; }
 .publication-field > p { margin: 0 0 12px; }
