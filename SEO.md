@@ -4,6 +4,9 @@
 
 ## Google 搜尋結果
 
+- 要改善目前搜尋結果中的主機名稱與小圈圈圖示，需要在 `https://tlshstudent-max.github.io/` 提供可抓取的品牌首頁，而不只是修改子目錄內的官網。已提供 `node scripts/prepare-search-home.mjs`：會產生獨立部署套件，包含正式會標、96px favicon、網站名稱結構化資料、官網介紹、robots 與 sitemap；執行後會印出套件資料夾位置，也可指定全新的空資料夾作為第二個參數。
+- 將套件放入同一帳號的 **`tlshstudent-max.github.io`** 公開儲存庫最外層，再設定 Pages 從 `main` 的 `/ (root)` 發布。這是品牌與快速查詢入口，連到現在的官網，並不搬動官網或改變登入回呼。原專案只合併產生器程式，不會自動建立或發布根網址網站。若根網址已有其他網站，先協調根首頁品牌，勿覆蓋。
+- 根網址部署後，選擇 Search Console 的「網址前置字元」資源 `https://tlshstudent-max.github.io/`，完成驗證並提交根網址的 `sitemap.xml`，對根首頁與目前官網首頁請求重新建立索引。GitHub Pages 使用者通常無法用 DNS 驗證 `github.io` 的「網域」資源。套件會保留原官網公開驗證標記；標記存在不代表新資源已經驗證。
 - Google 可自行改寫標題、網站名稱與摘要。上線不代表搜尋結果會立即改變，也無法保證顯示縮圖。
 - 首頁可見介紹與 meta description 都直接說明官網用途。部門導覽使用 `data-nosnippet`，讓這份導覽清單不成為 Google 的搜尋摘要；導覽連結仍可正常使用及被探索。這個設定需要 Google 重新抓取，且不保證採用指定描述。參考：[Google 摘要控制](https://developers.google.com/search/docs/appearance/snippet)。
 - Google 的「網站名稱」以網域或子網域為單位，不支援本專案使用的 `/tlsh-student-union.github.io/` 子目錄。此處的品牌資料仍有助辨識頁面，但無法保證取代搜尋結果中的「GitHub Pages documentation」。參考：[Google 網站名稱說明](https://developers.google.com/search/docs/appearance/site-names)。

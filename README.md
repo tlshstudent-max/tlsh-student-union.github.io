@@ -8,6 +8,7 @@
 - 完整設定、資料搬移、測試及交接：[SETUP.md](SETUP.md)。
 - 日常公告、活動、文件發布與草稿回復：[CONTENT-GUIDE.md](CONTENT-GUIDE.md)。
 - 搜尋結果、分享圖片與外觀設定：[SEO.md](SEO.md)，含 GitHub Pages 子路徑與動態公告的搜尋限制。
+- 搜尋小圖示與網站名稱：執行 `node scripts/prepare-search-home.mjs` 產生根網址品牌首頁套件，部署到 `tlshstudent-max.github.io` 儲存庫；原官網與登入網址不需搬動。完整發布及 Search Console 步驟見套件內的 README。
 - 第一次啟用免費後台：[START-HERE.md](START-HERE.md)，含單次初始化與第一位管理員設定。
 - 本機開發：`npm ci`、`npm run build`、`npm run dev`。
 - 自動驗證：`npm test`；瀏覽器流程：`npm run test:browser`。
