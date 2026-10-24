@@ -73,6 +73,8 @@
     <script type="module" src="navigation.js?v=identity-1"></script>
     <link rel="stylesheet" href="theme.css?v=identity-1">
     <link rel="stylesheet" href="glass.css?v=glass-1">
+    <link rel="stylesheet" href="glass-orb.css?v=orb-1">
+    <script type="module" src="glass-orb.js?v=orb-1"></script>
 </head>
 <body class="home-page">
     <a class="skip-link" href="#main-content">跳至主要內容</a>
@@ -90,8 +92,12 @@
             <p class="hero-note">公開資訊，免登入就能閱讀。</p>
         </div>
         <div class="hero-identity">
-            <img class="hero-logo" src="assets/union-logo.jpg" alt="斗六高中學生會正式會標" width="939" height="939" srcset="assets/union-logo-192.png 192w, assets/union-logo.jpg 939w" sizes="(max-width: 820px) 36px, (max-width: 1354px) 26vw, 352px" fetchpriority="high" decoding="async">
-            <p class="hero-brand-caption">TLSH STUDENT UNION</p>
+            <div class="orb-stage" id="glass-orb">
+                <img class="hero-logo orb-fallback" src="assets/union-logo.jpg" alt="斗六高中學生會正式會標" width="939" height="939" srcset="assets/union-logo-192.png 192w, assets/union-logo.jpg 939w" sizes="(max-width: 820px) 36px, (max-width: 1354px) 26vw, 352px" fetchpriority="high" decoding="async" draggable="false">
+                <canvas class="orb-canvas" aria-hidden="true" hidden></canvas>
+            </div>
+            <div class="orb-controls"><p id="orb-help" class="hero-brand-caption">TLSH STUDENT UNION</p><button id="orb-reset" class="orb-reset" type="button" hidden>回正 <span aria-hidden="true">↺</span></button></div>
+            <p id="orb-status" class="orb-status" role="status" aria-live="polite"></p>
         </div>
         <aside class="hero-directory" aria-label="常用服務">
             <p class="eyebrow">為同學，從這裡開始</p>
