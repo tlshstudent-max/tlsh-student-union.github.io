@@ -1153,3 +1153,102 @@ test('copy denial provides a selected manual link and unavailable content offers
     await expect(page.locator('#article-status')).toContainText('未公開');
     await expect(page.getByRole('button',{name:'複製連結',exact:true})).toBeHidden();
 });
+
+test('appearance persists across navigation and reloads without changing authentication storage',async({page})=>{
+    await backend(page);
+    await page.goto('/');await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+    await page.getByRole('button',{name:'切換為白色版',exact:true}).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+    expect(await page.evaluate(()=>localStorage.getItem('tlsh-appearance'))).toBe('light');
+    expect(await page.locator('meta[name="theme-color"]').getAttribute('content')).toBe('#f7f7f4');
+    await page.getByRole('link',{name:'公開文件',exact:true}).first().click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+    await page.reload();await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+    expect(await page.evaluate(()=>Boolean(localStorage.getItem('sb-school-auth-token')))).toBe(true);
+    await page.getByRole('button',{name:'切換為黑金版',exact:true}).focus();await page.keyboard.press('Enter');
+    await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+    await page.reload();await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+});
+
+test('appearance still switches when browser storage is unavailable',async({page})=>{
+    const errors=[];page.on('pageerror',e=>errors.push(e.message));
+    await page.addInitScript(()=>{
+        const get=Storage.prototype.getItem,set=Storage.prototype.setItem;
+        Storage.prototype.getItem=function(key){if(key==='tlsh-appearance')throw new Error('blocked');return get.call(this,key);};
+        Storage.prototype.setItem=function(key,value){if(key==='tlsh-appearance')throw new Error('blocked');return set.call(this,key,value);};
+    });
+    await page.goto('/');await page.getByRole('button',{name:'切換為白色版',exact:true}).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+    await page.getByRole('button',{name:'切換為黑金版',exact:true}).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+    expect(errors).toEqual([]);
+});
+
+test('white appearance covers every public page and editor with readable controls',async({page},testInfo)=>{
+    const mock=await backend(page);
+    mock.setContents([{...article,status:'published'},{...article,id:'12345678-1234-4234-8234-123456789abd',kind:'document',body:'公開會議紀錄',status:'published'}, {...article,id:'12345678-1234-4234-8234-123456789abe',title:'緊急測試',status:'published',is_urgent:true,urgent_until:new Date(Date.now()+86400000).toISOString()}]);
+    await page.addInitScript(()=>localStorage.setItem('tlsh-appearance','light'));
+    for(const width of [390,1440]) {
+        await page.setViewportSize({width,height:900});
+        for(const path of ['/','/activities/','/pr/','/rights/','/design/','/general/','/president/','/docs/','/privacy.html',`/announcement.html?id=${id}`,'/admin/']) {
+            await page.goto(path);await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+            await page.locator('.theme-toggle').waitFor();
+            const colors=await page.evaluate(()=>({text:getComputedStyle(document.body).color,bg:getComputedStyle(document.body).backgroundColor,overflow:document.documentElement.scrollWidth>innerWidth}));
+            expect(colors.bg,path).toBe('rgb(247, 247, 244)');
+            expect(contrastRatio(colors.text,colors.bg),path).toBeGreaterThanOrEqual(4.5);
+            expect(colors.overflow,path).toBe(false);
+            for(const selector of ['.card p','.info-card p','.news-card h3','.download-link','.form-privacy','#article-summary','.login-card > p','.antique-quote p']) {
+                for(const element of await page.locator(selector).all()) {
+                    if(!await element.isVisible())continue;
+                    const color=await element.evaluate(e=>getComputedStyle(e).color);
+                    expect(contrastRatio(color,'rgb(255, 255, 255)'),`${path} ${selector}`).toBeGreaterThanOrEqual(4.5);
+                }
+            }
+            if(path==='/')await page.screenshot({path:testInfo.outputPath(`white-home-${width}.png`)});
+        }
+        await page.getByRole('button',{name:'＋ 新增內容'}).click();
+        const title=page.getByLabel('標題',{exact:true});
+        await title.press('Tab');await expect(title).toHaveAttribute('aria-invalid','true');
+        const input=await title.evaluate(e=>({bg:getComputedStyle(e).backgroundColor,border:getComputedStyle(e).borderColor}));
+        expect(contrastRatio(input.border,input.bg)).toBeGreaterThanOrEqual(3);
+        const error=await page.locator('#content-error-title').evaluate(e=>getComputedStyle(e).color);
+        expect(contrastRatio(error,'rgb(247, 247, 242)')).toBeGreaterThanOrEqual(4.5);
+        await title.fill('預覽用公告');
+        const control=await title.evaluate(e=>({text:getComputedStyle(e).color,bg:getComputedStyle(e).backgroundColor,border:getComputedStyle(e).borderColor}));
+        expect(contrastRatio(control.text,control.bg)).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(control.border,control.bg)).toBeGreaterThanOrEqual(3);
+        await page.screenshot({path:testInfo.outputPath(`white-editor-${width}.png`)});
+    }
+});
+
+test('white appearance supports larger text and contrast or transparency preferences',async({page})=>{
+    await backend(page);await page.addInitScript(()=>localStorage.setItem('tlsh-appearance','light'));
+    await page.setViewportSize({width:320,height:900});
+    for(const path of ['/','/docs/','/president/','/admin/']) {
+        await page.goto(path);await page.locator('.theme-toggle').waitFor();
+        await page.addStyleTag({content:'html { font-size:200% !important; }'});
+        expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),path).toBe(true);
+        const size=await page.locator('.theme-toggle').boundingBox();expect(size.height).toBeGreaterThanOrEqual(44);expect(size.width).toBeGreaterThanOrEqual(44);
+    }
+    const cdp=await page.context().newCDPSession(page);
+    await cdp.send('Emulation.setEmulatedMedia',{features:[{name:'prefers-contrast',value:'more'},{name:'prefers-reduced-motion',value:'reduce'},{name:'prefers-reduced-transparency',value:'reduce'}]});
+    await expect.poll(()=>page.locator('.sitebar').evaluate(e=>getComputedStyle(e).backdropFilter)).toBe('none');
+    const styles=await page.locator('.sitebar').evaluate(e=>({border:getComputedStyle(e).borderBottomColor,bg:getComputedStyle(e).backgroundColor,blur:getComputedStyle(e).backdropFilter}));
+    expect(styles.blur).toBe('none');expect(contrastRatio(styles.border,styles.bg)).toBeGreaterThanOrEqual(3);
+    await page.getByRole('button',{name:'切換為黑金版',exact:true}).click();
+    expect(await page.locator('body').evaluate(e=>getComputedStyle(e).transitionDuration.split(',').every(value=>parseFloat(value)<=.00001))).toBe(true);
+});
+
+test('published articles get clean metadata and unavailable content is excluded after loading',async({page})=>{
+    const mock=await backend(page);mock.setContents([{...article,title:'<script>無法執行</script>',status:'published'}]);
+    await page.goto(`/announcement.html?id=${id}&utm_source=chat#unused`);
+    await expect(page.locator('#article-title')).toHaveText('<script>無法執行</script>');
+    expect(await page.locator('link[rel=canonical]').getAttribute('href')).toBe(`https://tlshstudent-max.github.io/tlsh-student-union.github.io/announcement.html?id=${id}`);
+    expect(await page.locator('meta[name=robots]').getAttribute('content')).toContain('index, follow');
+    expect(await page.locator('meta[name=description]').getAttribute('content')).toBe(article.summary);
+    const data=JSON.parse(await page.locator('script[type="application/ld+json"]').textContent());
+    expect(data.headline).toBe('<script>無法執行</script>');
+    mock.setContents([]);await page.reload();await expect(page.locator('#article-status')).toContainText('未公開');
+    expect(await page.locator('meta[name=robots]').getAttribute('content')).toBe('noindex, follow');
+    await expect(page.locator('link[rel=canonical]')).toHaveCount(0);
+});
