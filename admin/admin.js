@@ -1,10 +1,17 @@
 import { getClient, isConfigured } from '../backend.js';
 import { validateContent, mayEdit, mayPublish, safeHttpsUrl } from '../lib/content.js';
+import { createDraftStore } from '../lib/drafts.js';
+import { siteConfig } from '../site-config.js';
 
 const $ = id => document.getElementById(id);
 const form = $('content-form'), memberForm = $('member-form'), dialog = $('content-dialog');
 const labels = { announcement: '公告', document: '公開文件', draft: '草稿', published: '已發布', archived: '已下架', admin: '管理員', editor: '編輯者' };
 let client, member, sessionUser, contents = [], editing = null, dirty = false, saving = false, generation = 0;
+let draftStore = null, recoverableDraft = null;
+const categories = {
+    announcement: ['學生會公告', '校園活動', '學生權益', '行政公告'],
+    document: ['會議紀錄', '組織章程', '預算決算', '行政文件'],
+};
 
 function notice(id, text, state = '') {
     $(id).textContent = text;
@@ -17,6 +24,20 @@ function element(tag, text, className) {
     return node;
 }
 function field(name) { return form.elements.namedItem(name); }
+function categoryValue() { return field('category').value === '__custom__' ? $('custom-category').value : field('category').value; }
+function editorValues() { return { ...Object.fromEntries(new FormData(form)), category: categoryValue() }; }
+function setCategories(kind, value = categories[kind][0]) {
+    field('category').replaceChildren(...categories[kind].map(text => new Option(text, text)), new Option('其他（自行輸入）', '__custom__'));
+    const custom = !categories[kind].includes(value);
+    field('category').value = custom ? '__custom__' : value;
+    $('custom-category').value = custom ? value : '';
+}
+function saveLocalDraft() {
+    if (!member || !dialog.open || !dirty || saving || $('save-content').hidden) return;
+    const saved = draftStore?.save(editing?.id, editorValues(), editing?.version ?? null);
+    const message = saved ? '已暫存於此瀏覽器，尚未儲存到後台。' : '此瀏覽器目前無法暫存，請按「儲存內容」保留編輯。';
+    if ($('draft-status').textContent !== message) notice('draft-status', message, saved ? '' : 'error');
+}
 function displayError(error) {
     if (error?.code === '42501') return '目前帳號沒有這項操作權限。若權限剛有異動，請重新登入。';
     if (error?.code === '23514' && error.message?.includes('administrator')) return '必須保留至少一位啟用中的管理員。請先授權另一位管理員，再調整此帳號。';
@@ -28,6 +49,7 @@ function displayError(error) {
 function showLogin(message, session = null, state = '') {
     const hasSession = Boolean(session?.user);
     member = null; contents = []; sessionUser = null;
+    draftStore = null; recoverableDraft = null;
     $('dashboard').hidden = true;
     $('login-panel').hidden = false;
     $('google-login').hidden = hasSession;
@@ -72,6 +94,7 @@ async function enterSession(session) {
         if (error) throw error;
         if (!data?.active) { showLogin('這個帳號尚未獲授權，或已停用。請聯絡學生會管理員。', session); return; }
         member = data; sessionUser = session.user;
+        try { draftStore = createDraftStore(localStorage, siteConfig.supabaseUrl, member.email); } catch { draftStore = null; }
         $('login-panel').hidden = true;
         $('dashboard').hidden = false;
         $('identity').textContent = `${member.email} · ${labels[member.role]}`;
@@ -82,6 +105,7 @@ async function enterSession(session) {
         }
         selectPanel('content-panel');
         notice('dashboard-status', '');
+        $('view-published').hidden = true;
         await loadContent();
     } catch (error) {
         if (current === generation) showLogin(displayError(error), session, 'error');
@@ -209,16 +233,21 @@ function updatePreview() {
     $('preview-title').textContent = field('title').value || '尚未填寫標題';
     $('preview-summary').textContent = field('summary').value;
     $('preview-body').textContent = field('body').value;
-    $('preview-meta').textContent = `${field('category').value} · ${field('date').value}`;
+    $('preview-meta').textContent = `${categoryValue()} · ${field('date').value}`;
     const url = safeHttpsUrl(field('url').value);
     $('preview-link').hidden = !url;
     if (url) $('preview-link').href = url; else $('preview-link').removeAttribute('href');
     field('url').required = field('kind').value === 'document';
+    const custom = field('category').value === '__custom__';
+    $('custom-category-row').hidden = !custom;
+    $('custom-category').required = custom;
+    $('custom-category').disabled = !custom || $('save-content').hidden;
+    $('activity-template').hidden = field('kind').value !== 'announcement' || $('save-content').hidden;
 }
 
 function openEditor(item = null) {
     if (!member) return;
-    editing = item; dirty = false; saving = false;
+    editing = item; dirty = false; saving = false; recoverableDraft = null;
     form.reset();
     const readonly = item && (!mayEdit(member, item.kind) || (item.status === 'published' && !mayPublish(member)));
     for (const control of form.elements) control.disabled = Boolean(readonly);
@@ -232,14 +261,51 @@ function openEditor(item = null) {
     } else {
         const now = new Date();
         field('date').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-        field('category').value = field('kind').value === 'document' ? '會議紀錄' : '學生會公告';
     }
+    setCategories(field('kind').value, item?.category || categories[field('kind').value][0]);
     $('editor-heading').textContent = readonly ? '檢視內容' : item ? '編輯內容' : '新增內容';
     notice('editor-status', readonly ? '你目前可編輯草稿；修改或下架已發布內容，需要發布權限。' : '');
+    recoverableDraft = readonly ? null : draftStore?.load(item?.id);
+    $('draft-recovery').hidden = !recoverableDraft;
+    if (recoverableDraft) {
+        const permitted = mayEdit(member, recoverableDraft.values.kind);
+        $('restore-draft').disabled = !permitted;
+        $('draft-recovery-message').textContent = !permitted ? '找到本機暫存，但目前帳號沒有編輯這種類型的權限。'
+            : item && recoverableDraft.version !== item.version ? '找到本機暫存，但後台已有較新版本。回復文字後，儲存時仍會檢查版本衝突。'
+            : `找到 ${new Date(recoverableDraft.savedAt).toLocaleString('zh-TW')} 的本機暫存，可回復尚未儲存的文字。`;
+    }
+    notice('draft-status', readonly ? '' : '編輯中的文字會暫存在此瀏覽器，仍需按「儲存內容」存入後台。');
     updatePreview(); dialog.showModal();
 }
-form.addEventListener('input', () => { dirty = true; updatePreview(); });
-form.addEventListener('change', () => { dirty = true; updatePreview(); });
+field('kind').addEventListener('change', () => {
+    const previous = categoryValue();
+    const isPreset = Object.values(categories).flat().includes(previous);
+    setCategories(field('kind').value, isPreset ? categories[field('kind').value][0] : previous);
+});
+form.addEventListener('input', () => { dirty = true; updatePreview(); saveLocalDraft(); });
+form.addEventListener('change', () => { dirty = true; updatePreview(); saveLocalDraft(); });
+$('restore-draft').addEventListener('click', () => {
+    if (!recoverableDraft || !mayEdit(member, recoverableDraft.values.kind)) return;
+    const draft = recoverableDraft;
+    for (const [key, value] of Object.entries(draft.values)) if (key !== 'category') field(key).value = value;
+    setCategories(draft.values.kind, draft.values.category);
+    if (!mayPublish(member) && field('status').value === 'published') field('status').value = 'draft';
+    if (editing) editing = { ...editing, version: draft.version };
+    recoverableDraft = null; $('draft-recovery').hidden = true;
+    dirty = true; updatePreview(); saveLocalDraft();
+});
+$('discard-draft').addEventListener('click', () => {
+    if (!draftStore?.remove(editing?.id)) { notice('draft-status', '目前無法清除本機暫存，請確認瀏覽器儲存設定。', 'error'); return; }
+    recoverableDraft = null; $('draft-recovery').hidden = true;
+    notice('draft-status', '已捨棄本機暫存，後台內容未變更。');
+});
+$('activity-template').addEventListener('click', () => {
+    if (field('body').value.trim() && !confirm('套用範本會替換目前內文，確定繼續嗎？')) return;
+    setCategories('announcement', '校園活動');
+    field('body').value = '活動時間：\n活動地點：\n參加對象：\n報名方式：\n注意事項：';
+    dirty = true; updatePreview(); saveLocalDraft();
+    notice('editor-status', '請填妥活動時間、地點與報名方式，再發布。活動頁會同步顯示「校園活動」類別的已發布公告。');
+});
 function closeEditor() {
     if (saving) return;
     if (dirty && !confirm('內容尚未儲存，確定要關閉嗎？')) return;
@@ -247,30 +313,49 @@ function closeEditor() {
 }
 $('close-editor').addEventListener('click', closeEditor);
 dialog.addEventListener('cancel', event => { event.preventDefault(); closeEditor(); });
-window.addEventListener('beforeunload', event => { if (dirty) { event.preventDefault(); event.returnValue = ''; } });
+window.addEventListener('beforeunload', event => { if (dirty) { saveLocalDraft(); event.preventDefault(); event.returnValue = ''; } });
 
 form.addEventListener('submit', async event => {
     event.preventDefault();
     if (saving || !member) return;
     let item;
     try {
-        item = validateContent(Object.fromEntries(new FormData(form)));
+        item = validateContent(editorValues());
         if (!mayEdit(member, item.kind) || (item.status === 'published' && !mayPublish(member))) throw new Error('你目前沒有編輯或發布這項內容的權限。');
     } catch (error) { notice('editor-status', error.message, 'error'); return; }
     if (item.status === 'published' && !confirm('儲存後，這份內容會立即公開在官網。確定發布嗎？')) return;
-    saving = true; $('save-content').disabled = true; $('close-editor').disabled = true;
+    const current = generation, localDraftStore = draftStore, draftId = editing?.id;
+    const enabledControls = [...form.elements].filter(control => !control.disabled);
+    saving = true;
+    for (const control of enabledControls) control.disabled = true;
     notice('editor-status', '正在儲存…');
     try {
         let query = client.from('content');
         query = editing ? query.update(item).eq('id', editing.id).eq('version', editing.version) : query.insert(item);
         const { data, error } = await query.select('id').maybeSingle().abortSignal(AbortSignal.timeout(12000));
         if (error) throw error;
-        if (!data) { notice('editor-status', '內容可能已被其他人修改，或你的權限已變更。請保留目前文字，關閉後重新整理再編輯。', 'error'); return; }
+        if (!data) {
+            if (current === generation) notice('editor-status', '內容可能已被其他人修改，或你的權限已變更。請保留目前文字，關閉後重新整理再編輯。', 'error');
+            return;
+        }
+        localDraftStore?.remove(draftId);
+        if (current !== generation) return;
         dirty = false; dialog.close();
         notice('dashboard-status', item.status === 'published' ? '已發布。官網重新載入後即可看見更新。' : item.status === 'archived' ? '已下架，這份內容不再公開。' : '草稿已儲存，尚未公開。', 'success');
+        $('view-published').hidden = item.status !== 'published';
+        if (item.status === 'published') {
+            $('view-published').href = item.kind === 'document' ? item.url : `../announcement.html?id=${encodeURIComponent(data.id)}`;
+            $('view-published').textContent = item.kind === 'document' ? '查看這份文件 ↗' : '查看這則公告 ↗';
+        }
         await loadContent();
-    } catch (error) { notice('editor-status', displayError(error), 'error'); }
-    finally { saving = false; $('save-content').disabled = false; $('close-editor').disabled = false; }
+    } catch (error) { if (current === generation) notice('editor-status', displayError(error), 'error'); }
+    finally {
+        if (current === generation) {
+            saving = false;
+            for (const control of enabledControls) control.disabled = false;
+            updatePreview();
+        }
+    }
 });
 
 async function loadMembers() {

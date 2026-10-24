@@ -51,11 +51,15 @@
 #content-dialog { width: min(850px, calc(100vw - 32px)); max-height: 90dvh; overflow: auto; color: var(--ui-text); background: #141a10; border: 1px solid #7a805a; border-radius: 5px; padding: 30px; }
 #content-dialog::backdrop { background: #000b; backdrop-filter: blur(4px); }
 .editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px; }
+.editor-field { display: grid; gap: 8px; align-content: start; }
 .full-width { grid-column: 1 / -1; }
 .content-preview { padding: 20px; margin-top: 24px; border: 1px solid #414c33; background: #0a1007; overflow-wrap: anywhere; }
 .content-preview summary { cursor: pointer; color: var(--ui-gold); min-height: 30px; }
 .content-preview a { color: var(--ui-gold); }
 .content-preview h3 { font-size: 24px; }
+.draft-recovery { margin-top: 20px; padding: 16px; border: 1px solid #776d42; background: #292616; }
+.draft-recovery p { margin: 0 0 12px; overflow-wrap: anywhere; }
+#view-published { margin-bottom: 12px; }
 @media (max-width: 900px) {
     .login-panel { gap: 35px; }
     .content-filters { grid-template-columns: 1fr 1fr; }

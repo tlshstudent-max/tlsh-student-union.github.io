@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文書組 | 斗六高中學生會</title>
+    <title>公開文件 | 斗六高中學生會</title>
     <meta name="description" content="斗六高中學生會文書組：會議紀錄、組織章程與行政文件公開。">
     <meta name="theme-color" content="#030303">
     <meta name="robots" content="index, follow, max-image-preview:large">
@@ -45,14 +45,15 @@
     <header class="page-header">
         <a href="../index.html" class="back-link">← 返回石澗大廳</a>
         <div class="header-content">
-            <h1>文書組</h1>
-            <p class="motto">行政透明，讓每一份紀錄成為可追溯的歷史</p>
+            <h1>公開文件</h1>
+            <p class="motto">查找會議紀錄、自治法規與行政文件。</p>
         </div>
     </header>
 
     <main id="main-content" class="container">
-        <section class="zen-section">
-            <h2 class="section-title">行政核心</h2>
+        <section class="zen-section document-about">
+            <details>
+            <summary>文書組工作介紹</summary>
             <div class="grid">
                 <div class="card">
                     <h3>會議紀錄</h3>
@@ -67,6 +68,7 @@
                     <p>管理學生會組織章程與各項施行細則，提供同學隨時查閱。</p>
                 </div>
             </div>
+            </details>
         </section>
 
         <section class="archive-section">
@@ -78,30 +80,36 @@
                 <span id="document-count" class="document-count" aria-live="polite"></span>
             </div>
 
-            <div class="archive-controls" aria-label="文件篩選工具">
+            <div id="archive-controls" class="archive-controls" aria-label="文件篩選工具" hidden>
                 <div class="control-group search-group">
                     <label for="document-search">搜尋文件</label>
                     <input id="document-search" type="search" placeholder="輸入名稱、說明或類別" autocomplete="off">
                 </div>
-                <div class="control-group">
-                    <label for="category-filter">文件類別</label>
-                    <select id="category-filter">
-                        <option value="">全部類別</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="year-filter">學年度</label>
-                    <select id="year-filter">
-                        <option value="">全部年度</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="sort-order">排列方式</label>
-                    <select id="sort-order">
-                        <option value="newest">日期：新到舊</option>
-                        <option value="oldest">日期：舊到新</option>
-                    </select>
-                </div>
+                <details id="document-filters" class="document-filters">
+                    <summary>篩選與排序 <span id="active-filter-count"></span></summary>
+                    <div class="archive-filter-grid">
+                        <div class="control-group">
+                            <label for="category-filter">文件類別</label>
+                            <select id="category-filter">
+                                <option value="">全部類別</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="year-filter">學年度</label>
+                            <select id="year-filter">
+                                <option value="">全部年度</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="sort-order">排列方式</label>
+                            <select id="sort-order">
+                                <option value="newest">日期：新到舊</option>
+                                <option value="oldest">日期：舊到新</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="reset-document-filters" class="button button-secondary" type="button">清除搜尋與篩選</button>
+                </details>
             </div>
 
             <div id="archive-status" class="archive-status" role="status" aria-live="polite">

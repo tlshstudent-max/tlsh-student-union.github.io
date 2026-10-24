@@ -56,11 +56,17 @@
                 <div id="fs-status" class="form-status" role="status" aria-live="polite"></div>
 
                 <form id="my-form" class="zen-form" action="https://formspree.io/f/xwvwwloe" method="POST">
-                    <p class="form-privacy">資料由國立斗六高中學生會蒐集，用於處理意見與學生權益事項，原則保存至結案後一學年。稱呼可不填；詳見<a href="../privacy.html">個資告知與隱私權說明</a>。</p>
+                    <p class="form-privacy">資料由國立斗六高中學生會蒐集，用於處理意見與學生權益事項，原則保存至結案後一學年。稱呼與聯絡信箱可不填；詳見<a href="../privacy.html">個資告知與隱私權說明</a>。</p>
+                    <p class="form-privacy">匿名意見同樣受理。若希望收到個別回覆，可留下聯絡信箱；實際處理時間依案件情況與必要的校方協調而定。</p>
                     <input type="hidden" name="_subject" value="斗六高中學生會網站｜意見回饋">
                     <div class="honeypot" aria-hidden="true">
                         <label for="feedback-website">網站</label>
                         <input id="feedback-website" type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="feedback-email">聯絡信箱（選填，供本案回覆）</label>
+                        <input id="feedback-email" type="email" name="email" maxlength="254" autocomplete="email" placeholder="希望收到回覆時再填寫">
                     </div>
                     <div class="form-group">
                         <label for="feedback-name">如何稱呼您？（選填，可匿名）</label>

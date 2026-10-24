@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>活動組 | 斗六高中學生會</title>
+    <title>校園活動 | 斗六高中學生會</title>
     <meta name="description" content="斗六高中學生會活動組：校園活動、企劃成果與近期活動資訊。">
     <meta name="theme-color" content="#030303">
     <meta name="robots" content="index, follow, max-image-preview:large">
@@ -27,35 +27,29 @@
     <header class="page-header">
         <a href="../index.html" class="back-link">← 返回大廳</a>
         <div class="header-content">
-            <h1>活動組</h1>
-            <p class="motto">創造校園共同回憶，點燃青春火花</p>
+            <h1>校園活動</h1>
+            <p class="motto">時間、地點與參加方式，從這裡查詢。</p>
         </div>
     </header>
 
     <main id="main-content" class="container">
         <section class="zen-section">
             <h2 class="section-title">近期活動</h2>
-            <div class="grid">
-                <div class="card">
-                    <h3>年度舞會</h3>
-                    <p>燈光與音樂交織的夜晚，我們在石澗中起舞。</p>
-                </div>
-                <div class="card">
-                    <h3>校慶園遊會</h3>
-                    <p>攤位設計與創意競賽，展現斗中活力。</p>
-                </div>
-            </div>
+            <p id="activity-status" class="sync-status" role="status" aria-live="polite">正在讀取活動公告…</p>
+            <div id="activity-list" class="news-grid" aria-busy="true"></div>
+            <noscript><p>啟用 JavaScript 即可讀取正式活動公告，或寄信詢問學生會。</p></noscript>
         </section>
 
         <section class="zen-section">
-            <h2 class="section-title">組員名單與職掌</h2>
+            <h2 class="section-title">參加前，先確認</h2>
             <div class="card" style="width: 100%;">
-                <p>活動組致力於豐富同學的課後生活。目前內容正在由活動部長整理中，敬請期待更多的照片展示！</p>
+                <p>請確認正式公告中的活動時間、地點、參加對象與報名方式。活動資訊若有調整，以最新公告為準；有疑問可寄信至 <a href="mailto:tlsh.student@gmail.com">tlsh.student@gmail.com</a>。</p>
             </div>
         </section>
     </main>
 
     <footer>&copy; 2026 國立斗六高級中學學生會 · <a href="../privacy.html">隱私權說明</a></footer>
     <script src="../main.js?v=20260729"></script>
+    <script type="module" src="activities.js"></script>
 </body>
 </html>

@@ -24,6 +24,7 @@
         <section id="dashboard" hidden>
             <div class="workspace-heading"><div><p class="eyebrow">STAFF WORKSPACE</p><h1>幹部工作台</h1><p id="identity"></p></div><div class="heading-actions"><a class="button button-secondary" href="../index.html" target="_blank" rel="noopener">查看官網 ↗</a><button id="signout" class="button button-secondary">登出</button></div></div>
             <p id="dashboard-status" class="notice" role="status" aria-live="polite"></p>
+            <a id="view-published" class="button button-secondary" target="_blank" rel="noopener noreferrer" hidden>查看這則公告 ↗</a>
             <nav class="workspace-tabs" aria-label="工作台功能"><button class="tab active" data-panel="content-panel" aria-current="page">內容管理</button><button class="tab" data-panel="members-panel" hidden>成員與權限</button><button class="tab" data-panel="audit-panel" hidden>修改紀錄</button></nav>
 
             <section id="content-panel" class="workspace-panel" aria-labelledby="content-heading">
@@ -46,8 +47,25 @@
     <dialog id="content-dialog" aria-labelledby="editor-heading">
         <form id="content-form">
             <div class="panel-heading"><div><p class="eyebrow">CONTENT EDITOR</p><h2 id="editor-heading">新增內容</h2></div><button id="close-editor" type="button" class="button button-secondary">關閉</button></div>
-            <div class="editor-grid"><label>內容類型<select name="kind"><option value="announcement">公告</option><option value="document">公開文件</option></select></label><label>顯示日期<input name="date" type="date" min="1900-01-01" max="9999-12-31" required></label><label class="full-width">標題<input name="title" required maxlength="160" placeholder="讓同學一眼看懂這則消息"></label><label>類別<input name="category" required maxlength="60" placeholder="例如：學生會公告、會議紀錄"></label><label>學年度（文件適用）<input name="academic_year" maxlength="20" placeholder="例如：115"></label><label class="full-width">摘要<textarea name="summary" rows="3" maxlength="500" placeholder="簡單說明重點，最多 500 字"></textarea></label><label class="full-width">公告內文（選填）<textarea name="body" rows="8" maxlength="20000" placeholder="活動時間、地點、參加方式或完整說明。以純文字呈現，支援換行。"></textarea></label><label class="full-width">相關連結（公開文件必填）<input name="url" type="url" pattern="https://.*" maxlength="2048" placeholder="https://"></label><label>內容狀態<select name="status"><option value="draft">草稿 · 尚未公開</option><option value="published">已發布 · 立即公開</option><option value="archived">已下架 · 停止公開</option></select></label></div>
+            <div id="draft-recovery" class="draft-recovery" hidden>
+                <p id="draft-recovery-message"></p>
+                <div class="form-actions"><button id="restore-draft" type="button" class="button button-secondary">回復暫存</button><button id="discard-draft" type="button" class="button button-secondary">捨棄暫存</button></div>
+            </div>
+            <div class="editor-grid">
+                <label>內容類型<select name="kind"><option value="announcement">公告</option><option value="document">公開文件</option></select></label>
+                <label>顯示日期<input name="date" type="date" min="1900-01-01" max="9999-12-31" required></label>
+                <label class="full-width">標題<input name="title" required maxlength="160" placeholder="讓同學一眼看懂這則消息"></label>
+                <div class="editor-field"><label for="content-category">類別</label><select id="content-category" name="category" required><option value="學生會公告">學生會公告</option></select></div>
+                <label>學年度（文件適用）<input name="academic_year" maxlength="20" placeholder="例如：115"></label>
+                <label id="custom-category-row" class="full-width" hidden>自訂類別<input id="custom-category" maxlength="60" placeholder="輸入常用選項以外的類別" disabled></label>
+                <label class="full-width">摘要<textarea name="summary" rows="3" maxlength="500" placeholder="簡單說明重點，最多 500 字"></textarea></label>
+                <button id="activity-template" type="button" class="button button-secondary full-width">套用活動範本</button>
+                <label class="full-width">公告內文（選填）<textarea name="body" rows="8" maxlength="20000" placeholder="活動時間、地點、參加方式或完整說明。以純文字呈現，支援換行。"></textarea></label>
+                <label class="full-width">相關連結（公開文件必填）<input name="url" type="url" pattern="https://.*" maxlength="2048" placeholder="https://"></label>
+                <label>內容狀態<select name="status"><option value="draft">草稿 · 尚未公開</option><option value="published">已發布 · 立即公開</option><option value="archived">已下架 · 停止公開</option></select></label>
+            </div>
             <details class="content-preview"><summary>預覽公開內容</summary><p id="preview-meta" class="eyebrow"></p><h3 id="preview-title"></h3><p id="preview-summary"></p><div id="preview-body" class="article-body"></div><a id="preview-link" target="_blank" rel="noopener noreferrer" hidden>開啟相關連結 ↗</a></details>
+            <p id="draft-status" class="notice" role="status" aria-live="polite"></p>
             <p id="editor-status" class="notice" role="status" aria-live="polite"></p><div class="form-actions"><button id="save-content" type="submit" class="button button-primary">儲存內容</button><span class="muted">只有「已發布」的內容會出現在官網。</span></div>
         </form>
     </dialog>
