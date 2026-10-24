@@ -86,3 +86,30 @@ test('the sphere sleeps while idle and after it leaves the viewport',async({page
     const sleeping=await page.evaluate(()=>window.testOrbDraws);await page.waitForTimeout(160);
     expect(await page.evaluate(()=>window.testOrbDraws)).toBe(sleeping);
 });
+
+test('letters have open backgrounds and visible solid depth at an exact side view',async({page},testInfo)=>{
+    await page.emulateMedia({reducedMotion:'reduce'});
+    await page.addInitScript(()=>{
+        const draw=WebGLRenderingContext.prototype.drawArrays;
+        WebGLRenderingContext.prototype.drawArrays=function(...args){
+            draw.apply(this,args);
+            const width=this.drawingBufferWidth,height=this.drawingBufferHeight,bytes=new Uint8Array(width*height*4);
+            this.readPixels(0,0,width,height,this.RGBA,this.UNSIGNED_BYTE,bytes);
+            let count=0,min=width,max=0;
+            for(let y=0;y<height;y++)for(let x=0;x<width;x++)if(bytes[(y*width+x)*4+3]>245){count++;min=Math.min(min,x);max=Math.max(max,x);}
+            window.testSolidLetterPixels={count,min,max,width,height};
+        };
+    });
+    await page.goto('/');const orb=page.locator('#glass-orb');await expect(orb).toHaveClass(/orb-ready/);
+    await expect.poll(()=>page.evaluate(()=>window.testSolidLetterPixels?.count||0)).toBeGreaterThan(1000);
+    const front=await page.evaluate(()=>window.testSolidLetterPixels);
+    await page.screenshot({path:testInfo.outputPath('solid-front.png')});
+    expect(front.count/(front.width*front.height)).toBeLessThan(.35);
+    const box=await orb.boundingBox(),x=box.x+box.width*.45,y=box.y+box.height*.5;
+    await page.mouse.move(x,y);await page.mouse.down();await page.mouse.move(x+Math.PI/2/.009,y,{steps:8});await page.mouse.up();
+    await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    const side=await page.evaluate(()=>window.testSolidLetterPixels);
+    expect(side.count).toBeGreaterThan(1000);
+    expect((side.max-side.min)/side.width).toBeGreaterThan(.07);
+    await page.screenshot({path:testInfo.outputPath('solid-side.png')});
+});
