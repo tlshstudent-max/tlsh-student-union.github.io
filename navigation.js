@@ -1,3 +1,5 @@
+import { mountUrgentNotices } from './urgent-banner.js';
+
 const root = new URL('./', import.meta.url);
 const bar = document.createElement('nav');
 bar.className = 'sitebar';
@@ -26,6 +28,7 @@ for (const [label, path] of [['最新消息', '#announcements'], ['校園活動'
 bar.append(brand, links);
 const skipLink = document.querySelector('.skip-link');
 if (skipLink) skipLink.after(bar); else document.body.prepend(bar);
+if (!document.body.classList.contains('admin-page')) mountUrgentNotices(bar);
 const main = document.querySelector('main');
 if (main) main.tabIndex = -1;
 // The original return links remain available when JavaScript is disabled.

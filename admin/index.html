@@ -9,9 +9,9 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../stone-surface.css">
-    <link rel="stylesheet" href="../ui.css">
-    <link rel="stylesheet" href="admin.css?v=department-picker-2">
-    <script type="module" src="../navigation.js"></script>
+    <link rel="stylesheet" href="../ui.css?v=urgent-1">
+    <link rel="stylesheet" href="admin.css?v=urgent-1">
+    <script type="module" src="../navigation.js?v=urgent-1"></script>
 </head>
 <body class="admin-page">
     <a class="skip-link" href="#main-content">跳至主要內容</a>
@@ -29,7 +29,7 @@
             <nav class="workspace-tabs" aria-label="工作台功能"><button class="tab active" data-panel="content-panel" aria-current="page">內容管理</button><button class="tab" data-panel="members-panel" hidden>成員與權限</button><button class="tab" data-panel="audit-panel" hidden>修改紀錄</button></nav>
 
             <section id="content-panel" class="workspace-panel" aria-labelledby="content-heading">
-                <div class="panel-heading"><div><h2 id="content-heading">公告、部門內容與會議紀錄</h2><p>選擇發布位置，先存草稿、確認內容，再讓同學看見。</p></div><div class="heading-actions"><button id="new-content" class="button button-primary">＋ 新增內容</button><button id="new-minutes" class="button button-secondary">新增會議紀錄</button></div></div>
+                <div class="panel-heading"><div><h2 id="content-heading">公告、部門內容與會議紀錄</h2><p>選擇發布位置，先存草稿、確認內容，再讓同學看見。</p></div><div class="heading-actions"><button id="new-content" class="button button-primary">＋ 新增內容</button><button id="new-minutes" class="button button-secondary">新增會議紀錄</button><button id="new-urgent" class="button button-urgent">新增緊急通告</button></div></div>
                 <div class="content-filters"><label>搜尋內容<input id="content-search" type="search" placeholder="輸入標題或類別"></label><label>內容類型<select id="content-kind"><option value="">全部類型</option><option value="announcement">公告</option><option value="document">公開文件</option></select></label><label>發布狀態<select id="content-status"><option value="">全部狀態</option><option value="draft">草稿</option><option value="published">已發布</option><option value="archived">已下架</option></select></label><button id="refresh-content" class="button button-secondary">重新整理</button></div>
                 <label class="department-filter" for="content-department">依發布位置篩選<select id="content-department"><option value="">全部發布位置</option></select></label>
                 <p class="muted">此選單只篩選清單。要設定公告發布到哪個部門，請按「新增內容」或「編輯」，再點選發布位置。</p>
@@ -60,6 +60,7 @@
                 <fieldset class="publication-field full-width" aria-describedby="department-help"><legend>發布位置</legend><p id="department-help" class="muted">點選一個部門，內容會發布在該部門頁面。</p><div id="department-options" class="department-options"></div></fieldset>
                 <label class="check-label full-width"><input name="show_on_home" type="checkbox" checked>同時顯示在首頁最新消息</label>
                 <p id="publication-hint" class="muted full-width" role="status"></p>
+                <fieldset id="urgency-settings" class="full-width"><legend>緊急通告</legend><label class="check-label"><input type="checkbox" name="is_urgent">在全站頂端顯示緊急通告</label><div id="urgent-deadline-row" hidden><label>緊急提示結束時間（台灣時間）<input type="datetime-local" name="urgent_until" min="1900-01-01T00:00" max="9999-12-31T23:59"></label><p class="muted">不受部門與首頁勾選限制，發布後全站可見。到期只移除頂端提示，原公告仍保留；提前結束可取消勾選或下架公告。</p></div></fieldset>
                 <label class="full-width">標題<input name="title" required maxlength="160" placeholder="讓同學一眼看懂這則消息"></label>
                 <div class="editor-field"><label for="content-category">類別</label><select id="content-category" name="category" required><option value="學生會公告">學生會公告</option></select></div>
                 <label>學年度（文件適用）<input name="academic_year" maxlength="20" placeholder="例如：115"></label>
@@ -75,6 +76,6 @@
             <p id="editor-status" class="notice" role="status" aria-live="polite"></p><div class="form-actions"><button id="save-content" type="submit" class="button button-primary">儲存內容</button><span class="muted">只有「已發布」的內容會出現在官網。</span></div>
         </form>
     </dialog>
-    <script type="module" src="admin.js?v=department-picker-2"></script>
+    <script type="module" src="admin.js?v=urgent-1"></script>
 </body>
 </html>

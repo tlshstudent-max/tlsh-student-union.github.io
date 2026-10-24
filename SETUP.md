@@ -4,6 +4,12 @@
 
 日常發布、部門位置、會議紀錄、文件篩選及本機草稿回復見 [幹部操作說明](CONTENT-GUIDE.md)。沿用現有專案與資料表。
 
+## 已有專案：啟用緊急通告
+
+已完成 002 的專案，在 Supabase SQL Editor 貼上並執行 [003_urgent_notices.sql](supabase/migrations/003_urgent_notices.sql)，出現 `Success. No rows returned` 後再合併部署新版。只新增緊急標記、結束時間、限制與索引，沿用原有編輯／發布 RLS 及修改紀錄；不更動舊內容或幹部授權。可重跑，請勿重跑 001／初始化檔。新專案的最新 001 已包含緊急通告欄位。
+
+在尚未執行 003 的過渡期間，一般內容仍可讀寫；緊急提示不顯示，嘗試儲存緊急通告時會提示更新資料庫並保留文字。執行後可按原按鈕重試。
+
 ## 已有專案：升級發布位置與會議紀錄
 
 若先前已完成初始化，在 Supabase SQL Editor 執行 [002_publication_locations.sql](supabase/migrations/002_publication_locations.sql) 一次，再合併部署本次程式；不要重跑初始建表檔。更新新增 `department`、`show_on_home` 及索引，並允許以文件連結或內文發布會議紀錄，保留原有內容、幹部與權限。

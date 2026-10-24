@@ -18,6 +18,7 @@ test('PostgreSQL policies enforce public, editor and administrator boundaries', 
     `);
     await db.exec(await readFile(new URL('../supabase/migrations/001_content_management.sql', import.meta.url), 'utf8'));
     await db.exec(await readFile(new URL('../supabase/migrations/002_publication_locations.sql', import.meta.url), 'utf8'));
+    await db.exec(await readFile(new URL('../supabase/migrations/003_urgent_notices.sql', import.meta.url), 'utf8'));
     await db.exec(`
         insert into staff_members (email, role, edit_announcements, edit_documents, can_publish) values
           ('admin@example.com','admin',true,true,true),
@@ -89,6 +90,26 @@ test('PostgreSQL policies enforce public, editor and administrator boundaries', 
         await db.query("insert into content(kind,title,category,date,department,show_on_home) values ('announcement','公關草稿','公關消息','2026-10-24','pr',false)");
         await as(null);
         assert.equal((await db.query("select title from content where department='pr'")).rows.length,0);
+    });
+    await t.test('urgent notices require valid sources and existing publication rights, including direct API writes',async()=>{
+        await as('editor@example.com');
+        const {rows:[draft]}=await db.query("insert into content(kind,title,category,date,is_urgent,urgent_until) values ('announcement','Urgent draft','緊急通告','2026-10-24',true,now()+interval '1 hour') returning id");
+        await assert.rejects(db.query("update content set status='published' where id=$1",[draft.id]),/row-level/i);
+        await as(null);
+        assert.equal((await db.query('select id from content where is_urgent=true')).rows.length,0);
+        await assert.rejects(db.query("update content set is_urgent=true,urgent_until=now()+interval '1 hour'"),/permission/i);
+        await as('publisher@example.com');
+        await db.query("update content set status='published' where id=$1",[draft.id]);
+        await as(null);
+        assert.equal((await db.query("select id from content where is_urgent and urgent_until>now() and status='published'")).rows[0].id,draft.id);
+        await as('admin@example.com');
+        await assert.rejects(db.query("update content set urgent_until=null where id=$1",[draft.id]),/check constraint/i);
+        await assert.rejects(db.query("update content set urgent_until='infinity' where id=$1",[draft.id]),/check constraint/i);
+        await assert.rejects(db.query("insert into content(kind,title,category,date,body,is_urgent,urgent_until) values ('document','Invalid urgent file','文件','2026-10-24','內文',true,now()+interval '1 hour')"),/check constraint/i);
+        await db.query("update content set urgent_until=now()-interval '1 hour' where id=$1",[draft.id]);
+        await as(null);
+        assert.equal((await db.query("select id from content where is_urgent and urgent_until>now() and status='published'")).rows.length,0);
+        assert.equal((await db.query('select title from content where id=$1',[draft.id])).rows[0].title,'Urgent draft');
     });
     await t.test('admin can authorize staff, database auditing records actor, and last admin remains protected', async () => {
         await as('admin@example.com');

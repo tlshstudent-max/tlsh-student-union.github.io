@@ -1,5 +1,7 @@
 # 免費後台：第一次啟用
 
+**已完成 002 的既有專案要新增緊急通告**：只需在 Supabase SQL Editor 執行 [003_urgent_notices.sql](supabase/migrations/003_urgent_notices.sql)，再部署新版；不要重跑初始化檔。功能沿用原有發布權限，不需新增服務或付費。詳見 [升級說明](SETUP.md#已有專案啟用緊急通告)。
+
 先維持簡單架構：**現有 GitHub Pages 官網＋一個 Supabase Free 專案＋Google 幹部登入**。學生免登入，幹部只有管理員與編輯者兩種角色。管理員擁有全部權限，可授權及停用其他幹部；編輯者按公告、文件及發布權限分工。
 
 **已完成初始化的既有專案**：新增部門發布位置與直接輸入會議紀錄功能時，先在 SQL Editor 執行 [002_publication_locations.sql](supabase/migrations/002_publication_locations.sql)，再部署新版介面。它保留原有內容與幹部，不要重跑初始化檔。日常發布位置及會議紀錄操作見 [CONTENT-GUIDE.md](CONTENT-GUIDE.md)。

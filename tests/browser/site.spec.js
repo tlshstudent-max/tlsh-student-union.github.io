@@ -50,6 +50,8 @@ async function backend(page, member=admin, options={}) {
             if(url.searchParams.get('id')) data=data.filter(x=>x.id===url.searchParams.get('id').slice(3));
             if(url.searchParams.get('department')) data=data.filter(x=>publication(x).department===url.searchParams.get('department').slice(3));
             if(url.searchParams.get('show_on_home')==='eq.true') data=data.filter(x=>publication(x).show_on_home);
+            if(url.searchParams.get('is_urgent')==='eq.true') data=data.filter(x=>x.is_urgent===true);
+            if(url.searchParams.get('urgent_until')?.startsWith('gt.')) data=data.filter(x=>Date.parse(x.urgent_until)>Date.parse(url.searchParams.get('urgent_until').slice(3)));
             return reply(data);
         }
         if(url.pathname==='/rest/v1/rpc/manage_staff') {
@@ -716,4 +718,158 @@ test('a pending schema update preserves editing and explains the required migrat
     upgraded=true;
     await page.locator('#save-content').click();
     await expect(page.locator('#dashboard-status')).toContainText('草稿已儲存');
+});
+
+test('urgent draft can be recovered and published to every page with a Taiwan deadline',async({page})=>{
+    const mock=await backend(page);mock.setContents([]);
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'新增緊急通告',exact:true}).click();
+    await expect(page.getByLabel('在全站頂端顯示緊急通告')).toBeChecked();
+    await expect(page.getByLabel('內容狀態')).toHaveValue('draft');
+    await page.getByLabel('標題',{exact:true}).fill('活動集合地點異動');
+    await page.getByLabel('摘要',{exact:true}).fill('請改至行政大樓前集合。');
+    await page.getByLabel('緊急提示結束時間（台灣時間）',{exact:true}).fill('2099-10-24T18:30');
+    await page.getByRole('radio',{name:'公關組',exact:true}).check();
+    await page.getByLabel('同時顯示在首頁最新消息',{exact:true}).uncheck();
+    await page.reload();
+    await page.getByRole('button',{name:'新增緊急通告',exact:true}).click();
+    await page.getByRole('button',{name:'回復暫存',exact:true}).click();
+    await expect(page.getByLabel('緊急提示結束時間（台灣時間）',{exact:true})).toHaveValue('2099-10-24T18:30');
+    await page.locator('#save-content').click();
+    expect(mock.calls.find(call=>call.method==='POST').body).toMatchObject({is_urgent:true,urgent_until:'2099-10-24T10:30:00.000Z',status:'draft',department:'pr',show_on_home:false});
+    await page.goto('/rights/');
+    await expect(page.getByRole('region',{name:'緊急通告',exact:true})).toBeHidden();
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'編輯',exact:true}).click();
+    await expect(page.getByLabel('緊急提示結束時間（台灣時間）',{exact:true})).toHaveValue('2099-10-24T18:30');
+    await page.getByLabel('內容狀態').selectOption('published');
+    page.once('dialog',async dialog=>{
+        expect(dialog.message()).toContain('全站頂端'); await dialog.accept();
+    });
+    await page.locator('#save-content').click();
+    await expect(page.locator('#dashboard-status')).toContainText('已發布');
+    for(const path of ['/','/rights/','/docs/','/announcement.html?id='+id]) {
+        await page.goto(path);
+        await expect(page.locator('.urgent-title')).toHaveText('活動集合地點異動');
+        await expect(page.locator('.urgent-meta')).toContainText('18:30');
+    }
+    await page.getByRole('link',{name:'查看詳情：活動集合地點異動'}).click();
+    await expect(page.locator('#article-title')).toHaveText('活動集合地點異動');
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'編輯',exact:true}).click();
+    await page.getByLabel('在全站頂端顯示緊急通告').uncheck();
+    page.once('dialog',dialog=>dialog.accept());
+    await page.locator('#save-content').click();
+    await expect(page.locator('#dashboard-status')).toContainText('已發布');
+    expect(mock.calls.filter(call=>call.method==='PATCH').at(-1).body).toMatchObject({is_urgent:false,urgent_until:null});
+    await page.goto('/rights/');
+    await expect(page.getByRole('region',{name:'緊急通告',exact:true})).toBeHidden();
+    await page.goto('/pr/');
+    await expect(page.locator('.department-list h3')).toHaveText('活動集合地點異動');
+});
+
+const urgentFixture=overrides=>({...article,status:'published',is_urgent:true,urgent_until:'2099-10-24T10:30:00.000Z',updated_at:'2026-10-24T04:00:00Z',title:'緊急測試通告',...overrides});
+
+test('urgent notices fit mobile, stay collapsed across pages, and reopen when content changes',async({page},testInfo)=>{
+    const mock=await backend(page);
+    mock.setContents([urgentFixture({title:'<img src=x onerror=alert(1)>緊急異動',summary:'集合地點變更，請查看詳情。'}),urgentFixture({id:'12345678-1234-4234-8234-123456789abd',title:'第二則緊急通告'})]);
+    const banner=page.getByRole('region',{name:'緊急通告',exact:true});
+    for(const width of [320,390,768,1440]) {
+        await page.setViewportSize({width,height:844});await page.goto('/rights/');
+        await expect(banner).toBeVisible();
+        await expect(banner.locator('summary')).toContainText('2 則');
+        expect(await banner.evaluate(node=>node.scrollWidth<=node.clientWidth)).toBe(true);
+        await expect(banner.locator('img')).toHaveCount(0);
+        if(width===390||width===1440) await page.screenshot({path:testInfo.outputPath(`urgent-${width}.png`)});
+    }
+    await banner.locator('summary').click();
+    await expect(banner.locator('details')).not.toHaveAttribute('open','');
+    await page.goto('/docs/');
+    await expect(banner.locator('summary')).toContainText('2 則');
+    await expect(banner.locator('details')).not.toHaveAttribute('open','');
+    mock.setContents([urgentFixture({title:'更新的集合地點',updated_at:'2026-10-24T05:00:00Z'})]);
+    await page.reload();
+    await expect(banner.locator('details')).toHaveAttribute('open','');
+    await expect(banner.locator('.urgent-title')).toHaveText('更新的集合地點');
+});
+
+test('urgent notice expires while the page remains open and archived notices disappear after refresh',async({page})=>{
+    const now=Date.now();await page.clock.install({time:new Date(now)});
+    const mock=await backend(page);
+    mock.setContents([urgentFixture({urgent_until:new Date(now+10000).toISOString()})]);
+    await page.goto('/rights/');
+    await expect(page.locator('.urgent-title')).toHaveText('緊急測試通告');
+    await page.clock.fastForward(11000);
+    await expect(page.getByRole('region',{name:'緊急通告',exact:true})).toBeHidden();
+    await expect(page.locator('.department-status')).toContainText('目前尚無');
+    mock.setContents([urgentFixture({status:'archived'}),urgentFixture({status:'draft'}),urgentFixture({is_urgent:false}),urgentFixture({urgent_until:'2020-01-01T00:00:00Z'})]);
+    await page.reload();
+    await expect(page.getByRole('region',{name:'緊急通告',exact:true})).toBeHidden();
+    expect(mock.calls.filter(call=>call.query.is_urgent==='eq.true').every(call=>call.query.status==='eq.published'&&call.query.kind==='eq.announcement'&&call.query.urgent_until.startsWith('gt.'))).toBe(true);
+});
+
+test('urgent reader handles missing schema, failed requests, retry and unavailable session storage',async({page})=>{
+    const mock=await backend(page);mock.setContents([urgentFixture({})]);
+    let mode='schema';
+    await page.route('https://school.supabase.co/rest/v1/content*',route=>{
+        if(new URL(route.request().url()).searchParams.get('is_urgent')!=='eq.true') return route.fallback();
+        if(mode==='schema') return route.fulfill({status:400,contentType:'application/json',body:JSON.stringify({code:'42703',message:'column is_urgent does not exist'})});
+        if(mode==='offline') return route.fulfill({status:400,contentType:'application/json',body:'{"message":"network unavailable"}'});
+        return route.fallback();
+    });
+    await page.goto('/rights/');
+    await expect(page.getByRole('region',{name:'緊急通告',exact:true})).toBeHidden();
+    mode='offline';await page.reload();
+    await expect(page.locator('.urgent-error')).toContainText('暫時無法讀取');
+    mode='online';
+    await page.evaluate(()=>{Object.defineProperty(window,'sessionStorage',{value:{getItem(){throw new Error('storage blocked');},setItem(){throw new Error('storage blocked');},removeItem(){throw new Error('storage blocked');}}});});
+    await page.getByRole('button',{name:'重試',exact:true}).click();
+    await expect(page.locator('.urgent-title')).toHaveText('緊急測試通告');
+    await page.locator('.urgent-banner summary').click();
+    await expect(page.locator('.urgent-banner details')).not.toHaveAttribute('open','');
+});
+
+test('urgent editor explains missing migration and protects draft-only editors',async({page})=>{
+    const mock=await backend(page,{...admin,role:'editor',can_publish:false});
+    await page.route('https://school.supabase.co/rest/v1/content*',route=>route.request().method()==='POST'&&route.request().postDataJSON().is_urgent
+        ? route.fulfill({status:400,contentType:'application/json',body:JSON.stringify({code:'PGRST204',message:'Could not find is_urgent column'})}) : route.fallback());
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'新增緊急通告',exact:true}).click();
+    await page.getByLabel('標題',{exact:true}).fill('保留的緊急草稿');
+    await expect(page.getByLabel('內容狀態').locator('option[value="published"]')).toHaveJSProperty('disabled',true);
+    await page.locator('#save-content').click();
+    await expect(page.locator('#editor-status')).toContainText('003_urgent_notices.sql');
+    await expect(page.getByLabel('標題',{exact:true})).toHaveValue('保留的緊急草稿');
+    await expect(page.getByLabel('在全站頂端顯示緊急通告')).toBeChecked();
+    await page.getByLabel('在全站頂端顯示緊急通告').uncheck();
+    await page.locator('#save-content').click();
+    await expect(page.locator('#dashboard-status')).toContainText('草稿已儲存');
+    expect(mock.calls.find(call=>call.method==='POST').body).not.toHaveProperty('is_urgent');
+});
+
+test('visible-page refresh reopens revised urgent notices and an outage cannot keep expired notices visible',async({page})=>{
+    const now=Date.now();await page.clock.install({time:new Date(now)});
+    const mock=await backend(page);
+    const notice=urgentFixture({urgent_until:new Date(now+90000).toISOString()});
+    mock.setContents([notice]);
+    let offline=false;
+    await page.route('https://school.supabase.co/rest/v1/content*',route=>offline&&new URL(route.request().url()).searchParams.get('is_urgent')==='eq.true'
+        ? route.fulfill({status:400,contentType:'application/json',body:'{"message":"network unavailable"}'}) : route.fallback());
+    await page.goto('/rights/');
+    await expect(page.locator('.urgent-title')).toHaveText('緊急測試通告');
+    await page.locator('.urgent-banner summary').click();
+    await expect(page.locator('.urgent-banner details')).not.toHaveAttribute('open','');
+    mock.setContents([{...notice,title:'更新後的緊急通告',updated_at:new Date(now+10000).toISOString()}]);
+    await page.clock.fastForward(61000);
+    await expect(page.locator('.urgent-title')).toHaveText('更新後的緊急通告');
+    await expect(page.locator('.urgent-banner details')).toHaveAttribute('open','');
+    offline=true;
+    await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
+    await expect(page.locator('.urgent-error')).toContainText('暫時無法確認');
+    await page.clock.fastForward(30000);
+    await expect(page.locator('.urgent-title')).toHaveCount(0);
+    await expect(page.locator('.urgent-error')).toContainText('暫時無法讀取');
+    offline=false;mock.setContents([]);
+    await page.getByRole('button',{name:'重試',exact:true}).click();
+    await expect(page.getByRole('region',{name:'緊急通告',exact:true})).toBeHidden();
 });
