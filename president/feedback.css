@@ -1,0 +1,37 @@
+/* Feedback owns its spacing; it no longer depends on an unrelated department's card rules. */
+.office-page .container { max-width: 1080px; }
+#feedback { margin-top: 3.5rem; }
+.feedback-layout { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); align-items: start; gap: clamp(1.5rem, 4vw, 3.5rem); }
+.feedback-layout::before { content: ''; position: absolute; z-index: -1; pointer-events: none; inset: 15% 0 10% 38%; border-radius: 50%; background: radial-gradient(ellipse, var(--glass-tint), transparent 68%); }
+.feedback-intro { padding-top: .5rem; }
+.feedback-intro .eyebrow { margin: 0 0 1rem; }
+.feedback-intro h3 { margin: 0 0 1.25rem; font-size: clamp(1.5rem, 2.8vw, 2rem); font-weight: 500; line-height: 1.4; letter-spacing: .015em; color: var(--ui-text); }
+.feedback-intro .box-desc { margin: 0; font-size: 1rem; line-height: 1.9; }
+.feedback-information { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--ui-line); }
+.feedback-information .form-privacy { font-size: .8125rem; line-height: 1.9; margin: 0 0 .75rem; }
+.feedback-information a { display: inline; text-underline-offset: .2em; }
+.feedback-card { min-width: 0; padding: clamp(1.25rem, 3vw, 2.25rem); border: 1px solid var(--ui-line); border-radius: var(--ui-radius-dialog); }
+.feedback-card .zen-form { display: grid; gap: 1.25rem; margin: 0; }
+.feedback-card .form-group { min-width: 0; margin: 0; }
+.feedback-card .form-group label { margin-bottom: .625rem; font-size: .875rem; letter-spacing: .015em; line-height: 1.7; }
+.feedback-card .zen-form input, .feedback-card .zen-form textarea { font-size: 1rem; line-height: 1.6; padding: .875rem; background: #0b100a; color: var(--ui-text); transition: border-color 160ms ease, box-shadow 160ms ease; }
+.feedback-card input::placeholder, .feedback-card textarea::placeholder { color: var(--ui-muted); opacity: 1; }
+.feedback-card textarea { display: block; min-height: 10rem; resize: vertical; }
+.feedback-contact { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+.feedback-hint { margin: -.25rem 0 0; font-size: .8125rem; line-height: 1.8; color: var(--ui-muted); }
+.feedback-card .form-status { min-height: 0; margin: 0; text-align: left; line-height: 1.8; overflow-wrap: anywhere; }
+.feedback-card .form-status:empty { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.feedback-actions { display: flex; justify-content: flex-end; padding-top: .25rem; }
+.feedback-card .submit-btn { padding: .875rem 1rem; min-height: max(48px, 3rem); max-width: 100%; min-width: 0; gap: .75rem; letter-spacing: .02em; border-radius: var(--ui-radius-control); }
+.feedback-card .submit-btn span { min-width: 0; }
+@media (max-width: 760px) {
+    #feedback { margin-top: 2.5rem; }
+    .feedback-layout { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+    .feedback-intro { padding-top: 0; }
+    .feedback-information { margin-top: 1rem; padding-top: .875rem; }
+    .feedback-intro h3 br { display: none; }
+    .feedback-layout::before { inset: 20% 0 0; }
+}
+@media (max-width: 420px) {
+    .feedback-actions .button { width: 100%; justify-content: space-between; }
+}

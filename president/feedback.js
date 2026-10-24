@@ -3,6 +3,7 @@
     const status = document.getElementById('fs-status');
     const button = document.getElementById('submit-btn');
     if (!form || !status || !button) return;
+    const buttonLabel = button.querySelector('[data-submit-label]') || button;
 
     function setStatus(message, state) {
         status.textContent = message;
@@ -18,7 +19,7 @@
 
         button.disabled = true;
         button.setAttribute('aria-busy', 'true');
-        button.textContent = '傳送中…';
+        buttonLabel.textContent = '傳送中…';
         setStatus('正在安全傳送你的訊息…', 'is-loading');
 
         const controller = new AbortController();
@@ -41,7 +42,7 @@
             clearTimeout(timeout);
             button.disabled = false;
             button.removeAttribute('aria-busy');
-            button.textContent = '送出意見';
+            buttonLabel.textContent = '送出意見';
         }
     });
     form.elements.message.addEventListener('input', () => form.elements.message.setCustomValidity(''));

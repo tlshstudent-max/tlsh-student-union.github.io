@@ -1,0 +1,80 @@
+/* Materials sit on functional chrome; reading cards and form fields keep their solid surfaces. */
+:root {
+    --glass-solid: #11150f;
+    --glass-fill: rgba(15, 20, 16, .82);
+    --glass-control: rgba(238, 238, 232, .065);
+    --glass-edge: rgba(238, 238, 232, .2);
+    --glass-highlight: rgba(238, 238, 232, .09);
+    --glass-shadow: 0 12px 36px rgba(0, 0, 0, .2);
+    --glass-tint: rgba(217, 196, 119, .14);
+}
+:root[data-theme="light"] {
+    --glass-solid: #fcfcf8;
+    --glass-fill: rgba(255, 255, 251, .78);
+    --glass-control: rgba(255, 255, 255, .55);
+    --glass-edge: rgba(121, 132, 108, .32);
+    --glass-highlight: rgba(255, 255, 255, .94);
+    --glass-shadow: 0 12px 36px rgba(38, 45, 30, .065);
+    --glass-tint: rgba(191, 166, 91, .16);
+}
+.sitebar, html[data-theme="light"] .sitebar {
+    background: var(--glass-solid);
+    border-bottom-color: var(--glass-edge);
+    box-shadow: inset 0 1px 0 var(--glass-highlight), 0 4px 20px #00000005;
+}
+.feedback-card, .archive-controls, .login-card,
+html[data-theme="light"] :is(.feedback-card, .archive-controls, .login-card) {
+    background: var(--glass-solid);
+    border-color: var(--glass-edge);
+    box-shadow: inset 0 1px 0 var(--glass-highlight), var(--glass-shadow);
+}
+.theme-toggle, html[data-theme="light"] .theme-toggle {
+    background: linear-gradient(160deg, var(--glass-highlight), transparent 65%), var(--glass-control);
+    border-color: var(--glass-edge);
+    box-shadow: inset 0 1px 0 var(--glass-highlight);
+}
+.button, .submit-btn, .theme-toggle, .appeal-btn {
+    transform-origin: center;
+    scale: 1;
+    transition: scale 240ms cubic-bezier(.16, 1, .3, 1), translate 180ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 180ms ease;
+}
+:is(.button, .submit-btn, .theme-toggle, .appeal-btn):not(:disabled):not([aria-disabled="true"]):active {
+    scale: .975;
+    translate: 0 0;
+    transition-duration: 0s;
+}
+.feedback-card .button-primary { background: #d9c477; color: #181a15; border-color: #b6a062; box-shadow: inset 0 1px 0 #ffffff50, 0 4px 12px #00000012; }
+html[data-theme="light"] .feedback-card .button-primary { background: #dfcb89; color: #24261f; }
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .sitebar, html[data-theme="light"] .sitebar {
+        background: var(--glass-fill);
+        -webkit-backdrop-filter: blur(24px) saturate(140%);
+        backdrop-filter: blur(24px) saturate(140%);
+    }
+    .feedback-card, .archive-controls, .login-card,
+    html[data-theme="light"] :is(.feedback-card, .archive-controls, .login-card) {
+        background: linear-gradient(145deg, var(--glass-highlight), transparent 55%), var(--glass-fill);
+        -webkit-backdrop-filter: blur(20px) saturate(125%);
+        backdrop-filter: blur(20px) saturate(125%);
+    }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    :is(.button, .submit-btn, .theme-toggle, .appeal-btn):not(:disabled):not([aria-disabled="true"]):hover { translate: 0 -1px; }
+    :is(.button, .submit-btn, .theme-toggle, .appeal-btn):not(:disabled):not([aria-disabled="true"]):active { translate: 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .button, .submit-btn, .theme-toggle, .appeal-btn { scale: 1 !important; translate: none !important; }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .sitebar, html[data-theme="light"] .sitebar,
+    .feedback-card, .archive-controls, .login-card,
+    html[data-theme="light"] :is(.feedback-card, .archive-controls, .login-card) {
+        background: var(--glass-solid);
+        border-color: var(--ui-control-border);
+        -webkit-backdrop-filter: none; backdrop-filter: none;
+        box-shadow: none;
+        transition: none !important;
+    }
+    .theme-toggle, html[data-theme="light"] .theme-toggle { background: var(--glass-solid); border-color: var(--ui-control-border); box-shadow: none; }
+    .feedback-layout::before { display: none; }
+}
