@@ -6,9 +6,12 @@
     "build": "esbuild src/supabase.js --bundle --format=esm --platform=browser --target=es2022 --minify --legal-comments=linked --outfile=vendor/supabase.js && node scripts/vendor-licenses.js",
     "test": "node --test tests/*.test.js",
     "test:browser": "playwright test",
-    "dev": "python3 -m http.server 8000 --bind 127.0.0.1"
+    "dev": "python3 -m http.server 8000 --bind 127.0.0.1",
+    "build:brand": "node scripts/generate-brand-assets.mjs"
   },
-  "dependencies": { "@supabase/supabase-js": "2.118.0" },
+  "dependencies": {
+    "@supabase/supabase-js": "2.118.0"
+  },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.11",
     "@playwright/test": "1.64.1",

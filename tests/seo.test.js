@@ -18,11 +18,33 @@ test('public source pages expose unique canonical metadata and existing share as
         assert.ok(image.startsWith(publicRoot));await access(new URL('../'+image.slice(publicRoot.length),import.meta.url));
         assert.ok(html.indexOf('theme.js')<html.indexOf('rel="stylesheet"'),file);
         assert.ok(html.includes('theme.css'),file);
+        assert.match(html,/<link rel="icon" href="(?:\.\.\/)?favicon\.png" type="image\/png" sizes="96x96">/,file);
+        assert.match(html,/<link rel="apple-touch-icon" href="(?:\.\.\/)?apple-touch-icon\.png" sizes="180x180">/,file);
     }
     const sitemap=await readFile(new URL('../sitemap.xml',import.meta.url),'utf8');
     assert.deepEqual([...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(x=>x[1]).sort(),pages.map(path=>publicRoot+path).sort());
     const admin=await readFile(new URL('../admin/index.html',import.meta.url),'utf8');assert.match(admin,/noindex, nofollow/);
+    const home=await readFile(new URL('../index.html',import.meta.url),'utf8');
+    assert.match(home,/<section[^>]*id="departments"[^>]*data-nosnippet/);
+    assert.match(home,/<p class="hero-description">國立斗六高中學生會官方網站/);
     const png=await readFile(new URL('../og-image.png',import.meta.url));assert.equal(png.readUInt32BE(16),1200);assert.equal(png.readUInt32BE(20),630);
+});
+
+test('official identity uses the uploaded badge, correctly sized icons and verified social account',async()=>{
+    const home=await readFile(new URL('../index.html',import.meta.url),'utf8');
+    const data=JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+    const organization=data['@graph'].find(item=>item['@type']==='Organization');
+    assert.equal(organization.logo.url,publicRoot+'assets/union-logo.jpg');
+    assert.deepEqual(organization.sameAs,['https://www.instagram.com/tlsh_su/']);
+    await access(new URL('../assets/union-logo.jpg',import.meta.url));
+    assert.match(home,/<img class="hero-logo" src="assets\/union-logo\.jpg" alt="斗六高中學生會正式會標"/);
+    assert.ok(!home.includes('identity-plate'));
+    const manifest=JSON.parse(await readFile(new URL('../site.webmanifest',import.meta.url),'utf8'));
+    assert.deepEqual(manifest.icons.map(item=>item.sizes),['192x192','512x512']);
+    for(const [file,size] of [['favicon.png',96],['apple-touch-icon.png',180],...manifest.icons.map(item=>[item.src,Number(item.sizes.split('x')[0])])]) {
+        const png=await readFile(new URL('../'+file,import.meta.url));
+        assert.equal(png.readUInt32BE(16),size,file);assert.equal(png.readUInt32BE(20),size,file);
+    }
 });
 
 test('article metadata uses published identity and bounded plain descriptions',()=>{
