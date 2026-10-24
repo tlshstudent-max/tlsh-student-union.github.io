@@ -37,3 +37,14 @@ test('UI permissions distinguish editing from publishing and disabled accounts',
     assert.equal(mayEdit({...editor, active:false, role:'admin'}, 'announcement'), false);
     assert.equal(mayPublish({...editor, role:'admin'}), true);
 });
+
+test('validation reports independent field errors together without weakening source and deadline checks',()=>{
+    const input={kind:'announcement',title:' ',category:'',date:'2026-02-30',url:'http://example.com',status:'published',is_urgent:true,urgent_until:'2020-01-01T12:00'};
+    assert.throws(()=>validateContent(input),error=>{
+        assert.deepEqual(Object.keys(error.fieldErrors),['title','category','date','url','urgent_until']);
+        assert.equal(error.message,error.fieldErrors.title);
+        assert.match(error.fieldErrors.urgent_until,/結束時間已過/);
+        return true;
+    });
+    assert.throws(()=>validateContent({...input,kind:'document',title:'文件',category:'會議紀錄',date:'2026-10-24',url:'',body:'',is_urgent:false}),error=>Boolean(error.fieldErrors.body));
+});

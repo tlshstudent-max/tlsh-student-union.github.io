@@ -8,7 +8,7 @@
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="stone-surface.css?v=stone-2">
-    <link rel="stylesheet" href="ui.css?v=refinement-1">
+    <link rel="stylesheet" href="ui.css?v=feedback-1">
     <link rel="stylesheet" href="material.css?v=stone-2">
     <script type="module" src="navigation.js?v=refinement-1"></script>
 </head>
@@ -20,12 +20,14 @@
         <article id="article" hidden>
             <p class="eyebrow" id="article-category"></p>
             <h1 id="article-title"></h1>
-            <time id="article-date"></time>
+            <div class="article-meta"><time id="article-date"></time><button id="article-copy" class="button button-secondary article-copy" type="button">複製連結</button></div>
+            <p id="article-copy-status" class="copy-status" role="status" aria-live="polite"></p>
+            <div id="article-copy-fallback" class="copy-fallback" hidden><label for="article-copy-url">選取或長按下方網址後複製</label><input id="article-copy-url" type="url" readonly></div>
             <p id="article-summary"></p>
             <div class="article-body" id="article-body"></div>
             <p><a id="article-link" class="button button-secondary" target="_blank" rel="noopener noreferrer" hidden>開啟相關連結 ↗</a></p>
         </article>
     </main>
-    <script type="module" src="article.js?v=refinement-1"></script>
+    <script type="module" src="article.js?v=feedback-1"></script>
 </body>
 </html>

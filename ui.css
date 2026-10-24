@@ -109,6 +109,12 @@ body:not(.home-page) > footer a { display: inline-flex; align-items: center; min
 .article-shell { max-width: 800px; margin: 45px auto 80px; padding: 0 24px; }
 .article-shell h1 { font-size: clamp(1.625rem, 5vw, 2.375rem); line-height: 1.5; }
 .article-body { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 2; color: #d2d5c9; }
+.article-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; }
+.article-copy { min-height: max(44px, 2.75rem); padding: .5rem .875rem; font-size: .875rem; }
+.copy-status { font-size: .875rem; color: var(--ui-muted); margin: .75rem 0; }
+.copy-status:empty { margin: 0; }
+.copy-fallback { display: grid; gap: .5rem; margin-top: .75rem; font-size: .875rem; }
+.copy-fallback input { width: 100%; min-width: 0; min-height: max(44px, 2.75rem); padding: .75rem; background: #090d08; color: var(--ui-text); border: 1px solid var(--ui-control-border); border-radius: var(--ui-radius-control); font: inherit; }
 @media (max-width: 1240px) {
     .home-hero { margin: 0 30px; gap: 40px; }
     .home-page > .container, .site-footer { margin-left: 30px; margin-right: 30px; }

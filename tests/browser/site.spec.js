@@ -1065,3 +1065,91 @@ test('editor actions stay reachable on long forms and urgent labels match their 
     await page.locator('.urgent-banner summary').click();await expect(page.locator('.urgent-toggle-hint')).toContainText('展開');
     await page.locator('.urgent-banner summary').click();await expect(page.locator('.urgent-toggle-hint')).toContainText('收合');
 });
+
+test('inline field errors identify each problem, preserve text, and reveal closed settings',async({page},testInfo)=>{
+    const mock=await backend(page);
+    await page.goto('/admin/');await page.getByRole('button',{name:'＋ 新增內容'}).click();
+    const title=page.getByLabel('標題',{exact:true});
+    await title.fill(' ');await title.press('Tab');
+    await expect(title).toHaveAttribute('aria-invalid','true');
+    await expect(title).toHaveAttribute('aria-describedby','content-error-title');
+    await expect(page.locator('#content-error-title')).toContainText('標題必填');
+    await title.fill('會議公告');
+    await expect(title).not.toHaveAttribute('aria-invalid');
+    await expect(page.locator('[data-counter="title"]')).toHaveText('4 / 160');
+    await page.getByLabel('類別',{exact:true}).selectOption('__custom__');
+    await page.getByLabel('自訂類別',{exact:true}).focus();await page.keyboard.press('Tab');
+    await expect(page.locator('#custom-category')).toHaveAttribute('aria-invalid','true');
+    await page.getByLabel('自訂類別',{exact:true}).fill('會務');
+    await expect(page.locator('#custom-category')).not.toHaveAttribute('aria-invalid');
+    await page.getByLabel('相關連結（選填）',{exact:true}).fill('http://example.com');await page.keyboard.press('Tab');
+    await expect(page.locator('#content-error-url')).toContainText('HTTPS');
+    await page.locator('#editor-settings > summary').click();await page.locator('#save-content').click();
+    await expect(page.locator('#editor-settings')).toHaveAttribute('open','');
+    await expect(page.getByLabel('相關連結（選填）',{exact:true})).toBeFocused();
+    await expect(title).toHaveValue('會議公告');
+    expect(mock.calls.some(call=>call.method==='POST')).toBe(false);
+    await page.screenshot({path:testInfo.outputPath('inline-errors.png')});
+    await page.getByLabel('相關連結（選填）',{exact:true}).fill('https://example.com');
+    await expect(page.locator('#content-error-url')).toHaveCount(0);
+    await expect(page.locator('#editor-status')).toHaveText('');
+    await page.getByRole('button',{name:'儲存草稿',exact:true}).click();
+    await expect(page.locator('#dashboard-status')).toContainText('草稿已儲存');
+});
+
+test('restored drafts refresh error descriptions and action labels remain readable at larger text sizes',async({page})=>{
+    await backend(page);
+    await page.goto('/admin/');await page.getByRole('button',{name:'＋ 新增內容'}).click();
+    await page.getByLabel('標題',{exact:true}).fill('回復草稿');
+    page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'關閉',exact:true}).click();
+    await page.getByRole('button',{name:'＋ 新增內容'}).click();
+    await page.getByLabel('標題',{exact:true}).press('Tab');
+    await expect(page.getByLabel('標題',{exact:true})).toHaveAttribute('aria-invalid','true');
+    await page.getByRole('button',{name:'回復暫存',exact:true}).click();
+    await expect(page.getByLabel('標題',{exact:true})).toHaveValue('回復草稿');
+    await expect(page.getByLabel('標題',{exact:true})).not.toHaveAttribute('aria-invalid');
+    await page.getByRole('button',{name:'儲存草稿',exact:true}).click();
+    await expect(page.locator('#dashboard-status')).toContainText('草稿已儲存');
+    await page.getByRole('button',{name:'編輯',exact:true}).first().click();
+    await page.getByLabel('內容狀態').selectOption('published');
+    await expect(page.locator('#save-content')).toHaveText('發布內容');
+    page.once('dialog',dialog=>dialog.accept());await page.locator('#save-content').click();
+    await expect(page.locator('#dashboard-status')).toContainText('已發布');
+    await page.setViewportSize({width:320,height:844});
+    await page.addStyleTag({content:'html { font-size:200% !important; }'});
+    await page.getByRole('button',{name:'編輯',exact:true}).first().click();
+    await expect(page.locator('#save-content')).toHaveText('儲存並公開更新');
+    expect(await page.locator('#content-dialog').evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
+    await page.getByLabel('內容狀態').selectOption('archived');
+    await expect(page.locator('#save-content')).toHaveText('下架內容');
+});
+
+test('public content copies canonical announcement and minutes links without extra parameters',async({page})=>{
+    const mock=await backend(page);
+    mock.setContents([{...article,status:'published'},{...article,id:'12345678-1234-4234-8234-123456789abd',kind:'document',status:'published',body:'會議紀錄'}]);
+    await page.addInitScript(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{window.copiedArticleLink=text;}}}));
+    for(const [contentId,kind] of [[id,'announcement'],['12345678-1234-4234-8234-123456789abd','document']]) {
+        await page.goto(`/announcement.html?id=${contentId}&kind=${kind}&utm_source=class-chat#unused`);
+        await expect(page.locator('#article-title')).toHaveText(article.title);
+        await page.getByRole('button',{name:'複製連結',exact:true}).click();
+        await expect(page.locator('#article-copy-status')).toContainText('連結已複製');
+        const copied=new URL(await page.evaluate(()=>window.copiedArticleLink));
+        expect(copied.searchParams.get('id')).toBe(contentId);
+        expect(copied.searchParams.get('kind')).toBe(kind==='document'?'document':null);
+        expect([...copied.searchParams.keys()].sort()).toEqual(kind==='document'?['id','kind']:['id']);
+        expect(copied.hash).toBe('');
+    }
+});
+
+test('copy denial provides a selected manual link and unavailable content offers no share action',async({page})=>{
+    const mock=await backend(page);mock.setContents([{...article,status:'published'}]);
+    await page.addInitScript(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw new Error('permission denied');}}}));
+    await page.goto(`/announcement.html?id=${id}`);await expect(page.locator('#article-title')).toHaveText(article.title);
+    await page.getByRole('button',{name:'複製連結',exact:true}).click();
+    const fallback=page.getByLabel('選取或長按下方網址後複製',{exact:true});
+    await expect(fallback).toBeVisible();await expect(fallback).toBeFocused();await expect(fallback).toHaveAttribute('readonly');
+    expect(new URL(await fallback.inputValue()).searchParams.get('id')).toBe(id);
+    mock.setContents([]);await page.reload();
+    await expect(page.locator('#article-status')).toContainText('未公開');
+    await expect(page.getByRole('button',{name:'複製連結',exact:true})).toBeHidden();
+});

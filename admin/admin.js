@@ -1,5 +1,5 @@
 import { getClient, isConfigured } from '../backend.js';
-import { validateContent, mayEdit, mayPublish, safeHttpsUrl } from '../lib/content.js?v=urgent-1';
+import { validateContent, mayEdit, mayPublish, safeHttpsUrl } from '../lib/content.js?v=feedback-1';
 import { createDraftStore } from '../lib/drafts.js?v=urgent-1';
 import { siteConfig } from '../site-config.js';
 import { departments, publication, contentHref } from '../lib/publication.js';
@@ -7,9 +7,12 @@ import { taipeiInput, activeUrgent, urgentTimeLabel } from '../lib/urgent.js';
 
 const $ = id => document.getElementById(id);
 const form = $('content-form'), memberForm = $('member-form'), dialog = $('content-dialog');
+form.noValidate = true;
+const touchedFields = new Set(), fieldMessages = new Map();
 const labels = { announcement: '公告', document: '公開文件', draft: '草稿', published: '已發布', archived: '已下架', admin: '管理員', editor: '編輯者' };
 let client, member, sessionUser, contents = [], editing = null, dirty = false, saving = false, generation = 0;
 let draftStore = null, recoverableDraft = null;
+let validationSummaryActive = false;
 const categories = {
     announcement: ['學生會公告', '校園活動', '學生權益', '行政公告', '緊急通告'],
     document: ['會議紀錄', '組織章程', '預算決算', '行政文件'],
@@ -36,6 +39,54 @@ function element(tag, text, className) {
 function field(name) { return form.elements.namedItem(name); }
 function categoryValue() { return field('category').value === '__custom__' ? $('custom-category').value : field('category').value; }
 function editorValues() { return { ...Object.fromEntries(new FormData(form)), category: categoryValue(), show_on_home:field('show_on_home').checked, is_urgent:field('is_urgent').checked, urgent_until:field('urgent_until').value }; }
+function validationTarget(name) {
+    if (name === 'category' && field('category').value === '__custom__') return $('custom-category');
+    if (name === 'department') return form.querySelector('[name="department"]:checked') || form.querySelector('[name="department"]');
+    return field(name);
+}
+function clearFieldMessage(name) {
+    const entry = fieldMessages.get(name);
+    if (!entry) return;
+    const { target, node } = entry;
+    target.removeAttribute('aria-invalid');
+    const described = (target.getAttribute('aria-describedby') || '').split(' ').filter(id => id && id !== node.id);
+    if (described.length) target.setAttribute('aria-describedby', described.join(' ')); else target.removeAttribute('aria-describedby');
+    node.remove(); fieldMessages.delete(name);
+}
+function clearFieldMessages() { for (const name of [...fieldMessages.keys()]) clearFieldMessage(name); }
+function showFieldMessages(errors, all = false) {
+    for (const [name, entry] of fieldMessages) {
+        if (!errors[name] || entry.target !== validationTarget(name)) clearFieldMessage(name);
+    }
+    for (const [name, message] of Object.entries(errors)) {
+        if (!all && !touchedFields.has(name)) continue;
+        touchedFields.add(name);
+        const target = validationTarget(name);
+        if (!target) continue;
+        const existing = fieldMessages.get(name);
+        if (existing) { if (existing.node.textContent !== message) existing.node.textContent = message; continue; }
+        const node = element('p', message, 'field-error'); node.id = `content-error-${name}`;
+        if (name === 'department') target.closest('fieldset').append(node);
+        else if (target.closest('.editor-field')) target.closest('.editor-field').append(node);
+        else { node.classList.add('full-width'); target.closest('label').after(node); }
+        target.setAttribute('aria-invalid', 'true');
+        target.setAttribute('aria-describedby', [target.getAttribute('aria-describedby'), node.id].filter(Boolean).join(' '));
+        fieldMessages.set(name, { target, node });
+    }
+}
+function refreshFieldMessages() {
+    if (!dialog.open || saving || $('save-content').hidden) return;
+    let errors = {};
+    try { validateContent(editorValues()); } catch (error) { errors = error.fieldErrors || {}; }
+    showFieldMessages(errors);
+    if (validationSummaryActive && !Object.keys(errors).length) { notice('editor-status', ''); validationSummaryActive = false; }
+}
+function focusFirstError(errors) {
+    const target = validationTarget(Object.keys(errors)[0]);
+    if (!target) return;
+    const section = target.closest('details'); if (section) section.open = true;
+    target.focus();
+}
 function setCategories(kind, value = categories[kind][0]) {
     field('category').replaceChildren(...categories[kind].map(text => new Option(text, text)), new Option('其他（自行輸入）', '__custom__'));
     const custom = !categories[kind].includes(value);
@@ -249,6 +300,13 @@ $('new-minutes').addEventListener('click', () => openEditor(null, { kind:'docume
 $('new-urgent').addEventListener('click', () => openEditor(null, { kind:'announcement',department:'union',category:'緊急通告',is_urgent:true }));
 
 function updatePreview() {
+    for (const counter of form.querySelectorAll('[data-counter]')) {
+        const input = field(counter.dataset.counter);
+        counter.textContent = `${input.value.length} / ${input.maxLength}`;
+    }
+    const state = field('status').value;
+    $('save-content').textContent = saving ? '正在儲存…' : state === 'archived' ? '下架內容' : state === 'published' ? editing?.status === 'published' ? '儲存並公開更新' : '發布內容' : '儲存草稿';
+    $('save-hint').textContent = state === 'archived' ? '下架後將停止公開。' : state === 'published' ? '儲存後會立即公開。' : '草稿儲存後不會公開。';
     $('preview-title').textContent = field('title').value || '尚未填寫標題';
     $('preview-summary').textContent = field('summary').value;
     $('preview-body').textContent = field('body').value;
@@ -288,6 +346,8 @@ function updatePreview() {
 function openEditor(item = null, defaults = {}) {
     if (!member || (defaults.kind && !mayEdit(member, defaults.kind))) return;
     editing = item; dirty = false; saving = false; recoverableDraft = null;
+    touchedFields.clear(); clearFieldMessages();
+    validationSummaryActive = false;
     form.reset();
     const readonly = item && (!mayEdit(member, item.kind) || (item.status === 'published' && !mayPublish(member)));
     for (const control of form.elements) control.disabled = Boolean(readonly);
@@ -336,8 +396,14 @@ form.addEventListener('invalid', event => {
     const section = event.target.closest('details');
     if (section) section.open = true;
 }, true);
-form.addEventListener('input', () => { dirty = true; updatePreview(); saveLocalDraft(); });
-form.addEventListener('change', () => { dirty = true; updatePreview(); saveLocalDraft(); });
+form.addEventListener('input', () => { dirty = true; updatePreview(); saveLocalDraft(); refreshFieldMessages(); });
+form.addEventListener('change', () => { dirty = true; updatePreview(); saveLocalDraft(); refreshFieldMessages(); });
+form.addEventListener('focusout', event => {
+    if (event.relatedTarget?.closest('#save-content, #close-editor')) return;
+    const name = event.target.id === 'custom-category' ? 'category' : event.target.name;
+    if (!name || !dialog.open) return;
+    touchedFields.add(name); refreshFieldMessages();
+});
 $('restore-draft').addEventListener('click', () => {
     if (!recoverableDraft || !mayEdit(member, recoverableDraft.values.kind)) return;
     const draft = recoverableDraft;
@@ -350,7 +416,7 @@ $('restore-draft').addEventListener('click', () => {
     if (!mayPublish(member) && field('status').value === 'published') field('status').value = 'draft';
     if (editing) editing = { ...editing, version: draft.version };
     recoverableDraft = null; $('draft-recovery').hidden = true;
-    dirty = true; updatePreview(); saveLocalDraft();
+    dirty = true; updatePreview(); saveLocalDraft(); refreshFieldMessages();
 });
 $('discard-draft').addEventListener('click', () => {
     if (!draftStore?.remove(editing?.id)) { notice('draft-status', '目前無法清除本機暫存，請確認瀏覽器儲存設定。', 'error'); return; }
@@ -362,7 +428,7 @@ $('activity-template').addEventListener('click', () => {
     setCategories('announcement', '校園活動');
     field('department').value = 'activities';
     field('body').value = '活動時間：\n活動地點：\n參加對象：\n報名方式：\n注意事項：';
-    dirty = true; updatePreview(); saveLocalDraft();
+    dirty = true; updatePreview(); saveLocalDraft(); refreshFieldMessages();
     notice('editor-status', '請填妥活動時間、地點與報名方式，再發布。發布位置已設為活動組。');
 });
 function closeEditor() {
@@ -381,12 +447,16 @@ form.addEventListener('submit', async event => {
     try {
         item = validateContent(editorValues());
         if (!mayEdit(member, item.kind) || (item.status === 'published' && !mayPublish(member))) throw new Error('你目前沒有編輯或發布這項內容的權限。');
-    } catch (error) { notice('editor-status', error.message, 'error'); return; }
+    } catch (error) {
+        if (error.fieldErrors) { validationSummaryActive = true; showFieldMessages(error.fieldErrors, true); focusFirstError(error.fieldErrors); }
+        notice('editor-status', error.message, 'error'); return;
+    }
     const confirmation = item.is_urgent ? `這則緊急通告將顯示於全站頂端，提示至 ${urgentTimeLabel(item.urgent_until)}（台灣時間）。確定發布嗎？` : '儲存後，這份內容會立即公開在官網。確定發布嗎？';
     if (item.status === 'published' && !confirm(confirmation)) return;
     const current = generation, localDraftStore = draftStore, draftId = editing?.id;
     const enabledControls = [...form.elements].filter(control => !control.disabled);
     saving = true;
+    $('save-content').textContent = '正在儲存…';
     for (const control of enabledControls) control.disabled = true;
     notice('editor-status', '正在儲存…');
     try {

@@ -6,6 +6,23 @@ const status = document.getElementById('article-status'), feedback = document.ge
 const article = document.getElementById('article'), retry = document.getElementById('article-retry');
 const params = new URLSearchParams(location.search), id = params.get('id'), kind = params.get('kind') || 'announcement';
 let loading = false;
+const copy = document.getElementById('article-copy'), copyStatus = document.getElementById('article-copy-status');
+const copyFallback = document.getElementById('article-copy-fallback'), copyUrl = document.getElementById('article-copy-url');
+copy.addEventListener('click', async () => {
+    if (copy.disabled || article.hidden) return;
+    const url = new URL('announcement.html', import.meta.url);
+    url.searchParams.set('id', id);
+    if (kind === 'document') url.searchParams.set('kind', kind);
+    copy.disabled = true; copyStatus.textContent = ''; copyFallback.hidden = true;
+    try {
+        if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+        await navigator.clipboard.writeText(url.href);
+        copyStatus.textContent = '連結已複製，可貼到班群分享。';
+    } catch {
+        copyStatus.textContent = '目前無法自動複製，請選取下方連結。';
+        copyUrl.value = url.href; copyFallback.hidden = false; copyUrl.focus(); copyUrl.select();
+    } finally { copy.disabled = false; }
+});
 if (kind === 'document') {
     document.getElementById('article-back').href = 'docs/';
     document.getElementById('article-back').textContent = '← 返回公開文件';
