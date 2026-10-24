@@ -1,4 +1,4 @@
-import { createOrbRenderer } from './lib/orb-renderer.js?v=orb-1';
+import { createOrbRenderer } from './lib/orb-renderer.js?v=solid-1';
 
 const stage = document.getElementById('glass-orb');
 const canvas = stage.querySelector('canvas'), fallback = stage.querySelector('img');
