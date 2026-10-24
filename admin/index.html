@@ -9,9 +9,9 @@
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../stone-surface.css">
-    <link rel="stylesheet" href="../ui.css?v=urgent-1">
-    <link rel="stylesheet" href="admin.css?v=urgent-1">
-    <script type="module" src="../navigation.js?v=urgent-1"></script>
+    <link rel="stylesheet" href="../ui.css?v=design-1">
+    <link rel="stylesheet" href="admin.css?v=design-1">
+    <script type="module" src="../navigation.js?v=design-1"></script>
 </head>
 <body class="admin-page">
     <a class="skip-link" href="#main-content">跳至主要內容</a>
@@ -55,27 +55,32 @@
                 <div class="form-actions"><button id="restore-draft" type="button" class="button button-secondary">回復暫存</button><button id="discard-draft" type="button" class="button button-secondary">捨棄暫存</button></div>
             </div>
             <div class="editor-grid">
-                <label>內容類型<select name="kind"><option value="announcement">公告</option><option value="document">公開文件</option></select></label>
-                <label>顯示日期<input name="date" type="date" min="1900-01-01" max="9999-12-31" required></label>
-                <fieldset class="publication-field full-width" aria-describedby="department-help"><legend>發布位置</legend><p id="department-help" class="muted">點選一個部門，內容會發布在該部門頁面。</p><div id="department-options" class="department-options"></div></fieldset>
-                <label class="check-label full-width"><input name="show_on_home" type="checkbox" checked>同時顯示在首頁最新消息</label>
-                <p id="publication-hint" class="muted full-width" role="status"></p>
-                <fieldset id="urgency-settings" class="full-width"><legend>緊急通告</legend><label class="check-label"><input type="checkbox" name="is_urgent">在全站頂端顯示緊急通告</label><div id="urgent-deadline-row" hidden><label>緊急提示結束時間（台灣時間）<input type="datetime-local" name="urgent_until" min="1900-01-01T00:00" max="9999-12-31T23:59"></label><p class="muted">不受部門與首頁勾選限制，發布後全站可見。到期只移除頂端提示，原公告仍保留；提前結束可取消勾選或下架公告。</p></div></fieldset>
                 <label class="full-width">標題<input name="title" required maxlength="160" placeholder="讓同學一眼看懂這則消息"></label>
-                <div class="editor-field"><label for="content-category">類別</label><select id="content-category" name="category" required><option value="學生會公告">學生會公告</option></select></div>
-                <label>學年度（文件適用）<input name="academic_year" maxlength="20" placeholder="例如：115"></label>
-                <label id="custom-category-row" class="full-width" hidden>自訂類別<input id="custom-category" maxlength="60" placeholder="輸入常用選項以外的類別" disabled></label>
                 <label class="full-width">摘要<textarea name="summary" rows="3" maxlength="500" placeholder="簡單說明重點，最多 500 字"></textarea></label>
-                <button id="activity-template" type="button" class="button button-secondary full-width">套用活動範本</button>
-                <label class="full-width"><span id="body-label">公告內文（選填）</span><textarea name="body" rows="8" maxlength="20000" placeholder="直接輸入公告或會議紀錄，支援換行。"></textarea></label>
-                <label class="full-width"><span id="url-label">相關連結（選填）</span><input name="url" type="url" pattern="https://.*" maxlength="2048" placeholder="https://"></label>
+                <fieldset id="urgency-settings" class="full-width"><legend>緊急通告</legend><label class="check-label"><input type="checkbox" name="is_urgent">在全站頂端顯示緊急通告</label><div id="urgent-deadline-row" hidden><label>緊急提示結束時間（台灣時間）<input type="datetime-local" name="urgent_until" min="1900-01-01T00:00" max="9999-12-31T23:59"></label><p class="muted">到期自動移除頂端提示；原公告仍保留。</p></div></fieldset>
                 <label>內容狀態<select name="status"><option value="draft">草稿 · 尚未公開</option><option value="published">已發布 · 立即公開</option><option value="archived">已下架 · 停止公開</option></select></label>
             </div>
+            <details id="editor-settings" class="editor-settings" open>
+                <summary>發布位置與其他設定</summary>
+                <div class="editor-grid">
+                    <label>內容類型<select name="kind"><option value="announcement">公告</option><option value="document">公開文件</option></select></label>
+                    <label>顯示日期<input name="date" type="date" min="1900-01-01" max="9999-12-31" required></label>
+                    <fieldset class="publication-field full-width" aria-describedby="department-help"><legend>發布位置</legend><p id="department-help" class="muted">點選一個部門，內容會發布在該部門頁面。</p><div id="department-options" class="department-options"></div></fieldset>
+                    <label class="check-label full-width"><input name="show_on_home" type="checkbox" checked>同時顯示在首頁最新消息</label>
+                    <p id="publication-hint" class="muted full-width" role="status"></p>
+                    <div class="editor-field"><label for="content-category">類別</label><select id="content-category" name="category" required><option value="學生會公告">學生會公告</option></select></div>
+                    <label>學年度（文件適用）<input name="academic_year" maxlength="20" placeholder="例如：115"></label>
+                    <label id="custom-category-row" class="full-width" hidden>自訂類別<input id="custom-category" maxlength="60" placeholder="輸入常用選項以外的類別" disabled></label>
+                    <button id="activity-template" type="button" class="button button-secondary full-width">套用活動範本</button>
+                    <label class="full-width"><span id="body-label">公告內文（選填）</span><textarea name="body" rows="8" maxlength="20000" placeholder="直接輸入公告或會議紀錄，支援換行。"></textarea></label>
+                    <label class="full-width"><span id="url-label">相關連結（選填）</span><input name="url" type="url" pattern="https://.*" maxlength="2048" placeholder="https://"></label>
+                </div>
+            </details>
             <details class="content-preview"><summary>預覽公開內容</summary><p id="preview-meta" class="eyebrow"></p><h3 id="preview-title"></h3><p id="preview-summary"></p><div id="preview-body" class="article-body"></div><a id="preview-link" target="_blank" rel="noopener noreferrer" hidden>開啟相關連結 ↗</a></details>
             <p id="draft-status" class="notice" role="status" aria-live="polite"></p>
             <p id="editor-status" class="notice" role="status" aria-live="polite"></p><div class="form-actions"><button id="save-content" type="submit" class="button button-primary">儲存內容</button><span class="muted">只有「已發布」的內容會出現在官網。</span></div>
         </form>
     </dialog>
-    <script type="module" src="admin.js?v=urgent-1"></script>
+    <script type="module" src="admin.js?v=design-1"></script>
 </body>
 </html>
