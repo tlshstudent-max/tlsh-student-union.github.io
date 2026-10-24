@@ -22,6 +22,9 @@ test('public source pages expose unique canonical metadata and existing share as
     const sitemap=await readFile(new URL('../sitemap.xml',import.meta.url),'utf8');
     assert.deepEqual([...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map(x=>x[1]).sort(),pages.map(path=>publicRoot+path).sort());
     const admin=await readFile(new URL('../admin/index.html',import.meta.url),'utf8');assert.match(admin,/noindex, nofollow/);
+    const home=await readFile(new URL('../index.html',import.meta.url),'utf8');
+    assert.match(home,/<section[^>]*id="departments"[^>]*data-nosnippet/);
+    assert.match(home,/<p class="hero-description">國立斗六高中學生會官方網站/);
     const png=await readFile(new URL('../og-image.png',import.meta.url));assert.equal(png.readUInt32BE(16),1200);assert.equal(png.readUInt32BE(20),630);
 });
 
