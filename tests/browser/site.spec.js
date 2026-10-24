@@ -1252,3 +1252,63 @@ test('published articles get clean metadata and unavailable content is excluded 
     expect(await page.locator('meta[name=robots]').getAttribute('content')).toBe('noindex, follow');
     await expect(page.locator('link[rel=canonical]')).toHaveCount(0);
 });
+
+test('feedback has contained spacing, a message-first flow, and responsive columns in both appearances',async({page},testInfo)=>{
+    for(const theme of ['dark','light']) {
+        await page.goto('/president/#feedback');
+        if(await page.locator('html').getAttribute('data-theme')!==theme) await page.locator('.theme-toggle').click();
+        for(const width of [1440,390,320]) {
+            await page.setViewportSize({width,height:900});
+            await page.locator('#feedback').scrollIntoViewIfNeeded();
+            await expect(page.locator('#fs-status')).toBeEmpty();
+            const card=await page.locator('.feedback-card').boundingBox(),intro=await page.locator('.feedback-intro').boundingBox();
+            const message=await page.getByLabel('你的意見',{exact:true}).boundingBox(),email=await page.getByLabel('聯絡信箱（選填，供本案回覆）').boundingBox();
+            expect(message.x-card.x).toBeGreaterThanOrEqual(19);
+            expect(card.x+card.width-message.x-message.width).toBeGreaterThanOrEqual(19);
+            expect(message.y-card.y).toBeLessThan(100);
+            expect(message.y).toBeLessThan(email.y);
+            if(width===1440) expect(intro.x+intro.width).toBeLessThan(card.x);
+            else expect(intro.y+intro.height).toBeLessThan(card.y);
+            expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+            if(width!==320) await page.screenshot({path:testInfo.outputPath(`feedback-${theme}-${width}.png`)});
+        }
+        await page.addStyleTag({content:'html { font-size:200% !important; }'});
+        expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+        const button=await page.locator('#submit-btn').boundingBox();expect(button.height).toBeGreaterThanOrEqual(44);
+        await page.reload();
+    }
+});
+
+test('glass surfaces retain readable fields and become solid for transparency preferences',async({page})=>{
+    for(const theme of ['dark','light']) {
+        await page.goto('/president/#feedback');
+        if(await page.locator('html').getAttribute('data-theme')!==theme)await page.locator('.theme-toggle').click();
+        await expect.poll(()=>page.locator('.feedback-card').evaluate(e=>getComputedStyle(e).backdropFilter)).toContain('blur');
+        const input=await page.locator('#feedback-message').evaluate(e=>({text:getComputedStyle(e).color,border:getComputedStyle(e).borderColor,bg:getComputedStyle(e).backgroundColor}));
+        expect(contrastRatio(input.text,input.bg)).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(input.border,input.bg)).toBeGreaterThanOrEqual(3);
+        const cdp=await page.context().newCDPSession(page);
+        await cdp.send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-transparency',value:'reduce'}]});
+        for(const selector of ['.sitebar','.feedback-card']) {
+            await expect.poll(()=>page.locator(selector).evaluate(e=>getComputedStyle(e).backdropFilter)).toBe('none');
+            const bg=await page.locator(selector).evaluate(e=>getComputedStyle(e).backgroundColor);
+            expect(bg).toMatch(/^rgb\(/);
+        }
+        await cdp.send('Emulation.setEmulatedMedia',{features:[]});await cdp.detach();
+    }
+});
+
+test('button press feedback is immediate, cancellable, and respects reduced motion without submitting',async({page})=>{
+    let sends=0;await page.route('https://formspree.io/**',route=>{sends++;return route.fulfill({contentType:'application/json',body:'{}'});});
+    await page.goto('/president/#feedback');await page.getByLabel('你的意見',{exact:true}).fill('保留中的意見');
+    const button=page.locator('#submit-btn');await button.scrollIntoViewIfNeeded();
+    const box=await button.boundingBox();await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.down();
+    expect(await button.evaluate(e=>getComputedStyle(e).scale)).toBe('0.975');
+    await page.mouse.move(5,5);await page.mouse.up();
+    await expect.poll(()=>button.evaluate(e=>getComputedStyle(e).scale)).toBe('1');
+    expect(sends).toBe(0);await expect(page.getByLabel('你的意見',{exact:true})).toHaveValue('保留中的意見');
+    await page.emulateMedia({reducedMotion:'reduce'});await button.scrollIntoViewIfNeeded();
+    const target=await button.boundingBox();await page.mouse.move(target.x+target.width/2,target.y+target.height/2);await page.mouse.down();
+    expect(await button.evaluate(e=>getComputedStyle(e).scale)).toBe('1');
+    await page.mouse.move(5,5);await page.mouse.up();expect(sends).toBe(0);
+});

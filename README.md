@@ -45,7 +45,7 @@
 * **成員授權**：管理員在工作台的「成員與權限」新增或停用幹部，並分配公告、文件及發布權限。
 * **舊資料備份**：[原公開資料試算表](https://docs.google.com/spreadsheets/d/1SBd3jZVA38dv0TSuS-LyKIsSzmGWI9Zyo_7zH5pDNPU/edit) 保留作為搬移前備份，不會與後台雙向同步。
 * **交接說明**：帳號、資料來源及驗收步驟見 [SETUP.md](SETUP.md)。
-* **風格調整**：跨頁字級與互動放在 `ui.css`；讀取在其後的 `material.css` 集中材質、圓角及首頁構圖，背景底層由 `stone-surface.css` 共用，後台細節放在 `admin/admin.css`。最後載入的 `theme.css` 提供白色版，`theme.js` 在樣式載入前恢復使用者選擇，預設維持黑金版。各組的 `style.css` 保留必要的部門特色，避免重複定義共用元件。
+* **風格調整**：跨頁字級與互動放在 `ui.css`；讀取在其後的 `material.css` 集中材質、圓角及首頁構圖，背景底層由 `stone-surface.css` 共用，後台細節放在 `admin/admin.css`。`theme.css` 提供白色版，`theme.js` 在樣式載入前恢復使用者選擇，預設維持黑金版。最後的 `glass.css` 集中導覽／操作面板的毛玻璃、按鈕按壓及可及性替代樣式，意見回饋排版由 `president/feedback.css` 負責。各組的 `style.css` 保留必要的部門特色，避免重複定義共用元件。
 
 ---
 
