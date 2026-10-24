@@ -37,7 +37,7 @@ test('official identity uses the uploaded badge, correctly sized icons and verif
     assert.equal(organization.logo.url,publicRoot+'assets/union-logo.jpg');
     assert.deepEqual(organization.sameAs,['https://www.instagram.com/tlsh_su/']);
     await access(new URL('../assets/union-logo.jpg',import.meta.url));
-    assert.match(home,/<img class="hero-logo" src="assets\/union-logo\.jpg" alt="斗六高中學生會正式會標"/);
+    assert.match(home,/<img class="[^"]*\bhero-logo\b[^"]*" src="assets\/union-logo\.jpg" alt="斗六高中學生會正式會標"/);
     assert.ok(!home.includes('identity-plate'));
     const manifest=JSON.parse(await readFile(new URL('../site.webmanifest',import.meta.url),'utf8'));
     assert.deepEqual(manifest.icons.map(item=>item.sizes),['192x192','512x512']);

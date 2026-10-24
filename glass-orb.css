@@ -1,0 +1,19 @@
+/* The native badge remains the fallback and the source for crawlers without WebGL. */
+.orb-stage { position: relative; width: clamp(15rem, 26vw, 22rem); max-width: 100%; aspect-ratio: 1; border-radius: 50%; }
+.orb-stage .hero-logo { width: 100%; height: 100%; }
+.orb-canvas { position: absolute; inset: -6%; width: 112%; height: 112%; pointer-events: none; }
+.orb-ready { cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.orb-ready .orb-fallback { opacity: 0; }
+.orb-ready::before { content: ''; position: absolute; inset: 5% 0 -12%; pointer-events: none; z-index: -1; background: radial-gradient(ellipse at 50% 85%, #d9c47718, transparent 60%); }
+.orb-ready::after { content: ''; position: absolute; bottom: -9%; left: 18%; width: 64%; height: 8%; border-radius: 50%; background: #0003; filter: blur(12px); pointer-events: none; }
+.orb-ready.orb-dragging { cursor: grabbing; }
+.orb-stage:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 1rem; }
+.orb-controls { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .5rem 1rem; margin-top: 2rem; min-height: 44px; }
+.orb-controls .hero-brand-caption { margin: 0; font-size: .75rem; letter-spacing: .06em; }
+.orb-reset { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; padding: .5rem .875rem; border: 1px solid var(--ui-control-border); border-radius: 2rem; background: transparent; color: var(--ui-text); font: inherit; font-size: .8125rem; cursor: pointer; }
+.orb-reset:active { background: #d9c47720; }
+.orb-status { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); }
+html[data-theme="light"] .orb-ready::after { background: #4d574021; }
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .orb-ready::before, .orb-ready::after { display: none; }
+}
