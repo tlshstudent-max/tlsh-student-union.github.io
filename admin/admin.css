@@ -20,7 +20,7 @@
 .panel-heading h2 { margin: 0; font-size: 22px; font-weight: 500; }
 .panel-heading p { font-size: 14px; }
 .admin-page label { display: flex; flex-direction: column; gap: 8px; color: #d5dacb; font-size: 14px; }
-.admin-page input:not([type=checkbox]), .admin-page select, .admin-page textarea { display: block; min-width: 0; width: 100%; min-height: 46px; padding: 11px 12px; border: 1px solid #414936; border-radius: 3px; background: #090d08; color: #eff2e7; font: inherit; font-size: 16px; }
+.admin-page input:not([type=checkbox]):not([type=radio]), .admin-page select, .admin-page textarea { display: block; min-width: 0; width: 100%; min-height: 46px; padding: 11px 12px; border: 1px solid #414936; border-radius: 3px; background: #090d08; color: #eff2e7; font: inherit; font-size: 16px; }
 .admin-page textarea { resize: vertical; }
 .admin-page input[readonly] { color: #a4ad99; }
 .content-filters { display: grid; grid-template-columns: 2fr 1fr 1fr auto; align-items: end; gap: 16px; margin: 25px 0 15px; }
@@ -63,6 +63,14 @@
 #view-location { margin-bottom: 12px; }
 .department-filter { max-width: 360px; margin: 0 0 20px; }
 #publication-hint { margin: 0; }
+.admin-page .publication-field { margin: 0; min-width: 0; }
+.publication-field > p { margin: 0 0 12px; }
+.department-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.admin-page .department-choice { flex-direction: row; align-items: center; min-height: 48px; padding: 10px 12px; border: 1px solid #414936; border-radius: 3px; cursor: pointer; background: #090d08; }
+.department-choice input { flex: 0 0 auto; width: 18px; height: 18px; margin: 0; accent-color: var(--ui-gold); }
+.department-choice:has(:checked) { border-color: var(--ui-gold); background: #2b2d1c; color: #f1dfa1; }
+.department-choice:has(:disabled) { cursor: default; opacity: .6; }
+@media (max-width: 380px) { .department-options { grid-template-columns: 1fr; } }
 @media (max-width: 900px) {
     .login-panel { gap: 35px; }
     .content-filters { grid-template-columns: 1fr 1fr; }

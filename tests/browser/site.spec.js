@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { siteConfig } from '../../site-config.js';
-import { publication } from '../../lib/publication.js';
+import { departments, publication } from '../../lib/publication.js';
 
 const csv = 'date,year,category,title,description,url,status,news_date,news_category,news_title,news_summary,news_url\n2026-10-01,115,會議紀錄,公開會議紀錄,文件說明,https://example.com/file,公開,2026-10-01,學生會公告,校園測試消息,公告摘要,https://example.com/news';
 const id = '12345678-1234-4234-8234-123456789abc';
@@ -370,7 +370,7 @@ test('local editor drafts survive reload, preserve custom categories, and clear 
     await page.goto('/admin/');
     await page.getByRole('button',{name:'＋ 新增內容'}).click();
     await page.getByLabel('標題',{exact:true}).fill('暫存的活動想法');
-    await page.getByLabel('發布位置',{exact:true}).selectOption('pr');
+    await page.getByRole('radio',{name:'公關組',exact:true}).check();
     await page.getByLabel('同時顯示在首頁最新消息',{exact:true}).uncheck();
     await page.getByLabel('類別',{exact:true}).selectOption('__custom__');
     await page.getByLabel('自訂類別',{exact:true}).fill('跨組合作');
@@ -384,7 +384,7 @@ test('local editor drafts survive reload, preserve custom categories, and clear 
     await page.getByRole('button',{name:'回復暫存',exact:true}).click();
     await expect(page.getByLabel('標題',{exact:true})).toHaveValue('暫存的活動想法');
     await expect(page.getByLabel('自訂類別',{exact:true})).toHaveValue('跨組合作');
-    await expect(page.getByLabel('發布位置',{exact:true})).toHaveValue('pr');
+    await expect(page.getByRole('radio',{name:'公關組',exact:true})).toBeChecked();
     await expect(page.getByLabel('同時顯示在首頁最新消息',{exact:true})).not.toBeChecked();
     await page.locator('#save-content').click();
     await expect(page.locator('#dashboard-status')).toContainText('草稿已儲存');
@@ -506,13 +506,55 @@ test('an in-flight save cannot reopen the workspace after the account signs out'
     await expect(page.locator('#login-status')).toContainText('安全登出');
 });
 
+test('department choices respond to clicks and keyboard on desktop and mobile',async({page})=>{
+    const mock=await backend(page);
+    mock.setContents([]);
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'＋ 新增內容'}).click();
+    const group=page.getByRole('group',{name:'發布位置',exact:true});
+    for(const width of [1280,390,320]) {
+        await page.setViewportSize({width,height:844});
+        for(const [value,{label}] of Object.entries(departments)) {
+            await group.getByText(label,{exact:true}).click();
+            await expect(group.getByRole('radio',{name:label,exact:true})).toBeChecked();
+            await expect(group.locator('input:checked')).toHaveCount(1);
+            expect(await page.locator('#content-form').evaluate(form=>new FormData(form).get('department'))).toBe(value);
+        }
+        expect(await page.locator('#content-dialog').evaluate(node=>node.scrollWidth<=node.clientWidth)).toBe(true);
+    }
+    const pr=group.getByRole('radio',{name:'公關組',exact:true});
+    await pr.focus();
+    await page.keyboard.press('Space');
+    await expect(pr).toBeChecked();
+    await page.keyboard.press('ArrowRight');
+    await expect(group.getByRole('radio',{name:'學權組',exact:true})).toBeChecked();
+    await page.getByLabel('標題',{exact:true}).fill('點選部門後儲存');
+    await page.locator('#save-content').click();
+    await expect(page.locator('#dashboard-status')).toContainText('草稿已儲存');
+    expect(mock.calls.find(call=>call.method==='POST').body.department).toBe('rights');
+    await page.getByRole('button',{name:'編輯',exact:true}).click();
+    await expect(group.getByRole('radio',{name:'學權組',exact:true})).toBeChecked();
+});
+
+test('published content keeps department choices read-only without publishing permission',async({page})=>{
+    const mock=await backend(page,{...admin,role:'editor',can_publish:false});
+    mock.setContents([{...article,status:'published',department:'pr'}]);
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'檢視',exact:true}).click();
+    const group=page.getByRole('group',{name:'發布位置',exact:true});
+    await expect(group.getByRole('radio',{name:'公關組',exact:true})).toBeChecked();
+    for(const radio of await group.getByRole('radio').all()) await expect(radio).toBeDisabled();
+    await expect(page.locator('#save-content')).toBeHidden();
+    expect(mock.calls.some(call=>['POST','PATCH'].includes(call.method))).toBe(false);
+});
+
 test('staff can publish to one department, move the post, opt into home, and archive everywhere',async({page})=>{
     const mock=await backend(page);
     mock.setContents([]);
     await page.goto('/admin/');
     await page.getByRole('button',{name:'＋ 新增內容'}).click();
     await page.getByLabel('標題',{exact:true}).fill('公關組專屬消息');
-    await page.getByLabel('發布位置',{exact:true}).selectOption('pr');
+    await page.getByRole('radio',{name:'公關組',exact:true}).check();
     await page.getByLabel('同時顯示在首頁最新消息',{exact:true}).uncheck();
     await expect(page.locator('#publication-hint')).toHaveText('設為「已發布」後顯示於：公關組。');
     await page.getByLabel('內容狀態').selectOption('published');
@@ -529,8 +571,8 @@ test('staff can publish to one department, move the post, opt into home, and arc
     await expect(page.locator('.news-card')).toHaveCount(0);
     await page.goto('/admin/');
     await page.getByRole('button',{name:'編輯',exact:true}).click();
-    await expect(page.getByLabel('發布位置',{exact:true})).toHaveValue('pr');
-    await page.getByLabel('發布位置',{exact:true}).selectOption('rights');
+    await expect(page.getByRole('radio',{name:'公關組',exact:true})).toBeChecked();
+    await page.getByRole('radio',{name:'學權組',exact:true}).check();
     await page.getByLabel('同時顯示在首頁最新消息',{exact:true}).check();
     page.once('dialog',dialog=>dialog.accept());
     await page.locator('#save-content').click();
@@ -558,7 +600,7 @@ test('meeting minutes can be written inline, published, read from the library, a
     await page.goto('/admin/');
     await page.getByRole('button',{name:'新增會議紀錄',exact:true}).click();
     await expect(page.locator('#content-form').getByLabel('內容類型')).toHaveValue('document');
-    await expect(page.getByLabel('發布位置',{exact:true})).toHaveValue('docs');
+    await expect(page.getByRole('radio',{name:'文書組',exact:true})).toBeChecked();
     await page.getByLabel('標題',{exact:true}).fill('學生會第一次會議紀錄');
     await page.getByLabel('文件內文／會議紀錄（可直接輸入）').fill('出席人員：測試\n決議：<img src=x onerror=alert(1)>');
     await page.locator('#save-content').click();
@@ -595,7 +637,7 @@ test('linked minutes remain accessible from their department, the library and op
     await page.goto('/admin/');
     await page.getByRole('button',{name:'新增會議紀錄',exact:true}).click();
     await page.getByLabel('標題',{exact:true}).fill('公關協作會議紀錄');
-    await page.getByLabel('發布位置',{exact:true}).selectOption('pr');
+    await page.getByRole('radio',{name:'公關組',exact:true}).check();
     await page.getByLabel('文件連結（已輸入內文時可不填）').fill('https://example.com/minutes.pdf');
     await page.getByLabel('內容狀態').selectOption('published');
     page.once('dialog',dialog=>dialog.accept());
@@ -666,11 +708,11 @@ test('a pending schema update preserves editing and explains the required migrat
     await page.goto('/admin/');
     await page.getByRole('button',{name:'＋ 新增內容'}).click();
     await page.getByLabel('標題',{exact:true}).fill('保留編輯中的公關資料');
-    await page.getByLabel('發布位置',{exact:true}).selectOption('pr');
+    await page.getByRole('radio',{name:'公關組',exact:true}).check();
     await page.locator('#save-content').click();
     await expect(page.locator('#editor-status')).toContainText('002_publication_locations.sql');
     await expect(page.getByLabel('標題',{exact:true})).toHaveValue('保留編輯中的公關資料');
-    await expect(page.getByLabel('發布位置',{exact:true})).toHaveValue('pr');
+    await expect(page.getByRole('radio',{name:'公關組',exact:true})).toBeChecked();
     upgraded=true;
     await page.locator('#save-content').click();
     await expect(page.locator('#dashboard-status')).toContainText('草稿已儲存');
