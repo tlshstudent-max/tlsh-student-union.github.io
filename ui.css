@@ -1,6 +1,6 @@
 /* Shared reading and navigation layer; retains the original stone palette. */
-:root { --ui-gold: #d9c477; --ui-text: #eeeee8; --ui-muted: #b3b4ad; --ui-line: #30322c; --ui-control-border: #737f66; }
-body { color: var(--ui-text); letter-spacing: .035em; line-height: 1.75; overflow-wrap: anywhere; }
+:root { --ui-gold: #d9c477; --ui-text: #eeeee8; --ui-muted: #b3b4ad; --ui-line: #30322c; --ui-control-border: #737f66; --ui-radius-control: .25rem; --ui-radius-card: .5rem; --ui-radius-dialog: .75rem; --ui-response: 160ms; }
+body { color: var(--ui-text); letter-spacing: .015em; line-height: 1.8; font-optical-sizing: auto; overflow-wrap: anywhere; }
 [hidden] { display: none !important; }
 :target { scroll-margin-top: 110px; }
 a, button, input, select, textarea { -webkit-tap-highlight-color: rgba(217,196,119,.2); touch-action: manipulation; }
@@ -20,14 +20,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .urgent-banner ul { list-style: none; padding: 0; margin: 4px 0; }
 .urgent-banner li { padding: 12px 0; border-top: 1px solid #6a4339; }
 .urgent-banner a { color: #ffe0bd; text-underline-offset: 4px; }
-.urgent-title { font-size: 1.0625rem; font-weight: 600; }
-.urgent-summary { font-size: 0.875rem; margin: 6px 0; white-space: pre-line; max-height: 5.25em; overflow: auto; }
+.urgent-title { display: inline-flex; align-items: center; min-height: max(44px, 2.75rem); font-size: 1.0625rem; font-weight: 600; }
+.urgent-summary { font-size: 0.875rem; margin: 6px 0; white-space: pre-line; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
 .urgent-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; font-size: 0.75rem; color: #e6c5ba; }
 .urgent-meta a { display: inline-flex; align-items: center; min-height: 44px; }
 .urgent-error { font-size: 0.8125rem; margin: 4px 0; }
-.urgent-error button { min-height: 44px; padding: 4px 12px; border: 1px solid #a77967; border-radius: 3px; background: transparent; color: #ffe0bd; font: inherit; cursor: pointer; }
+.urgent-error button { min-height: 44px; padding: 4px 12px; border: 1px solid #a77967; border-radius: var(--ui-radius-control); background: transparent; color: #ffe0bd; font: inherit; cursor: pointer; }
 .eyebrow { color: var(--ui-gold); font-size: 0.75rem; letter-spacing: .15em; font-weight: 600; }
-.button { display: inline-flex; align-items: center; justify-content: center; gap: 1.5rem; min-height: max(44px, 3rem); padding: .75rem 1.375rem; border: 1px solid var(--ui-line); border-radius: 3px; color: var(--ui-text); font: inherit; font-size: 0.9375rem; font-weight: 600; text-decoration: none; cursor: pointer; transition: background .18s ease, border-color .18s ease; }
+.button { display: inline-flex; align-items: center; justify-content: center; gap: 1.5rem; min-height: max(44px, 3rem); padding: .75rem 1.375rem; border: 1px solid var(--ui-line); border-radius: var(--ui-radius-control); color: var(--ui-text); font: inherit; font-size: 0.9375rem; font-weight: 600; text-decoration: none; cursor: pointer; transition: background .18s ease, border-color .18s ease; }
 .button-primary { background: var(--ui-gold); border-color: var(--ui-gold); color: #181a15; }
 .button-primary:hover { background: #e7d698; border-color: #e7d698; }
 .button-secondary { background: #151815; }
@@ -117,7 +117,7 @@ body:not(.home-page) > footer a { display: inline-flex; align-items: center; min
     .sitebar { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 10px 20px; gap: 4px 12px; }
     .site-brand { grid-column: 1; grid-row: 1; }
     .sitebar-links { grid-column: 1 / -1; grid-row: 2; width: 100%; gap: 22px; overflow-x: auto; }
-    .sitebar .staff-link { grid-column: 2; grid-row: 1; border: 1px solid #4b4d37; border-radius: 3px; padding: 0 .5rem; margin: 0; }
+    .sitebar .staff-link { grid-column: 2; grid-row: 1; border: 1px solid #4b4d37; border-radius: var(--ui-radius-control); padding: 0 .5rem; margin: 0; }
     .home-hero { grid-template-columns: 1fr; padding: 42px 0 35px; gap: 25px; }
     .home-hero h1 { font-size: 2.375rem; }
     .hero-directory { padding: 15px 22px 0; }
@@ -152,6 +152,48 @@ body:not(.home-page) > footer a { display: inline-flex; align-items: center; min
     .archive-filter-grid { grid-template-columns: 1fr; gap: 14px; }
     .motto, .subtitle, .office-subtitle { letter-spacing: .04em; }
     .section-title.gold-title, .section-title { margin-top: 35px; }
+}
+
+/* A restrained shared hierarchy for the stone surfaces. */
+.page-header h1, .office-header h1, body:not(.home-page) > header h1 {
+    font-size: clamp(1.875rem, 4vw, 3rem); font-weight: 500; line-height: 1.35; letter-spacing: .035em; text-indent: 0;
+}
+.home-hero h1 { line-height: 1.4; }
+.section-title, .section-title.gold-title, h2.section-title { font-size: 1.125rem; font-weight: 600; line-height: 1.5; letter-spacing: .04em; }
+.card h3, .info-card h3 { font-size: 1.125rem; font-weight: 600; line-height: 1.55; letter-spacing: .02em; margin-bottom: .75rem; }
+.card p, .info-card p { font-size: 1rem; line-height: 1.85; letter-spacing: .015em; }
+.card, .info-card { background: #10130f; border: 1px solid #343b2d; border-radius: var(--ui-radius-card); box-shadow: inset 0 1px 0 #ffffff05; }
+.card:not(a):not(button):hover, .info-card:hover { transform: none; background: #10130f; border-color: #343b2d; box-shadow: inset 0 1px 0 #ffffff05; }
+.news-card, .home-page .news-card { border-radius: var(--ui-radius-card); transition: background-color var(--ui-response) ease, border-color var(--ui-response) ease, transform var(--ui-response) ease; }
+.sitebar-links a[aria-current], .sitebar .staff-link[aria-current] { color: var(--ui-gold); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .5em; }
+.control-group input, .control-group select, .zen-form input, .zen-form textarea { border-radius: var(--ui-radius-control); transition: background-color var(--ui-response) ease, border-color var(--ui-response) ease; }
+.document-body .title { font-size: 1.125rem; font-weight: 500; letter-spacing: .015em; }
+.document-description { font-size: .9375rem; line-height: 1.8; }
+.document-year, .document-category, .date, .control-group label { font-size: .875rem; letter-spacing: .02em; }
+.docs-page .archive-item, .docs-page .archive-item:hover { padding-left: 0; transition: background-color var(--ui-response) ease; }
+.archive-controls { border-radius: var(--ui-radius-card); }
+.article-shell { padding-bottom: 1rem; }
+.article-shell #article { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--ui-line); }
+.article-shell h1 { font-weight: 600; letter-spacing: .02em; line-height: 1.4; margin: .75rem 0 1rem; }
+#article-date { display: block; color: var(--ui-muted); font-size: .875rem; letter-spacing: .025em; }
+#article-summary { color: #c2c6b9; font-size: 1.0625rem; line-height: 1.85; margin: 1.5rem 0; }
+.article-body { line-height: 1.9; }
+.article-feedback { margin: 1.5rem 0; padding: 1rem 1.25rem; border: 1px solid var(--ui-line); border-radius: var(--ui-radius-card); background: #11150f; }
+.article-feedback p { margin: 0; }
+.article-feedback .button { margin-top: .75rem; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    a.news-card:hover, .home-page a.news-card:hover { transform: translateY(-2px); border-color: #81764e; background: #181e14; box-shadow: none; }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .sitebar { background: #090b0b; backdrop-filter: none; }
+    .card, .info-card, .news-card, .home-page .news-card, .archive-controls { background: #11150f; }
+}
+@media (prefers-contrast: more) {
+    :root { --ui-muted: #d3d7ca; --ui-line: #818b73; --ui-control-border: #a7b895; }
+    .sitebar, .card, .info-card, .news-card, .home-page .news-card { border-color: #818b73; }
+}
+@media (prefers-reduced-motion: reduce) {
+    a.news-card:hover, .home-page a.news-card:hover { transform: none; }
 }
 
 /* Instant press feedback; actions still commit through native click / keyboard activation. */

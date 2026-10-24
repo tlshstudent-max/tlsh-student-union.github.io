@@ -24,7 +24,7 @@ import { announcementCard } from './lib/public-cards.js';
             }
 
             container.replaceChildren(...announcements.map(item => announcementCard(item)));
-            status.textContent = `已同步 ${announcements.length} 則公開消息`;
+            status.textContent = `共 ${announcements.length} 則公開消息`;
         } catch (error) {
             console.error('公告讀取失敗：', error);
             status.textContent = '最新消息暫時無法讀取，請重新載入。';

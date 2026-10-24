@@ -8,10 +8,11 @@
     <title>幹部工作台 | 斗六高中學生會</title>
     <link rel="icon" href="../favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../stone-surface.css">
-    <link rel="stylesheet" href="../ui.css?v=design-1">
-    <link rel="stylesheet" href="admin.css?v=design-1">
-    <script type="module" src="../navigation.js?v=design-1"></script>
+    <link rel="stylesheet" href="../stone-surface.css?v=stone-2">
+    <link rel="stylesheet" href="../ui.css?v=refinement-1">
+    <link rel="stylesheet" href="../material.css?v=stone-2">
+    <link rel="stylesheet" href="admin.css?v=refinement-1">
+    <script type="module" src="../navigation.js?v=refinement-1"></script>
 </head>
 <body class="admin-page">
     <a class="skip-link" href="#main-content">跳至主要內容</a>
@@ -49,7 +50,7 @@
 
     <dialog id="content-dialog" aria-labelledby="editor-heading">
         <form id="content-form">
-            <div class="panel-heading"><div><p class="eyebrow">CONTENT EDITOR</p><h2 id="editor-heading">新增內容</h2></div><button id="close-editor" type="button" class="button button-secondary">關閉</button></div>
+            <div class="panel-heading editor-topbar"><div><p class="eyebrow">CONTENT EDITOR</p><h2 id="editor-heading">新增內容</h2></div><button id="close-editor" type="button" class="button button-secondary">關閉</button></div>
             <div id="draft-recovery" class="draft-recovery" hidden>
                 <p id="draft-recovery-message"></p>
                 <div class="form-actions"><button id="restore-draft" type="button" class="button button-secondary">回復暫存</button><button id="discard-draft" type="button" class="button button-secondary">捨棄暫存</button></div>
@@ -78,7 +79,7 @@
             </details>
             <details class="content-preview"><summary>預覽公開內容</summary><p id="preview-meta" class="eyebrow"></p><h3 id="preview-title"></h3><p id="preview-summary"></p><div id="preview-body" class="article-body"></div><a id="preview-link" target="_blank" rel="noopener noreferrer" hidden>開啟相關連結 ↗</a></details>
             <p id="draft-status" class="notice" role="status" aria-live="polite"></p>
-            <p id="editor-status" class="notice" role="status" aria-live="polite"></p><div class="form-actions"><button id="save-content" type="submit" class="button button-primary">儲存內容</button><span class="muted">只有「已發布」的內容會出現在官網。</span></div>
+            <p id="editor-status" class="notice" role="status" aria-live="polite"></p><div class="form-actions editor-actions"><button id="save-content" type="submit" class="button button-primary">儲存內容</button><span class="muted">只有「已發布」的內容會出現在官網。</span></div>
         </form>
     </dialog>
     <script type="module" src="admin.js?v=design-1"></script>

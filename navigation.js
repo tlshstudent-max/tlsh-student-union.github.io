@@ -1,4 +1,4 @@
-import { mountUrgentNotices } from './urgent-banner.js';
+import { mountUrgentNotices } from './urgent-banner.js?v=refinement-1';
 
 const root = new URL('./', import.meta.url);
 const bar = document.createElement('nav');
@@ -16,16 +16,26 @@ name.textContent = '斗六高中學生會';
 brand.append(emblem, name);
 const links = document.createElement('div');
 links.className = 'sitebar-links';
+const destinations = [];
 for (const [label, path] of [['最新消息', '#announcements'], ['校園活動', 'activities/'], ['公開文件', 'docs/'], ['意見回饋', 'president/#feedback'], ['幹部登入', 'admin/']]) {
     const a = document.createElement('a');
     a.textContent = label;
     a.href = new URL(path, root).href;
     if (path === 'admin/') a.className = 'staff-link';
-    const target = new URL(a.href);
-    if (!target.hash && location.pathname.startsWith(target.pathname)) a.setAttribute('aria-current', 'page');
+    destinations.push(a);
     if (path === 'admin/') bar.append(a); else links.append(a);
 }
 bar.prepend(brand, links);
+function updateCurrentLocation() {
+    const normalizedPath = path => path.replace(/index\.html$/, '').replace(/\/$/, '') || '/';
+    for (const a of destinations) {
+        const target = new URL(a.href), samePage = normalizedPath(location.pathname) === normalizedPath(target.pathname);
+        a.removeAttribute('aria-current');
+        if (samePage && (!target.hash || location.hash === target.hash)) a.setAttribute('aria-current', target.hash ? 'location' : 'page');
+    }
+}
+updateCurrentLocation();
+window.addEventListener('hashchange', updateCurrentLocation);
 const skipLink = document.querySelector('.skip-link');
 if (skipLink) skipLink.after(bar); else document.body.prepend(bar);
 if (!document.body.classList.contains('admin-page')) mountUrgentNotices(bar);

@@ -970,3 +970,98 @@ test('urgent editor starts with the task, saves collapsed defaults, and reveals 
     await expect(page.locator('#dashboard-status')).toContainText('草稿已儲存');
     expect(mock.calls.find(call=>call.method==='POST').body).toMatchObject({is_urgent:true,department:'union',status:'draft',url:'https://example.com/info'});
 });
+
+test('navigation reflects section changes and index.html aliases',async({page})=>{
+    await page.goto('/index.html#announcements');
+    await expect(page.getByRole('link',{name:'最新消息',exact:true}).first()).toHaveAttribute('aria-current','location');
+    await page.evaluate(()=>{location.hash='departments';});
+    await expect(page.getByRole('link',{name:'最新消息',exact:true}).first()).not.toHaveAttribute('aria-current');
+    await page.goto('/president/index.html#feedback');
+    const feedback=page.getByRole('link',{name:'意見回饋',exact:true}).first();
+    await expect(feedback).toHaveAttribute('aria-current','location');
+    expect(await feedback.evaluate(e=>getComputedStyle(e).textDecorationLine)).toContain('underline');
+    await page.goto('/docs/index.html');
+    await expect(page.getByRole('link',{name:'公開文件',exact:true}).first()).toHaveAttribute('aria-current','page');
+});
+
+test('article errors offer an in-place retry while unavailable content stays private',async({page})=>{
+    const mock=await backend(page);mock.setContents([{...article,status:'published'}]);
+    let offline=true,attempts=0;
+    await page.route('https://school.supabase.co/rest/v1/content*',route=>{
+        if(!new URL(route.request().url()).searchParams.get('id')) return route.fallback();
+        attempts++;
+        return offline ? route.fulfill({status:400,contentType:'application/json',body:'{"message":"temporarily unavailable"}'}) : route.fallback();
+    });
+    await page.goto(`/announcement.html?id=${id}`);
+    await expect(page.locator('#article-status')).toContainText('目前無法讀取');
+    await expect(page.locator('#article')).toBeHidden();
+    offline=false;
+    await page.getByRole('button',{name:'重新載入',exact:true}).click();
+    await expect(page.locator('#article-title')).toHaveText(article.title);
+    await expect(page.locator('#article-feedback')).toBeHidden();
+    expect(attempts).toBe(2);
+    mock.setContents([]);await page.reload();
+    await expect(page.locator('#article-status')).toContainText('未公開');
+    await expect(page.locator('#article-retry')).toBeHidden();
+    await expect(page.locator('#article')).toBeHidden();
+    await page.goto('/announcement.html?id=invalid');
+    await expect(page.locator('#article-status')).toContainText('連結無效');
+    await expect(page.locator('#article-retry')).toBeHidden();
+});
+
+test('static cards and document rows remain still while typography and control shapes agree',async({page})=>{
+    await page.setViewportSize({width:1440,height:900});
+    await page.goto('/pr/');
+    const heading=await page.locator('h1').evaluate(e=>{const s=getComputedStyle(e);return {size:parseFloat(s.fontSize),tracking:parseFloat(s.letterSpacing),weight:+s.fontWeight};});
+    expect(heading.tracking/heading.size).toBeLessThanOrEqual(.05);
+    expect(heading.weight).toBeGreaterThanOrEqual(500);
+    const card=page.locator('.card').first();
+    await card.hover();await page.waitForTimeout(200);
+    expect(await card.evaluate(e=>getComputedStyle(e).transform)).toBe('none');
+    await page.goto('/design/');const designRadius=await page.locator('.info-card').first().evaluate(e=>getComputedStyle(e).borderTopLeftRadius);
+    await page.goto('/general/');expect(await page.locator('.info-card').first().evaluate(e=>getComputedStyle(e).borderTopLeftRadius)).toBe(designRadius);
+    await page.goto('/docs/');await page.locator('.archive-item').waitFor();
+    const link=page.locator('.download-link').first(),before=await link.boundingBox();
+    await page.locator('.archive-item').first().hover();await page.waitForTimeout(200);
+    const after=await link.boundingBox();expect(Math.abs(after.x-before.x)).toBeLessThan(.5);
+    const docsRadius=await page.locator('#document-search').evaluate(e=>getComputedStyle(e).borderTopLeftRadius);
+    await backend(page);await page.goto('/admin/');await page.getByRole('button',{name:'＋ 新增內容'}).click();
+    expect(await page.getByLabel('標題',{exact:true}).evaluate(e=>getComputedStyle(e).borderTopLeftRadius)).toBe(docsRadius);
+});
+
+test('transparency and contrast preferences provide solid navigation and dialog surfaces',async({page})=>{
+    const cdp=await page.context().newCDPSession(page);
+    await cdp.send('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-transparency',value:'reduce'}]});
+    await page.goto('/');await page.locator('.sitebar').waitFor();
+    expect(await page.evaluate(()=>matchMedia('(prefers-reduced-transparency: reduce)').matches)).toBe(true);
+    expect(await page.locator('.sitebar').evaluate(e=>getComputedStyle(e).backdropFilter)).toBe('none');
+    await cdp.send('Emulation.setEmulatedMedia',{features:[{name:'prefers-contrast',value:'more'}]});
+    expect(await page.evaluate(()=>matchMedia('(prefers-contrast: more)').matches)).toBe(true);
+    const barColors=await page.locator('.sitebar').evaluate(e=>({border:getComputedStyle(e).borderBottomColor,bg:getComputedStyle(e).backgroundColor}));
+    expect(contrastRatio(barColors.border,barColors.bg)).toBeGreaterThanOrEqual(3);
+    await backend(page);await page.goto('/admin/');await page.getByRole('button',{name:'＋ 新增內容'}).click();
+    expect(await page.locator('#content-dialog').evaluate(e=>getComputedStyle(e,'::backdrop').backdropFilter)).toBe('none');
+});
+
+test('editor actions stay reachable on long forms and urgent labels match their state',async({page})=>{
+    await page.setViewportSize({width:390,height:844});
+    const mock=await backend(page);
+    await page.goto('/admin/');await page.getByRole('button',{name:'＋ 新增內容'}).click();
+    await page.locator('#content-dialog').evaluate(e=>{e.scrollTop=e.scrollHeight;});
+    const boxes=await page.evaluate(()=>{
+        const bounds=id=>{const r=document.getElementById(id).getBoundingClientRect();return {top:r.top,bottom:r.bottom};};
+        return {dialog:bounds('content-dialog'),close:bounds('close-editor'),save:bounds('save-content')};
+    });
+    expect(boxes.close.top).toBeGreaterThanOrEqual(boxes.dialog.top);
+    expect(boxes.close.bottom).toBeLessThanOrEqual(boxes.dialog.bottom);
+    expect(boxes.save.bottom).toBeLessThanOrEqual(boxes.dialog.bottom);
+    await page.getByRole('button',{name:'關閉',exact:true}).click();
+    mock.setContents([urgentFixture({summary:'這是需要查看全文的長摘要。'.repeat(30)})]);
+    await page.goto('/rights/');await page.locator('.urgent-title').waitFor();
+    await expect(page.locator('.urgent-toggle-hint')).toContainText('收合');
+    const summary=await page.locator('.urgent-summary').evaluate(e=>({height:e.clientHeight,line:parseFloat(getComputedStyle(e).lineHeight),overflow:getComputedStyle(e).overflowY}));
+    expect(summary.height).toBeLessThanOrEqual(summary.line*2+1);
+    expect(summary.overflow).toBe('hidden');
+    await page.locator('.urgent-banner summary').click();await expect(page.locator('.urgent-toggle-hint')).toContainText('展開');
+    await page.locator('.urgent-banner summary').click();await expect(page.locator('.urgent-toggle-hint')).toContainText('收合');
+});
