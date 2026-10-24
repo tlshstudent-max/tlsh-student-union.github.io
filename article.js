@@ -1,6 +1,7 @@
 import { publishedContent } from './backend.js';
 import { safeHttpsUrl, normalizeDate } from './lib/content.js';
 import { departments } from './lib/publication.js';
+import { setPublicArticleMetadata } from './lib/seo.js';
 
 const status = document.getElementById('article-status'), feedback = document.getElementById('article-feedback');
 const article = document.getElementById('article'), retry = document.getElementById('article-retry');
@@ -34,15 +35,17 @@ async function loadArticle() {
     status.textContent = '正在讀取內容…'; article.setAttribute('aria-busy', 'true');
     try {
         if (!['announcement', 'document'].includes(kind) || !/^[0-9a-f-]{36}$/i.test(id || '')) {
+            document.querySelector('meta[name="robots"]').content = 'noindex, follow';
             status.textContent = '這個內容連結無效，請返回列表重新選擇。';
             return;
         }
         const [item] = await publishedContent(kind, id);
         if (!item) {
+            document.querySelector('meta[name="robots"]').content = 'noindex, follow';
             status.textContent = '這份內容目前未公開，或已經下架。';
             return;
         }
-        document.title = `${item.title} | 斗六高中學生會`;
+        setPublicArticleMetadata(item, kind);
         for (const field of ['category', 'title', 'summary', 'body']) document.getElementById(`article-${field}`).textContent = item[field];
         if (item.department !== 'union') document.getElementById('article-category').textContent = `${departments[item.department].label} · ${item.category}`;
         if (kind === 'announcement' && item.department !== 'union') {

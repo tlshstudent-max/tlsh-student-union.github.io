@@ -1,0 +1,93 @@
+/* Shared controls plus an optional porcelain-white surface; black/gold remains the default. */
+:root { color-scheme: dark; }
+.sitebar-actions { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+.theme-toggle { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: max(44px, 2.75rem); min-width: 44px; padding: .5rem .75rem; border: 1px solid var(--ui-line); border-radius: 2rem; background: transparent; color: var(--ui-text); font: inherit; font-size: .8125rem; cursor: pointer; white-space: nowrap; }
+.theme-toggle:hover { border-color: var(--ui-control-border); }
+.theme-icon { font-size: 1.125rem; line-height: 1; }
+@media (max-width: 820px) {
+    .sitebar-actions { grid-column: 2; grid-row: 1; gap: .5rem; }
+}
+@media (max-width: 600px) {
+    .theme-toggle { padding: .5rem; }
+    .theme-label { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .site-brand { letter-spacing: .02em; gap: .5rem; }
+}
+:root[data-theme="light"] {
+    color-scheme: light;
+    --ui-text: #232720; --ui-muted: #5c6258; --ui-gold: #796018;
+    --ui-line: #d7dbd1; --ui-control-border: #858c7e;
+    --zen-gold: #796018; --zen-warm: #796018; --gold-color: #796018;
+    --rights-accent: #315f6b; --activities-accent: #796018;
+    --material-edge: #d7dbd1; --material-light: linear-gradient(145deg, #fff, #fdfdfb);
+    --material-depth: inset 0 1px 0 #fff, 0 8px 28px #20271c06;
+}
+html[data-theme="light"] body { background: #f7f7f4 !important; color: var(--ui-text); }
+html[data-theme="light"] #cursor-glow { display: none !important; }
+html[data-theme="light"] .sitebar { background: #fafaf8ee; border-color: var(--ui-line); box-shadow: 0 1px 0 #fff8; }
+html[data-theme="light"] :is(.site-brand, h1, .page-header h1, .office-header h1, .card h3, .news-card h3, .dept-card h3, .info-card h3, .title, .site-footer strong) { color: var(--ui-text) !important; text-shadow: none; }
+html[data-theme="light"] :is(.section-title, .eyebrow, .category-tag, .document-category, .download-link, .email-tag, .text-link, .form-privacy a, .card a:not(.button), .info-card a:not(.button), .contact-box a, .content-preview a) { color: var(--ui-gold); }
+html[data-theme="light"] :is(.hero-description, .motto, .subtitle, .office-subtitle, .card p, .info-card p, .news-card p, .dept-card p, .appeal-box p, .contact-box p, .box-desc, .archive-intro, .document-description, .document-year, .document-count, .date, .news-date, .archive-status, .form-privacy, .form-group label, .sitebar-links a, .login-intro > p:not(.eyebrow), .login-card > p, .workspace-heading p, .panel-heading p, .muted, .audit-row time, .empty-state, .article-body, #article-summary) { color: var(--ui-muted) !important; opacity: 1; }
+html[data-theme="light"] :is(.sitebar-links a:hover, .sitebar-links a[aria-current], .staff-link, .tab.active) { color: var(--ui-gold) !important; }
+html[data-theme="light"] :is(.card, .info-card, .news-card, .home-page .news-card, .card:not(a):not(button):hover, .info-card:hover, .archive-controls, .appeal-box, .contact-box, .article-feedback, .login-card, .workspace-panel, .content-preview, #member-form) { background: var(--material-light); border-color: var(--ui-line); box-shadow: var(--material-depth); color: var(--ui-text) !important; }
+html[data-theme="light"] :is(.dept-card, .dept-card:hover, .home-page .dept-card) { color: var(--ui-text) !important; background: transparent; border-color: var(--ui-line); box-shadow: none; }
+html[data-theme="light"] :is(.home-page .hero-directory, .home-hero) { border-color: var(--ui-line); }
+html[data-theme="light"] .home-page .hero-directory { background: var(--material-light); }
+html[data-theme="light"] .hero-directory > a { border-color: var(--ui-line); color: var(--ui-text); }
+html[data-theme="light"] .hero-directory > a:hover { background: #eceee6; }
+html[data-theme="light"] .directory-number { color: var(--ui-gold); }
+html[data-theme="light"] :is(.identity-caption, .identity-signature) { color: var(--ui-muted); }
+html[data-theme="light"] .identity-plate { background: radial-gradient(ellipse at 5% 0%, #fff, transparent 65%), linear-gradient(145deg, #f4f3e9, #e7e8df); border-color: #d7d8cc; box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a3a79333, 24px 32px 64px #282d1914; }
+html[data-theme="light"] .identity-mark { text-shadow: 1px 1px 0 #fff8; }
+html[data-theme="light"] body:not(.home-page) > header { background: linear-gradient(160deg, #fff8, transparent 70%); border-color: var(--ui-line); }
+html[data-theme="light"] .antique-quote { background: #eeefe7; color: var(--ui-text); }
+html[data-theme="light"] .antique-quote p { color: var(--ui-text); }
+html[data-theme="light"] .button-primary { background: #dfcb89; border-color: #b6a062; color: #24261f; box-shadow: inset 0 1px 0 #fff8, 0 4px 12px #20271c08; }
+html[data-theme="light"] .button-primary:hover { background: #ead89d; }
+html[data-theme="light"] .button-secondary { background: #fff; border-color: #a6ad9e; color: var(--ui-text); }
+html[data-theme="light"] .button-secondary:hover { background: #eceee6; border-color: #7b846f; }
+html[data-theme="light"] :is(.appeal-btn, .submit-btn) { background: #fff; color: var(--ui-gold); border-color: #a28a48; }
+html[data-theme="light"] :is(.appeal-btn:hover, .submit-btn:hover) { background: #f2ead0; color: #54400e; }
+html[data-theme="light"] :is(.control-group input, .control-group select, .zen-form input, .zen-form textarea, .copy-fallback input, .admin-page input:not([type=checkbox]):not([type=radio]), .admin-page select, .admin-page textarea, .admin-page .department-choice) { background: #fff; color: var(--ui-text); border-color: var(--ui-control-border); }
+html[data-theme="light"] :is(input, textarea)::placeholder { color: #676f60; opacity: 1; }
+html[data-theme="light"] :is(.admin-page label, .admin-page legend, .control-group label) { color: #484f42; }
+html[data-theme="light"] .admin-page input[readonly] { color: var(--ui-muted); }
+html[data-theme="light"] :is(.content-list, .content-row, .member-row, .audit-row, .workspace-tabs, .editor-settings, .admin-page fieldset, .archive-item, .archive-list, .site-footer, .login-fineprint, .hero-directory > a) { border-color: var(--ui-line); }
+html[data-theme="light"] .tab { color: var(--ui-muted); }
+html[data-theme="light"] .badge { color: #4b543d; border-color: #9ea88e; }
+html[data-theme="light"] .badge.published { background: #eaf1e2; color: #3b5d26; border-color: #7e966d; }
+html[data-theme="light"] .badge.archived { color: var(--ui-muted); border-color: #a3a99c; }
+html[data-theme="light"] .draft-recovery { background: #f8f2df; border-color: #bca15b; }
+html[data-theme="light"] :is(.notice, .form-status.is-success) { color: #726019; }
+html[data-theme="light"] .notice.success { color: #3e6129; }
+html[data-theme="light"] :is(.notice.error, .field-error, .form-status.is-error, .sync-status.is-warning, .archive-status.is-error, .error-text) { color: #963d29; }
+html[data-theme="light"] .admin-page [aria-invalid="true"] { border-color: #ac4a33 !important; }
+html[data-theme="light"] :is(.button-danger, .button-urgent, .badge.urgent) { background: #fff0e9; color: #8e3926; border-color: #b9725e; }
+html[data-theme="light"] #content-dialog { background: #f7f7f2; border-color: #8e987f; box-shadow: 0 24px 80px #141b1930; }
+html[data-theme="light"] #content-dialog::backdrop { background: #101a1666; }
+html[data-theme="light"] :is(.editor-topbar, .editor-actions) { background: #f7f7f2; border-color: var(--ui-line); }
+html[data-theme="light"] .department-choice:has(:checked) { background: #f2ecd8; border-color: #8d7127; color: #614d16; }
+html[data-theme="light"] :is(footer, footer a) { color: var(--ui-muted) !important; border-color: var(--ui-line) !important; }
+html[data-theme="light"] :is(.section-title::after, h2.section-title::after) { background: var(--ui-line); }
+/* Urgency keeps its own warm warning palette in both appearances. */
+html[data-theme="light"] .urgent-banner { background: #fff0e8; border-color: #bb7b65; color: #712d1d; }
+html[data-theme="light"] .urgent-banner a { color: #8b3c1b; }
+html[data-theme="light"] :is(.urgent-meta, .urgent-toggle-hint) { color: #81503c; }
+html[data-theme="light"] .urgent-banner li { border-color: #dcb49f; }
+html[data-theme="light"] .urgent-error button { color: #8b3c1b; border-color: #b47c60; }
+@media (hover: hover) and (pointer: fine) {
+    html[data-theme="light"] :is(a.news-card:hover, .home-page a.news-card:hover) { background: #f0f2e9; border-color: #a6ad95; }
+}
+@media (max-width: 600px) {
+    html[data-theme="light"] .home-hero { background: #fff; }
+    html[data-theme="light"] .home-page .hero-directory { background: none; box-shadow: none; }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    html[data-theme="light"] .sitebar { background: #fafaf8; backdrop-filter: none; }
+    html[data-theme="light"] :is(.card, .info-card, .news-card, .home-page .news-card, .home-hero, .home-page .hero-directory, .card:not(a):not(button):hover, .info-card:hover) { background: #fff; box-shadow: none; }
+}
+@media (prefers-contrast: more) {
+    :root[data-theme="light"] { --ui-muted: #41483b; --ui-line: #7b846f; --ui-control-border: #657057; --material-edge: #7b846f; }
+}
+@media (prefers-reduced-motion: no-preference) {
+    html[data-theme-changing] :is(body, .sitebar, .home-hero, .card, .info-card, .news-card, .button, .hero-directory, .workspace-panel, #content-dialog, .editor-topbar, .editor-actions) { transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease; }
+}
