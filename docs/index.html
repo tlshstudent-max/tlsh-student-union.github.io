@@ -51,6 +51,11 @@
     </header>
 
     <main id="main-content" class="container">
+        <section class="department-feed" data-department-feed="docs" data-kind="announcement" data-hide-empty aria-labelledby="department-feed-title">
+            <h2 id="department-feed-title" class="section-title">文書組公告</h2>
+            <p class="department-status" role="status" aria-live="polite">正在讀取公開內容…</p>
+            <div class="department-list news-grid" aria-busy="true"></div>
+        </section>
         <section class="zen-section document-about">
             <details>
             <summary>文書組工作介紹</summary>
@@ -122,5 +127,6 @@
     <footer>&copy; 2026 國立斗六高級中學學生會文書組 · <a href="../privacy.html">隱私權說明</a></footer>
     <script src="../main.js?v=20260729"></script>
     <script type="module" src="documents.js"></script>
+    <script type="module" src="../department-feed.js"></script>
 </body>
 </html>

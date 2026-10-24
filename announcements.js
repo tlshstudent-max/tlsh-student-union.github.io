@@ -1,4 +1,4 @@
-import { fetchAnnouncements } from './public-data.js';
+import { fetchHomeContent } from './public-data.js';
 import { announcementCard } from './lib/public-cards.js';
 (() => {
     const container = document.getElementById('announcement-grid');
@@ -14,7 +14,7 @@ import { announcementCard } from './lib/public-cards.js';
         status.classList.remove('is-warning');
         status.textContent = '正在讀取公開消息…';
         try {
-            const announcements = (await fetchAnnouncements())
+            const announcements = (await fetchHomeContent())
                 .sort((a, b) => (b.date?.timestamp || 0) - (a.date?.timestamp || 0));
 
             if (!announcements.length) {

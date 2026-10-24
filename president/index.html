@@ -39,6 +39,11 @@
     </header>
 
     <main id="main-content" class="container">
+        <section class="department-feed" data-department-feed="president" aria-labelledby="department-feed-title">
+            <h2 id="department-feed-title" class="section-title">正副會長室公告與文件</h2>
+            <p class="department-status" role="status" aria-live="polite">正在讀取公開內容…</p>
+            <div class="department-list news-grid" aria-busy="true"></div>
+        </section>
         
         <section class="zen-section">
             <h2 class="section-title gold-title"><span>/ </span>會長寄語</h2>
@@ -88,5 +93,6 @@
 
     <script src="feedback.js"></script>
     <script src="../main.js?v=20260729"></script>
+    <script type="module" src="../department-feed.js"></script>
 </body>
 </html>

@@ -17,14 +17,16 @@ test('only real calendar dates and safe HTTPS links are accepted', () => {
     assert.equal(safeHttpsUrl('https://example.com/校園'), 'https://example.com/%E6%A0%A1%E5%9C%92');
 });
 
-test('content validation enforces document links and preserves plain text', () => {
+test('content validation enforces document sources and preserves plain text', () => {
     const input = { kind: 'announcement', title: '<img src=x onerror=alert(1)>', summary: '', body: '第一行\n第二行', date: '2026-10-23', category: '公告', status: 'draft' };
     assert.equal(validateContent(input).body, input.body);
     assert.equal(validateContent(input).title, input.title);
-    for (const change of [{kind:'document'}, {status:'private'}, {title:' '}, {date:'2026-02-30'}, {url:'javascript:alert(1)'}, {title:'字'.repeat(161)}]) {
+    for (const change of [{kind:'document',body:''}, {status:'private'}, {title:' '}, {date:'2026-02-30'}, {url:'javascript:alert(1)'}, {title:'字'.repeat(161)}, {department:'unknown'}, {show_on_home:'false'}]) {
         assert.throws(() => validateContent({...input, ...change}));
     }
     assert.equal(validateContent({...input, kind:'document', url:'https://example.com/file'}).url, 'https://example.com/file');
+    assert.equal(validateContent({...input,kind:'document'}).body,input.body);
+    assert.equal(validateContent({...input,department:'pr',show_on_home:false}).department,'pr');
 });
 
 test('UI permissions distinguish editing from publishing and disabled accounts', () => {

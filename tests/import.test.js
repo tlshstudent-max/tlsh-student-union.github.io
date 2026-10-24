@@ -5,7 +5,7 @@ import { sheetToSql } from '../lib/sheet-import.js';
 
 test('sheet export preserves content, escapes SQL and can be imported repeatedly without duplicates',async t=>{
     const db=new PGlite(); t.after(()=>db.close());
-    await db.exec('create table content (id uuid primary key,kind text,title text,summary text,body text,category text,date text,academic_year text,url text,status text)');
+    await db.exec('create table content (id uuid primary key,kind text,title text,summary text,body text,category text,department text,show_on_home boolean,date text,academic_year text,url text,status text)');
     const csv = 'date,year,category,title,description,url,status,news_date,news_category,news_title,news_summary,news_url\n2026-10-01,115,法規,文件,說明,https://example.com/file,公開,2026-10-01,公告,"Student\'s news; DROP TABLE content;",摘要,https://example.com/news';
     const result=sheetToSql(csv);
     assert.equal(result.count,2); assert.deepEqual(result.warnings,[]);

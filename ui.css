@@ -40,12 +40,16 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .home-page .sync-status { margin: 0 0 22px; text-align: left; font-size: 13px; color: var(--ui-muted); }
 .sync-status .button, .archive-status .button { margin: 10px 0; }
 .sync-status.is-warning { color: #efb7a5; }
-.activities-page .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 18px; }
-.activities-page .news-card { display: block; padding: 24px; border: 1px solid var(--ui-line); background: #121511; color: var(--ui-text); text-decoration: none; }
-.activities-page .news-card h3 { font-size: 20px; font-weight: 500; }
-.activities-page .news-card p, .activities-page .news-date { color: var(--ui-muted); }
-.activities-page .category-tag { color: var(--ui-gold); font-size: 13px; }
-.activities-page .news-date { font-size: 13px; }
+.activities-page .news-grid, .department-feed .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 18px; }
+.activities-page .news-card, .department-feed .news-card { display: block; padding: 24px; border: 1px solid var(--ui-line); background: #121511; color: var(--ui-text); text-decoration: none; overflow-wrap: anywhere; }
+.activities-page .news-card h3, .department-feed .news-card h3 { font-size: 20px; font-weight: 500; }
+.activities-page .news-card p, .activities-page .news-date, .department-feed .news-card p, .department-feed .news-date { color: var(--ui-muted); }
+.activities-page .category-tag, .department-feed .category-tag { color: var(--ui-gold); font-size: 13px; }
+.activities-page .news-date, .department-feed .news-date { font-size: 13px; }
+.department-feed { margin: 30px 0 48px; }
+.department-feed .section-title { margin: 20px 0; }
+.department-status { color: var(--ui-muted); font-size: 14px; }
+.department-status .button { margin: 10px 0; }
 .home-page .news-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 18px; }
 .home-page .news-card { padding: 28px 30px; background: #121511; border-color: #30342a; }
 .home-page .news-card h3 { font-size: 20px; letter-spacing: .04em; margin: 14px 0 10px; font-weight: 500; }

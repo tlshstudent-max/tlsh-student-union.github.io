@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { siteConfig } from '../../site-config.js';
+import { publication } from '../../lib/publication.js';
 
 const csv = 'date,year,category,title,description,url,status,news_date,news_category,news_title,news_summary,news_url\n2026-10-01,115,會議紀錄,公開會議紀錄,文件說明,https://example.com/file,公開,2026-10-01,學生會公告,校園測試消息,公告摘要,https://example.com/news';
 const id = '12345678-1234-4234-8234-123456789abc';
@@ -47,6 +48,8 @@ async function backend(page, member=admin, options={}) {
             if(url.searchParams.get('status')==='eq.published') data=data.filter(x=>x.status==='published');
             if(url.searchParams.get('kind')?.startsWith('eq.')) data=data.filter(x=>x.kind===url.searchParams.get('kind').slice(3));
             if(url.searchParams.get('id')) data=data.filter(x=>x.id===url.searchParams.get('id').slice(3));
+            if(url.searchParams.get('department')) data=data.filter(x=>publication(x).department===url.searchParams.get('department').slice(3));
+            if(url.searchParams.get('show_on_home')==='eq.true') data=data.filter(x=>publication(x).show_on_home);
             return reply(data);
         }
         if(url.pathname==='/rest/v1/rpc/manage_staff') {
@@ -244,6 +247,7 @@ test('editor sees only permitted management controls and cannot select published
     await page.goto('/admin/');
     await expect(page.locator('#dashboard')).toBeVisible();
     await expect(page.getByRole('button',{name:'成員與權限',exact:true})).toBeHidden();
+    await expect(page.getByRole('button',{name:'新增會議紀錄',exact:true})).toBeDisabled();
     await page.getByRole('button',{name:'＋ 新增內容'}).click();
     await expect(page.locator('[name=kind] option[value=document]')).toHaveJSProperty('disabled', true);
     await expect(page.locator('[name=status] option[value=published]')).toHaveJSProperty('disabled', true);
@@ -288,7 +292,9 @@ test('production configuration serves workspace announcements and documents to s
         requests.push(url);
         if(unavailable) return route.fulfill({status:503,contentType:'application/json',body:'{"message":"temporarily unavailable"}'});
         const data=url.pathname==='/rest/v1/content' && url.searchParams.get('status')==='eq.published'
-            ? published.filter(item=>`eq.${item.kind}`===url.searchParams.get('kind')) : [];
+            ? published.filter(item=>(!url.searchParams.get('kind')||`eq.${item.kind}`===url.searchParams.get('kind'))
+                && (!url.searchParams.get('department')||`eq.${publication(item).department}`===url.searchParams.get('department'))
+                && (url.searchParams.get('show_on_home')!=='eq.true'||publication(item).show_on_home)) : [];
         return route.fulfill({contentType:'application/json',headers:{'Access-Control-Allow-Origin':'*'},body:JSON.stringify(data)});
     });
     await page.goto('/');
@@ -320,7 +326,7 @@ test('offline public feeds show no stale announcements and retry recovers',async
     await page.goto('/docs/');
     await expect(page.locator('#archive-status')).toContainText('暫時無法讀取');
     online=true;
-    await page.getByRole('button',{name:'重新載入'}).click();
+    await page.locator('#archive-status').getByRole('button',{name:'重新載入'}).click();
     await expect(page.locator('.archive-item')).toHaveCount(1);
 });
 
@@ -364,6 +370,8 @@ test('local editor drafts survive reload, preserve custom categories, and clear 
     await page.goto('/admin/');
     await page.getByRole('button',{name:'＋ 新增內容'}).click();
     await page.getByLabel('標題',{exact:true}).fill('暫存的活動想法');
+    await page.getByLabel('發布位置',{exact:true}).selectOption('pr');
+    await page.getByLabel('同時顯示在首頁最新消息',{exact:true}).uncheck();
     await page.getByLabel('類別',{exact:true}).selectOption('__custom__');
     await page.getByLabel('自訂類別',{exact:true}).fill('跨組合作');
     await page.getByLabel('公告內文（選填）').fill('尚未儲存的文字');
@@ -376,6 +384,8 @@ test('local editor drafts survive reload, preserve custom categories, and clear 
     await page.getByRole('button',{name:'回復暫存',exact:true}).click();
     await expect(page.getByLabel('標題',{exact:true})).toHaveValue('暫存的活動想法');
     await expect(page.getByLabel('自訂類別',{exact:true})).toHaveValue('跨組合作');
+    await expect(page.getByLabel('發布位置',{exact:true})).toHaveValue('pr');
+    await expect(page.getByLabel('同時顯示在首頁最新消息',{exact:true})).not.toBeChecked();
     await page.locator('#save-content').click();
     await expect(page.locator('#dashboard-status')).toContainText('草稿已儲存');
     expect(mock.calls.find(call=>call.method==='POST').body.category).toBe('跨組合作');
@@ -494,4 +504,174 @@ test('an in-flight save cannot reopen the workspace after the account signs out'
     await expect.poll(()=>page.evaluate(()=>Object.keys(localStorage).filter(key=>key.startsWith('tlsh-draft:')).length)).toBe(0);
     await expect(page.locator('#dashboard')).toBeHidden();
     await expect(page.locator('#login-status')).toContainText('安全登出');
+});
+
+test('staff can publish to one department, move the post, opt into home, and archive everywhere',async({page})=>{
+    const mock=await backend(page);
+    mock.setContents([]);
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'＋ 新增內容'}).click();
+    await page.getByLabel('標題',{exact:true}).fill('公關組專屬消息');
+    await page.getByLabel('發布位置',{exact:true}).selectOption('pr');
+    await page.getByLabel('同時顯示在首頁最新消息',{exact:true}).uncheck();
+    await expect(page.locator('#publication-hint')).toHaveText('設為「已發布」後顯示於：公關組。');
+    await page.getByLabel('內容狀態').selectOption('published');
+    page.once('dialog',dialog=>dialog.accept());
+    await page.locator('#save-content').click();
+    await expect(page.locator('#view-location')).toHaveAttribute('href',/\/pr\/$/);
+    expect(mock.calls.find(call=>call.method==='POST').body).toMatchObject({department:'pr',show_on_home:false});
+    await page.goto('/pr/');
+    await expect(page.locator('.department-list h3')).toHaveText('公關組專屬消息');
+    await page.goto('/rights/');
+    await expect(page.locator('.department-status')).toContainText('目前尚無');
+    await page.goto('/');
+    await expect(page.locator('#announcement-status')).toContainText('目前沒有');
+    await expect(page.locator('.news-card')).toHaveCount(0);
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'編輯',exact:true}).click();
+    await expect(page.getByLabel('發布位置',{exact:true})).toHaveValue('pr');
+    await page.getByLabel('發布位置',{exact:true}).selectOption('rights');
+    await page.getByLabel('同時顯示在首頁最新消息',{exact:true}).check();
+    page.once('dialog',dialog=>dialog.accept());
+    await page.locator('#save-content').click();
+    await expect(page.locator('#dashboard-status')).toContainText('已發布');
+    await page.goto('/pr/');
+    await expect(page.locator('.department-status')).toContainText('目前尚無');
+    await page.goto('/rights/');
+    await expect(page.locator('.department-list h3')).toHaveText('公關組專屬消息');
+    await page.goto('/');
+    await expect(page.locator('.news-card h3')).toHaveText('公關組專屬消息');
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'編輯',exact:true}).click();
+    await page.getByLabel('內容狀態').selectOption('archived');
+    await page.locator('#save-content').click();
+    await expect(page.locator('#dashboard-status')).toContainText('已下架');
+    await page.goto('/rights/');
+    await expect(page.locator('.department-status')).toContainText('目前尚無');
+    await page.goto('/');
+    await expect(page.locator('#announcement-status')).toContainText('目前沒有');
+});
+
+test('meeting minutes can be written inline, published, read from the library, and updated',async({page})=>{
+    const mock=await backend(page);
+    mock.setContents([]);
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'新增會議紀錄',exact:true}).click();
+    await expect(page.locator('#content-form').getByLabel('內容類型')).toHaveValue('document');
+    await expect(page.getByLabel('發布位置',{exact:true})).toHaveValue('docs');
+    await page.getByLabel('標題',{exact:true}).fill('學生會第一次會議紀錄');
+    await page.getByLabel('文件內文／會議紀錄（可直接輸入）').fill('出席人員：測試\n決議：<img src=x onerror=alert(1)>');
+    await page.locator('#save-content').click();
+    await expect(page.locator('#dashboard-status')).toContainText('草稿已儲存');
+    await page.goto('/docs/');
+    await expect(page.locator('#archive-status')).toContainText('目前尚無公開文件');
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'編輯',exact:true}).click();
+    await page.getByLabel('內容狀態').selectOption('published');
+    page.once('dialog',dialog=>dialog.accept());
+    await page.locator('#save-content').click();
+    await expect(page.locator('#view-published')).toHaveAttribute('href',`../announcement.html?id=${id}&kind=document`);
+    await page.goto('/docs/');
+    await expect(page.locator('.archive-item .title')).toHaveText('學生會第一次會議紀錄');
+    await page.locator('.archive-item .download-link').click();
+    await expect(page.locator('#article-body')).toContainText('<img src=x onerror=alert(1)>');
+    await expect(page.locator('#article-body img')).toHaveCount(0);
+    await expect(page.locator('#article-back')).toHaveText('← 返回公開文件');
+    await page.goto('/');
+    await expect(page.locator('.news-card h3')).toHaveText('學生會第一次會議紀錄');
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'編輯',exact:true}).click();
+    await page.getByLabel('文件內文／會議紀錄（可直接輸入）').fill('更新後的正式紀錄');
+    page.once('dialog',dialog=>dialog.accept());
+    await page.locator('#save-content').click();
+    await expect(page.locator('#dashboard-status')).toContainText('已發布');
+    await page.goto(`/announcement.html?id=${id}&kind=document`);
+    await expect(page.locator('#article-body')).toHaveText('更新後的正式紀錄');
+});
+
+test('linked minutes remain accessible from their department, the library and optional home listing',async({page})=>{
+    const mock=await backend(page);
+    mock.setContents([]);
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'新增會議紀錄',exact:true}).click();
+    await page.getByLabel('標題',{exact:true}).fill('公關協作會議紀錄');
+    await page.getByLabel('發布位置',{exact:true}).selectOption('pr');
+    await page.getByLabel('文件連結（已輸入內文時可不填）').fill('https://example.com/minutes.pdf');
+    await page.getByLabel('內容狀態').selectOption('published');
+    page.once('dialog',dialog=>dialog.accept());
+    await page.locator('#save-content').click();
+    await expect(page.locator('#view-published')).toHaveAttribute('href','https://example.com/minutes.pdf');
+    await page.goto('/pr/');
+    await expect(page.locator('.department-list .news-card')).toHaveAttribute('href','https://example.com/minutes.pdf');
+    await page.goto('/docs/');
+    await expect(page.locator('.archive-item .download-link')).toHaveAttribute('href','https://example.com/minutes.pdf');
+    await page.goto('/');
+    await expect(page.locator('.news-card')).toHaveAttribute('href','https://example.com/minutes.pdf');
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'編輯',exact:true}).click();
+    await page.getByLabel('文件連結（已輸入內文時可不填）').fill('https://example.com/minutes-updated.pdf');
+    await page.getByLabel('同時顯示在首頁最新消息',{exact:true}).uncheck();
+    page.once('dialog',dialog=>dialog.accept());
+    await page.locator('#save-content').click();
+    await expect(page.locator('#dashboard-status')).toContainText('已發布');
+    await page.goto('/');
+    await expect(page.locator('#announcement-status')).toContainText('目前沒有');
+    await page.goto('/docs/');
+    await expect(page.locator('.archive-item .download-link')).toHaveAttribute('href','https://example.com/minutes-updated.pdf');
+    await page.goto('/pr/');
+    await expect(page.locator('.department-list .news-card')).toHaveAttribute('href','https://example.com/minutes-updated.pdf');
+});
+
+test('each department page lists only its own published posts on mobile',async({page})=>{
+    const mock=await backend(page,null,{session:false});
+    const locations=['president','activities','pr','rights','design','docs','general'];
+    mock.setContents(locations.flatMap((department,i)=>[
+        {...article,id:`12345678-1234-4234-8234-${String(i).padStart(12,'0')}`,status:'published',department,show_on_home:false,title:`${department} 專屬內容`},
+        {...article,department,status:'draft',title:'不可公開的草稿'},
+    ]));
+    await page.setViewportSize({width:320,height:844});
+    for(const department of locations) {
+        await page.goto(`/${department}/`);
+        await expect(page.locator('.news-card h3')).toHaveText(`${department} 專屬內容`);
+        await expect(page.locator('body')).not.toContainText('不可公開的草稿');
+        expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+    }
+});
+
+test('public pages keep reading old records while the locations migration is pending',async({page})=>{
+    const mock=await backend(page,null,{session:false});
+    mock.setContents([{...article,status:'published',category:'學生權益',title:'既有學權消息'}]);
+    let fallback=0;
+    await page.route('https://school.supabase.co/rest/v1/content*',route=>{
+        if(new URL(route.request().url()).searchParams.get('select')?.includes('department')) {
+            return route.fulfill({status:400,contentType:'application/json',headers:{'Access-Control-Allow-Origin':'*'},body:JSON.stringify({code:'42703',message:'column department does not exist'})});
+        }
+        fallback++;return route.fallback();
+    });
+    await page.goto('/rights/');
+    await expect(page.locator('.department-list h3')).toHaveText('既有學權消息');
+    await page.goto('/');
+    await expect(page.locator('.news-card h3')).toHaveText('既有學權消息');
+    expect(fallback).toBeGreaterThanOrEqual(2);
+});
+
+test('a pending schema update preserves editing and explains the required migration',async({page})=>{
+    const mock=await backend(page);
+    mock.setContents([]);
+    let upgraded=false;
+    await page.route('https://school.supabase.co/rest/v1/content*',route=>{
+        if(route.request().method()==='POST'&&!upgraded) return route.fulfill({status:400,contentType:'application/json',body:JSON.stringify({code:'PGRST204',message:'department column is missing'})});
+        return route.fallback();
+    });
+    await page.goto('/admin/');
+    await page.getByRole('button',{name:'＋ 新增內容'}).click();
+    await page.getByLabel('標題',{exact:true}).fill('保留編輯中的公關資料');
+    await page.getByLabel('發布位置',{exact:true}).selectOption('pr');
+    await page.locator('#save-content').click();
+    await expect(page.locator('#editor-status')).toContainText('002_publication_locations.sql');
+    await expect(page.getByLabel('標題',{exact:true})).toHaveValue('保留編輯中的公關資料');
+    await expect(page.getByLabel('發布位置',{exact:true})).toHaveValue('pr');
+    upgraded=true;
+    await page.locator('#save-content').click();
+    await expect(page.locator('#dashboard-status')).toContainText('草稿已儲存');
 });
