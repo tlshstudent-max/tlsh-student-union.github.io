@@ -260,6 +260,7 @@ function updatePreview() {
     $('urgency-settings').hidden = documentKind;
     if (documentKind) field('is_urgent').checked = false;
     const urgent = field('is_urgent').checked;
+    $('editor-heading').textContent = $('save-content').hidden ? '檢視內容' : editing ? '編輯內容' : urgent ? '新增緊急通告' : '新增內容';
     field('is_urgent').disabled = $('save-content').hidden || documentKind;
     field('urgent_until').disabled = $('save-content').hidden || !urgent;
     field('urgent_until').required = urgent;
@@ -306,7 +307,7 @@ function openEditor(item = null, defaults = {}) {
         field('date').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
     }
     setCategories(field('kind').value, item?.category || defaults.category || categories[field('kind').value][0]);
-    $('editor-heading').textContent = readonly ? '檢視內容' : item ? '編輯內容' : '新增內容';
+    $('editor-settings').open = !field('is_urgent').checked;
     notice('editor-status', readonly ? '你目前可編輯草稿；修改或下架已發布內容，需要發布權限。' : '');
     recoverableDraft = readonly ? null : draftStore?.load(item?.id);
     $('draft-recovery').hidden = !recoverableDraft;
@@ -319,6 +320,7 @@ function openEditor(item = null, defaults = {}) {
     }
     notice('draft-status', readonly ? '' : '編輯中的文字會暫存在此瀏覽器，仍需按「儲存內容」存入後台。');
     updatePreview(); dialog.showModal();
+    if (!readonly && !item) field('title').focus();
 }
 field('kind').addEventListener('change', () => {
     if (field('kind').value === 'document' && field('department').value === 'union') field('department').value = 'docs';
@@ -329,6 +331,11 @@ field('kind').addEventListener('change', () => {
 field('is_urgent').addEventListener('change', () => {
     if (field('is_urgent').checked && !field('urgent_until').value) field('urgent_until').value = taipeiInput(Date.now() + 24 * 3600000);
 });
+// Reveal required fields before the browser tries to focus them inside a collapsed section.
+form.addEventListener('invalid', event => {
+    const section = event.target.closest('details');
+    if (section) section.open = true;
+}, true);
 form.addEventListener('input', () => { dirty = true; updatePreview(); saveLocalDraft(); });
 form.addEventListener('change', () => { dirty = true; updatePreview(); saveLocalDraft(); });
 $('restore-draft').addEventListener('click', () => {
@@ -339,6 +346,7 @@ $('restore-draft').addEventListener('click', () => {
         else if (key !== 'category') field(key).value = value;
     }
     setCategories(draft.values.kind, draft.values.category);
+    $('editor-settings').open = !draft.values.is_urgent;
     if (!mayPublish(member) && field('status').value === 'published') field('status').value = 'draft';
     if (editing) editing = { ...editing, version: draft.version };
     recoverableDraft = null; $('draft-recovery').hidden = true;

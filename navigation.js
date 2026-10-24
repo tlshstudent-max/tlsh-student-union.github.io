@@ -23,9 +23,9 @@ for (const [label, path] of [['最新消息', '#announcements'], ['校園活動'
     if (path === 'admin/') a.className = 'staff-link';
     const target = new URL(a.href);
     if (!target.hash && location.pathname.startsWith(target.pathname)) a.setAttribute('aria-current', 'page');
-    links.append(a);
+    if (path === 'admin/') bar.append(a); else links.append(a);
 }
-bar.append(brand, links);
+bar.prepend(brand, links);
 const skipLink = document.querySelector('.skip-link');
 if (skipLink) skipLink.after(bar); else document.body.prepend(bar);
 if (!document.body.classList.contains('admin-page')) mountUrgentNotices(bar);

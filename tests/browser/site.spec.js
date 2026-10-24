@@ -7,6 +7,12 @@ const id = '12345678-1234-4234-8234-123456789abc';
 const article = { id, kind:'announcement', title:'第一則公告', summary:'公告摘要', body:'第一行\n第二行', category:'學生會公告', date:'2026-10-23', academic_year:'', url:null, status:'draft', version:1 };
 const admin = { email:'admin@example.com', role:'admin', active:true, edit_announcements:true, edit_documents:true, can_publish:true };
 
+function contrastRatio(first,second) {
+    const luminance=color=>color.match(/[\d.]+/g).slice(0,3).map(Number).map(x=>x/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4).reduce((sum,x,i)=>sum+x*[.2126,.7152,.0722][i],0);
+    const a=luminance(first),b=luminance(second);
+    return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+}
+
 test.beforeEach(async ({page}) => {
     // Keep legacy/unconfigured scenarios independent of the production rollout setting.
     await page.route('**/site-config.js',route=>route.fulfill({contentType:'text/javascript',body:"export const siteConfig = {supabaseUrl:'',supabasePublishableKey:''};"}));
@@ -729,6 +735,7 @@ test('urgent draft can be recovered and published to every page with a Taiwan de
     await page.getByLabel('標題',{exact:true}).fill('活動集合地點異動');
     await page.getByLabel('摘要',{exact:true}).fill('請改至行政大樓前集合。');
     await page.getByLabel('緊急提示結束時間（台灣時間）',{exact:true}).fill('2099-10-24T18:30');
+    await page.locator('#editor-settings > summary').click();
     await page.getByRole('radio',{name:'公關組',exact:true}).check();
     await page.getByLabel('同時顯示在首頁最新消息',{exact:true}).uncheck();
     await page.reload();
@@ -872,4 +879,94 @@ test('visible-page refresh reopens revised urgent notices and an outage cannot k
     offline=false;mock.setContents([]);
     await page.getByRole('button',{name:'重試',exact:true}).click();
     await expect(page.getByRole('region',{name:'緊急通告',exact:true})).toBeHidden();
+});
+
+test('reading links and form boundaries remain distinct on dark surfaces',async({page})=>{
+    await page.goto('/activities/');
+    const link=page.locator('.card a[href^="mailto:"]');
+    const colors=await link.evaluate(e=>({text:getComputedStyle(e).color,bg:getComputedStyle(e.closest('.card')).backgroundColor}));
+    expect(contrastRatio(colors.text,colors.bg)).toBeGreaterThanOrEqual(4.5);
+    await page.goto('/docs/');
+    await page.locator('.archive-item').waitFor();
+    const input=await page.locator('#document-search').evaluate(e=>({border:getComputedStyle(e).borderTopColor,bg:getComputedStyle(e).backgroundColor}));
+    expect(contrastRatio(input.border,input.bg)).toBeGreaterThanOrEqual(3);
+    await backend(page);await page.goto('/admin/');
+    await page.getByRole('button',{name:'＋ 新增內容'}).click();
+    const fieldColors=await page.getByLabel('標題',{exact:true}).evaluate(e=>({border:getComputedStyle(e).borderTopColor,surface:getComputedStyle(e.closest('dialog')).backgroundColor}));
+    expect(contrastRatio(fieldColors.border,fieldColors.surface)).toBeGreaterThanOrEqual(3);
+    for(const target of ['.content-preview > summary','.check-label','#close-editor']) {
+        const height=await page.locator('#content-dialog').locator(target).first().evaluate(e=>e.getBoundingClientRect().height);
+        expect(height).toBeGreaterThanOrEqual(44);
+    }
+});
+
+test('press feedback is immediate, cancellable and remains available with reduced motion',async({page})=>{
+    await page.goto('/');
+    for(const reducedMotion of ['no-preference','reduce']) {
+        await page.emulateMedia({reducedMotion});
+        const link=page.getByRole('link',{name:'查看最新消息'});
+        await link.hover();await page.waitForTimeout(200);
+        const before=await link.evaluate(e=>getComputedStyle(e).filter);
+        await page.mouse.down();
+        const pressed=await link.evaluate(e=>({filter:getComputedStyle(e).filter,transition:getComputedStyle(e).transitionDuration}));
+        expect(pressed.filter).not.toBe(before);
+        expect(parseFloat(pressed.transition)).toBeLessThan(.02);
+        await page.mouse.move(0,0);await page.mouse.up();
+        await expect(page).toHaveURL(/\/$/);
+    }
+    // Keyboard users keep their focus cue and native activation.
+    await page.getByRole('link',{name:'查看最新消息'}).focus();
+    await expect(page.getByRole('link',{name:'查看最新消息'})).toBeFocused();
+    await page.keyboard.press('Enter');await expect(page).toHaveURL(/#announcements$/);
+});
+
+test('text preference doubles headings and inputs without overlapping mobile navigation',async({page})=>{
+    for(const path of ['/','/activities/','/pr/','/rights/','/design/','/docs/','/general/','/president/','/privacy.html']) {
+        await page.setViewportSize({width:320,height:844});await page.goto(path);
+        await page.locator('.site-brand').waitFor();
+        const baseline=await page.locator('h1').evaluate(e=>parseFloat(getComputedStyle(e).fontSize));
+        await page.addStyleTag({content:'html { font-size:200% !important; }'});
+        expect(await page.locator('h1').evaluate(e=>parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(baseline*1.9);
+        const boxes=await page.evaluate(()=>{
+            const brand=document.querySelector('.site-brand').getBoundingClientRect(),staff=document.querySelector('.staff-link').getBoundingClientRect();
+            return {brandRight:brand.right,staffLeft:staff.left,body:document.documentElement.scrollWidth,width:innerWidth};
+        });
+        expect(boxes.brandRight).toBeLessThanOrEqual(boxes.staffLeft);
+        expect(boxes.body,path).toBeLessThanOrEqual(boxes.width);
+    }
+    await backend(page);await page.goto('/admin/');
+    await page.addStyleTag({content:'html { font-size:200% !important; }'});
+    await page.getByRole('button',{name:'新增緊急通告',exact:true}).click();
+    expect(await page.getByLabel('標題',{exact:true}).evaluate(e=>parseFloat(getComputedStyle(e).fontSize))).toBe(32);
+    expect(await page.locator('#content-dialog').evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
+});
+
+test('urgent editor starts with the task, saves collapsed defaults, and reveals invalid advanced fields',async({page},testInfo)=>{
+    await page.setViewportSize({width:390,height:844});
+    const mock=await backend(page);mock.setContents([]);
+    await page.goto('/admin/');await page.getByRole('button',{name:'新增緊急通告',exact:true}).click();
+    await expect(page.getByRole('heading',{name:'新增緊急通告',exact:true})).toBeVisible();
+    await expect(page.getByLabel('標題',{exact:true})).toBeFocused();
+    await expect(page.locator('#editor-settings')).not.toHaveAttribute('open','');
+    const positions=await page.evaluate(()=>{
+        const form=document.getElementById('content-form'),top=name=>form.elements.namedItem(name).getBoundingClientRect().top;
+        return {title:top('title'),summary:top('summary'),deadline:top('urgent_until'),status:top('status'),viewport:innerHeight};
+    });
+    expect(positions.title).toBeLessThan(positions.summary);
+    expect(positions.summary).toBeLessThan(positions.deadline);
+    expect(positions.deadline).toBeLessThan(positions.status);
+    expect(positions.title).toBeLessThan(positions.viewport);
+    await page.screenshot({path:testInfo.outputPath('urgent-editor-390.png')});
+    await page.getByLabel('標題',{exact:true}).fill('第一輪改善驗證');
+    // A recovered or edited invalid URL may be in the closed advanced section.
+    await page.locator('input[name="url"]').evaluate(e=>{e.value='http://example.com/invalid';});
+    await page.locator('#save-content').click();
+    await expect(page.locator('#editor-settings')).toHaveAttribute('open','');
+    await expect(page.locator('input[name="url"]')).toBeFocused();
+    expect(mock.calls.some(call=>call.method==='POST')).toBe(false);
+    await page.getByLabel('相關連結（選填）',{exact:true}).fill('https://example.com/info');
+    await page.locator('#editor-settings > summary').click();
+    await page.locator('#save-content').click();
+    await expect(page.locator('#dashboard-status')).toContainText('草稿已儲存');
+    expect(mock.calls.find(call=>call.method==='POST').body).toMatchObject({is_urgent:true,department:'union',status:'draft',url:'https://example.com/info'});
 });
