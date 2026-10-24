@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../stone-surface.css">
     <link rel="stylesheet" href="../ui.css">
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="admin.css?v=department-picker-2">
     <script type="module" src="../navigation.js"></script>
 </head>
 <body class="admin-page">
@@ -32,6 +32,7 @@
                 <div class="panel-heading"><div><h2 id="content-heading">公告、部門內容與會議紀錄</h2><p>選擇發布位置，先存草稿、確認內容，再讓同學看見。</p></div><div class="heading-actions"><button id="new-content" class="button button-primary">＋ 新增內容</button><button id="new-minutes" class="button button-secondary">新增會議紀錄</button></div></div>
                 <div class="content-filters"><label>搜尋內容<input id="content-search" type="search" placeholder="輸入標題或類別"></label><label>內容類型<select id="content-kind"><option value="">全部類型</option><option value="announcement">公告</option><option value="document">公開文件</option></select></label><label>發布狀態<select id="content-status"><option value="">全部狀態</option><option value="draft">草稿</option><option value="published">已發布</option><option value="archived">已下架</option></select></label><button id="refresh-content" class="button button-secondary">重新整理</button></div>
                 <label class="department-filter" for="content-department">依發布位置篩選<select id="content-department"><option value="">全部發布位置</option></select></label>
+                <p class="muted">此選單只篩選清單。要設定公告發布到哪個部門，請按「新增內容」或「編輯」，再點選發布位置。</p>
                 <p id="content-count" class="muted"></p><div id="content-list" class="content-list" aria-live="polite" aria-busy="false"></div>
                 <p class="muted">日期用於顯示及排序；選擇「已發布」會立即公開，不會依日期排程。</p>
             </section>
@@ -56,7 +57,7 @@
             <div class="editor-grid">
                 <label>內容類型<select name="kind"><option value="announcement">公告</option><option value="document">公開文件</option></select></label>
                 <label>顯示日期<input name="date" type="date" min="1900-01-01" max="9999-12-31" required></label>
-                <div class="editor-field full-width"><label for="content-department-select">發布位置</label><select id="content-department-select" name="department" required></select></div>
+                <fieldset class="publication-field full-width" aria-describedby="department-help"><legend>發布位置</legend><p id="department-help" class="muted">點選一個部門，內容會發布在該部門頁面。</p><div id="department-options" class="department-options"></div></fieldset>
                 <label class="check-label full-width"><input name="show_on_home" type="checkbox" checked>同時顯示在首頁最新消息</label>
                 <p id="publication-hint" class="muted full-width" role="status"></p>
                 <label class="full-width">標題<input name="title" required maxlength="160" placeholder="讓同學一眼看懂這則消息"></label>
@@ -74,6 +75,6 @@
             <p id="editor-status" class="notice" role="status" aria-live="polite"></p><div class="form-actions"><button id="save-content" type="submit" class="button button-primary">儲存內容</button><span class="muted">只有「已發布」的內容會出現在官網。</span></div>
         </form>
     </dialog>
-    <script type="module" src="admin.js"></script>
+    <script type="module" src="admin.js?v=department-picker-2"></script>
 </body>
 </html>

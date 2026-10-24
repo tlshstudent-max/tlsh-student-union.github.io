@@ -14,7 +14,11 @@ const categories = {
     document: ['會議紀錄', '組織章程', '預算決算', '行政文件'],
 };
 for (const [value, { label }] of Object.entries(departments)) {
-    field('department').append(new Option(label, value));
+    const choice = element('label', undefined, 'department-choice');
+    const input = document.createElement('input');
+    input.type = 'radio'; input.name = 'department'; input.value = value; input.required = true;
+    choice.append(input, element('span', label));
+    $('department-options').append(choice);
     $('content-department').append(new Option(label, value));
 }
 
@@ -332,7 +336,7 @@ $('activity-template').addEventListener('click', () => {
     field('department').value = 'activities';
     field('body').value = '活動時間：\n活動地點：\n參加對象：\n報名方式：\n注意事項：';
     dirty = true; updatePreview(); saveLocalDraft();
-    notice('editor-status', '請填妥活動時間、地點與報名方式，再發布。活動頁會同步顯示「校園活動」類別的已發布公告。');
+    notice('editor-status', '請填妥活動時間、地點與報名方式，再發布。發布位置已設為活動組。');
 });
 function closeEditor() {
     if (saving) return;
