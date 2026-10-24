@@ -1312,3 +1312,27 @@ test('button press feedback is immediate, cancellable, and respects reduced moti
     expect(await button.evaluate(e=>getComputedStyle(e).scale)).toBe('1');
     await page.mouse.move(5,5);await page.mouse.up();expect(sends).toBe(0);
 });
+
+test('official badge loads upright across both appearances and replaces placeholder marks',async({page},testInfo)=>{
+    const mock=await backend(page);mock.setContents([{...article,status:'published'}]);
+    await page.setViewportSize({width:1440,height:1000});
+    for(const theme of ['dark','light']) {
+        await page.goto('/');
+        if(await page.locator('html').getAttribute('data-theme')!==theme)await page.locator('.theme-toggle').click();
+        for(const selector of ['.site-brand img','.hero-logo']) {
+            await expect.poll(()=>page.locator(selector).evaluate(img=>img.complete&&img.naturalWidth>0)).toBe(true);
+            expect(await page.locator(selector).evaluate(img=>new URL(img.src).origin)).toBe('http://127.0.0.1:8010');
+            expect(await page.locator(selector).evaluate(img=>getComputedStyle(img).filter)).toBe('none');
+        }
+        await expect(page.locator('.hero-logo')).toHaveAttribute('alt','斗六高中學生會正式會標');
+        const badge=await page.locator('.hero-logo').evaluate(img=>({width:img.naturalWidth,height:img.naturalHeight,source:new URL(img.currentSrc).pathname,transform:getComputedStyle(img).transform}));
+        expect(badge.width).toBeGreaterThan(0);expect(badge.width).toBe(badge.height);
+        expect(badge.source).toBe('/assets/union-logo.jpg');expect(badge.transform).toBe('none');
+        await expect(page.locator('.identity-plate,.brand-emblem')).toHaveCount(0);
+        await page.screenshot({path:testInfo.outputPath(`official-home-${theme}.png`)});
+    }
+    await page.goto('/admin/');await expect.poll(()=>page.locator('.login-logo').evaluate(img=>img.complete&&img.naturalWidth===192)).toBe(true);
+    await page.setViewportSize({width:320,height:844});await page.goto('/');
+    await expect(page.locator('.site-brand img')).toBeVisible();
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});

@@ -12,7 +12,8 @@
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <link rel="canonical" href="https://tlshstudent-max.github.io/tlsh-student-union.github.io/">
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
+    <link rel="icon" href="favicon.png" type="image/png" sizes="96x96">
     <link rel="manifest" href="site.webmanifest">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="zh_TW">
@@ -20,14 +21,14 @@
     <meta property="og:title" content="國立斗六高中學生會 | 官方網站">
     <meta property="og:description" content="國立斗六高中學生會官方網站，提供最新公告、校園活動、學生權益管道、會議紀錄與公開文件。公開資訊免登入即可閱讀。">
     <meta property="og:url" content="https://tlshstudent-max.github.io/tlsh-student-union.github.io/">
-    <meta property="og:image" content="https://tlshstudent-max.github.io/tlsh-student-union.github.io/og-image.png">
+    <meta property="og:image" content="https://tlshstudent-max.github.io/tlsh-student-union.github.io/og-image.png?v=official-1">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="斗六高中學生會官方網站">
+    <meta property="og:image:alt" content="斗六高中學生會正式會標與官網資訊">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="國立斗六高中學生會 | 官方網站">
     <meta name="twitter:description" content="國立斗六高中學生會官方網站，提供最新公告、校園活動、學生權益管道、會議紀錄與公開文件。公開資訊免登入即可閱讀。">
-    <meta name="twitter:image" content="https://tlshstudent-max.github.io/tlsh-student-union.github.io/og-image.png">
+    <meta name="twitter:image" content="https://tlshstudent-max.github.io/tlsh-student-union.github.io/og-image.png?v=official-1">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="stone-surface.css?v=stone-2">
     <script type="application/ld+json">
@@ -41,7 +42,13 @@
           "alternateName": "斗六高中學生會",
           "description": "國立斗六高中學生會官方網站，提供最新公告、校園活動、學生權益管道、會議紀錄與公開文件。",
           "url": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/",
-          "logo": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/favicon.svg",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/assets/union-logo.jpg",
+            "width": 939,
+            "height": 939
+          },
+          "sameAs": ["https://www.instagram.com/tlsh_su/"],
           "email": "tlsh.student@gmail.com",
           "parentOrganization": {
             "@type": "HighSchool",
@@ -61,10 +68,10 @@
       ]
     }
     </script>
-    <link rel="stylesheet" href="ui.css?v=feedback-1">
-    <link rel="stylesheet" href="material.css?v=stone-2">
-    <script type="module" src="navigation.js?v=appearance-1"></script>
-    <link rel="stylesheet" href="theme.css?v=appearance-1">
+    <link rel="stylesheet" href="ui.css?v=identity-1">
+    <link rel="stylesheet" href="material.css?v=identity-1">
+    <script type="module" src="navigation.js?v=identity-1"></script>
+    <link rel="stylesheet" href="theme.css?v=identity-1">
     <link rel="stylesheet" href="glass.css?v=glass-1">
 </head>
 <body class="home-page">
@@ -82,13 +89,9 @@
             </div>
             <p class="hero-note">公開資訊，免登入就能閱讀。</p>
         </div>
-        <div class="hero-identity" aria-hidden="true">
-            <div class="identity-plate">
-                <span class="identity-caption">TLSH</span>
-                <span class="identity-ring"></span>
-                <span class="identity-mark">斗</span>
-                <span class="identity-signature">STUDENT UNION</span>
-            </div>
+        <div class="hero-identity">
+            <img class="hero-logo" src="assets/union-logo.jpg" alt="斗六高中學生會正式會標" width="939" height="939" srcset="assets/union-logo-192.png 192w, assets/union-logo.jpg 939w" sizes="(max-width: 820px) 36px, (max-width: 1354px) 26vw, 352px" fetchpriority="high" decoding="async">
+            <p class="hero-brand-caption">TLSH STUDENT UNION</p>
         </div>
         <aside class="hero-directory" aria-label="常用服務">
             <p class="eyebrow">為同學，從這裡開始</p>
@@ -144,7 +147,7 @@
 
     </main>
 
-    <footer class="site-footer"><div><strong>斗六高中學生會</strong><p>讓參與更容易，讓自治被看見。</p></div><div><a href="privacy.html">隱私權說明</a><a href="admin/index.html">幹部登入</a><p>&copy; 2026 國立斗六高級中學學生會</p></div></footer>
+    <footer class="site-footer"><div><strong>斗六高中學生會</strong><p>讓參與更容易，讓自治被看見。</p></div><div><a href="https://www.instagram.com/tlsh_su/" target="_blank" rel="noopener noreferrer">Instagram ↗</a><a href="privacy.html">隱私權說明</a><a href="admin/index.html">幹部登入</a><p>&copy; 2026 國立斗六高級中學學生會</p></div></footer>
 
     <script type="module" src="announcements.js"></script>
     <script src="main.js?v=20260729"></script>

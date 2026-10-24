@@ -8,7 +8,8 @@ a, button, input, select, textarea { -webkit-tap-highlight-color: rgba(217,196,1
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 5px; }
 .sitebar { position: sticky; top: 0; z-index: 60; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 16px max(24px, calc((100vw - 1180px)/2)); border-bottom: 1px solid var(--ui-line); background: #090b0bee; backdrop-filter: blur(16px); }
 .site-brand { display: inline-flex; align-items: center; gap: .75rem; min-width: 0; min-height: max(44px, 2.75rem); color: #f3f0e6; text-decoration: none; font-size: 0.9375rem; letter-spacing: .08em; }
-.brand-emblem { display: grid; flex: 0 0 auto; place-items: center; width: 2.125rem; height: 2.125rem; border: 1px solid #9f925c; color: var(--ui-gold); font-family: serif; font-size: 1.3125rem; }
+.brand-logo { display: block; flex: 0 0 auto; width: 2.25rem; height: 2.25rem; object-fit: contain; border-radius: 50%; }
+.login-logo { width: 4.5rem; height: 4.5rem; }
 .sitebar-links { display: flex; align-items: center; gap: 25px; }
 .sitebar-links a { display: inline-flex; align-items: center; min-height: 44px; color: #c6c7c0; text-decoration: none; font-size: 0.875rem; white-space: nowrap; }
 .sitebar-links a:hover, .sitebar-links a[aria-current] { color: var(--ui-gold); }

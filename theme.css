@@ -35,9 +35,6 @@ html[data-theme="light"] .home-page .hero-directory { background: var(--material
 html[data-theme="light"] .hero-directory > a { border-color: var(--ui-line); color: var(--ui-text); }
 html[data-theme="light"] .hero-directory > a:hover { background: #eceee6; }
 html[data-theme="light"] .directory-number { color: var(--ui-gold); }
-html[data-theme="light"] :is(.identity-caption, .identity-signature) { color: var(--ui-muted); }
-html[data-theme="light"] .identity-plate { background: radial-gradient(ellipse at 5% 0%, #fff, transparent 65%), linear-gradient(145deg, #f4f3e9, #e7e8df); border-color: #d7d8cc; box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #a3a79333, 24px 32px 64px #282d1914; }
-html[data-theme="light"] .identity-mark { text-shadow: 1px 1px 0 #fff8; }
 html[data-theme="light"] body:not(.home-page) > header { background: linear-gradient(160deg, #fff8, transparent 70%); border-color: var(--ui-line); }
 html[data-theme="light"] .antique-quote { background: #eeefe7; color: var(--ui-text); }
 html[data-theme="light"] .antique-quote p { color: var(--ui-text); }
@@ -91,3 +88,5 @@ html[data-theme="light"] .urgent-error button { color: #8b3c1b; border-color: #b
 @media (prefers-reduced-motion: no-preference) {
     html[data-theme-changing] :is(body, .sitebar, .home-hero, .card, .info-card, .news-card, .button, .hero-directory, .workspace-panel, #content-dialog, .editor-topbar, .editor-actions) { transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease; }
 }
+
+html[data-theme="light"] .hero-logo { box-shadow: 0 18px 50px #242b1910; }
