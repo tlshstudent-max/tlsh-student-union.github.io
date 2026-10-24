@@ -44,7 +44,7 @@
 * **成員授權**：管理員在工作台的「成員與權限」新增或停用幹部，並分配公告、文件及發布權限。
 * **舊資料備份**：[原公開資料試算表](https://docs.google.com/spreadsheets/d/1SBd3jZVA38dv0TSuS-LyKIsSzmGWI9Zyo_7zH5pDNPU/edit) 保留作為搬移前備份，不會與後台雙向同步。
 * **交接說明**：帳號、資料來源及驗收步驟見 [SETUP.md](SETUP.md)。
-* **風格調整**：全局樣式鎖定於根目錄的 `style.css`；各組專屬裝潢請至該資料夾下的 `style.css` 進行微調。
+* **風格調整**：跨頁字級、卡片、控制項圓角與互動以 `ui.css` 為準，材質由 `stone-surface.css` 共用，後台細節放在 `admin/admin.css`。各組的 `style.css` 保留必要的部門特色，避免重複定義共用元件。
 
 ---
 

@@ -8,14 +8,14 @@
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="stone-surface.css">
-    <link rel="stylesheet" href="ui.css?v=design-1">
-    <script type="module" src="navigation.js?v=design-1"></script>
+    <link rel="stylesheet" href="ui.css?v=refinement-1">
+    <script type="module" src="navigation.js?v=refinement-1"></script>
 </head>
 <body>
     <a class="skip-link" href="#main-content">跳至主要內容</a>
     <main id="main-content" class="article-shell">
         <a id="article-back" class="button button-secondary" href="index.html#announcements">← 返回最新消息</a>
-        <p id="article-status" role="status">正在讀取內容…</p>
+        <div id="article-feedback" class="article-feedback"><p id="article-status" role="status">正在讀取內容…</p><button id="article-retry" type="button" class="button button-secondary" hidden>重新載入</button></div>
         <article id="article" hidden>
             <p class="eyebrow" id="article-category"></p>
             <h1 id="article-title"></h1>
@@ -25,6 +25,6 @@
             <p><a id="article-link" class="button button-secondary" target="_blank" rel="noopener noreferrer" hidden>開啟相關連結 ↗</a></p>
         </article>
     </main>
-    <script type="module" src="article.js"></script>
+    <script type="module" src="article.js?v=refinement-1"></script>
 </body>
 </html>

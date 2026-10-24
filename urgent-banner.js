@@ -29,7 +29,8 @@ export function mountUrgentNotices(anchor) {
         if (items.length) {
             const details = node('details'), heading = node('summary');
             try { details.open = sessionStorage.getItem(storageKey) !== signature; } catch { details.open = true; }
-            heading.append(node('strong', `！緊急通告 · ${items.length} 則`), node('span', '展開／收合', 'urgent-toggle-hint'));
+            const toggleHint = node('span', details.open ? '收合 ↑' : '展開 ↓', 'urgent-toggle-hint');
+            heading.append(node('strong', `！緊急通告 · ${items.length} 則`), toggleHint);
             details.append(heading);
             const list = node('ul');
             for (const item of items) {
@@ -47,6 +48,7 @@ export function mountUrgentNotices(anchor) {
             // Persist during activation; the native asynchronous toggle event can be lost on navigation.
             heading.addEventListener('click', event => {
                 event.preventDefault(); details.open = !details.open;
+                toggleHint.textContent = details.open ? '收合 ↑' : '展開 ↓';
                 try { if (details.open) sessionStorage.removeItem(storageKey); else sessionStorage.setItem(storageKey, signature); } catch { /* Optional convenience only. */ }
             });
             region.append(details);
