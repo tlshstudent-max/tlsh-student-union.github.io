@@ -6,7 +6,7 @@ function memory() {
     const data = new Map();
     return { data, getItem: key => data.get(key) ?? null, setItem: (key, value) => data.set(key, value), removeItem: key => data.delete(key) };
 }
-const values = { kind:'announcement',title:'尚未送出的文字',summary:'',body:'第一行\n第二行',category:'學生會公告',date:'2026-10-24',academic_year:'',url:'',status:'draft' };
+const values = { kind:'announcement',title:'尚未送出的文字',summary:'',body:'第一行\n第二行',category:'學生會公告',date:'2026-10-24',academic_year:'',url:'',status:'draft',department:'union',show_on_home:true };
 
 test('local drafts isolate accounts, projects, and content, and exclude credentials', () => {
     const storage = memory();
@@ -33,6 +33,11 @@ test('unfinished editor values can be recovered; malformed or oversized drafts f
     assert.equal(store.load(null), null);
     storage.data.set(key, JSON.stringify({values:{...values,unrecognized:'ignore'},version:null,savedAt:Date.now()}));
     assert.equal(store.load(null).values.unrecognized, undefined);
+    const legacy={...values,category:'校園活動'};
+    delete legacy.department; delete legacy.show_on_home;
+    storage.data.set(key,JSON.stringify({values:legacy,version:null,savedAt:Date.now()}));
+    assert.equal(store.load(null).values.department,'activities');
+    assert.equal(store.load(null).values.show_on_home,true);
 });
 
 test('unavailable browser storage does not crash the editor', () => {

@@ -2,6 +2,7 @@ import { getClient, isConfigured } from '../backend.js';
 import { validateContent, mayEdit, mayPublish, safeHttpsUrl } from '../lib/content.js';
 import { createDraftStore } from '../lib/drafts.js';
 import { siteConfig } from '../site-config.js';
+import { departments, publication, contentHref } from '../lib/publication.js';
 
 const $ = id => document.getElementById(id);
 const form = $('content-form'), memberForm = $('member-form'), dialog = $('content-dialog');
@@ -12,6 +13,10 @@ const categories = {
     announcement: ['學生會公告', '校園活動', '學生權益', '行政公告'],
     document: ['會議紀錄', '組織章程', '預算決算', '行政文件'],
 };
+for (const [value, { label }] of Object.entries(departments)) {
+    field('department').append(new Option(label, value));
+    $('content-department').append(new Option(label, value));
+}
 
 function notice(id, text, state = '') {
     $(id).textContent = text;
@@ -25,7 +30,7 @@ function element(tag, text, className) {
 }
 function field(name) { return form.elements.namedItem(name); }
 function categoryValue() { return field('category').value === '__custom__' ? $('custom-category').value : field('category').value; }
-function editorValues() { return { ...Object.fromEntries(new FormData(form)), category: categoryValue() }; }
+function editorValues() { return { ...Object.fromEntries(new FormData(form)), category: categoryValue(), show_on_home:field('show_on_home').checked }; }
 function setCategories(kind, value = categories[kind][0]) {
     field('category').replaceChildren(...categories[kind].map(text => new Option(text, text)), new Option('其他（自行輸入）', '__custom__'));
     const custom = !categories[kind].includes(value);
@@ -39,6 +44,7 @@ function saveLocalDraft() {
     if ($('draft-status').textContent !== message) notice('draft-status', message, saved ? '' : 'error');
 }
 function displayError(error) {
+    if (['42703', 'PGRST204'].includes(error?.code)) return '發布位置設定尚未啟用。請管理員在 Supabase 執行 002_publication_locations.sql；目前的編輯文字仍保留。';
     if (error?.code === '42501') return '目前帳號沒有這項操作權限。若權限剛有異動，請重新登入。';
     if (error?.code === '23514' && error.message?.includes('administrator')) return '必須保留至少一位啟用中的管理員。請先授權另一位管理員，再調整此帳號。';
     if (error?.code === '23514' || error?.code === '22023') return '資料格式不符，請檢查必填欄位與網址。';
@@ -99,6 +105,7 @@ async function enterSession(session) {
         $('dashboard').hidden = false;
         $('identity').textContent = `${member.email} · ${labels[member.role]}`;
         $('new-content').disabled = !mayEdit(member, 'announcement') && !mayEdit(member, 'document');
+        $('new-minutes').disabled = !mayEdit(member, 'document');
         for (const panel of ['members-panel', 'audit-panel']) {
             document.querySelector(`[data-panel="${panel}"]`).hidden = member.role !== 'admin';
             $(panel).hidden = true;
@@ -106,6 +113,7 @@ async function enterSession(session) {
         selectPanel('content-panel');
         notice('dashboard-status', '');
         $('view-published').hidden = true;
+        $('view-location').hidden = true;
         await loadContent();
     } catch (error) {
         if (current === generation) showLogin(displayError(error), session, 'error');
@@ -196,7 +204,7 @@ async function loadContent() {
             if (data.length < 200) break;
         }
         if (current !== generation || !member) return;
-        contents = items; renderContent();
+        contents = items.map(item => ({ ...item, ...publication(item) })); renderContent();
     } catch (error) {
         notice('dashboard-status', displayError(error), 'error');
     } finally {
@@ -208,6 +216,7 @@ async function loadContent() {
 function renderContent() {
     const query = $('content-search').value.trim().toLocaleLowerCase();
     const filtered = contents.filter(item => (!$('content-kind').value || item.kind === $('content-kind').value)
+        && (!$('content-department').value || item.department === $('content-department').value)
         && (!$('content-status').value || item.status === $('content-status').value)
         && (!query || `${item.title} ${item.category}`.toLocaleLowerCase().includes(query)));
     $('content-count').textContent = `顯示 ${filtered.length} 筆，共 ${contents.length} 筆可管理內容`;
@@ -216,7 +225,7 @@ function renderContent() {
         const status = element('div');
         status.append(element('span', labels[item.status], `badge ${item.status}`));
         const body = element('div');
-        body.append(element('p', `${labels[item.kind]} · ${item.category} · ${item.date}`, 'muted'), element('h3', item.title));
+        body.append(element('p', `${departments[item.department].label} · ${labels[item.kind]} · ${item.category} · ${item.date}`, 'muted'), element('h3', item.title));
         const readonly = item.status === 'published' && !mayPublish(member);
         const button = element('button', readonly ? '檢視' : '編輯', 'button button-secondary');
         button.addEventListener('click', () => openEditor(item));
@@ -225,9 +234,10 @@ function renderContent() {
     });
     $('content-list').replaceChildren(...(nodes.length ? nodes : [element('p', contents.length ? '沒有符合條件的內容。' : '目前沒有可管理內容。有編輯權限的幹部可以從「新增內容」開始。', 'empty-state')]));
 }
-for (const id of ['content-search', 'content-kind', 'content-status']) $(id).addEventListener('input', renderContent);
+for (const id of ['content-search', 'content-kind', 'content-status', 'content-department']) $(id).addEventListener('input', renderContent);
 $('refresh-content').addEventListener('click', loadContent);
 $('new-content').addEventListener('click', () => openEditor());
+$('new-minutes').addEventListener('click', () => openEditor(null, { kind:'document',department:'docs',category:'會議紀錄' }));
 
 function updatePreview() {
     $('preview-title').textContent = field('title').value || '尚未填寫標題';
@@ -237,7 +247,18 @@ function updatePreview() {
     const url = safeHttpsUrl(field('url').value);
     $('preview-link').hidden = !url;
     if (url) $('preview-link').href = url; else $('preview-link').removeAttribute('href');
-    field('url').required = field('kind').value === 'document';
+    const documentKind = field('kind').value === 'document';
+    field('url').required = documentKind && !field('body').value.trim();
+    $('body-label').textContent = documentKind ? '文件內文／會議紀錄（可直接輸入）' : '公告內文（選填）';
+    $('url-label').textContent = documentKind ? '文件連結（已輸入內文時可不填）' : '相關連結（選填）';
+    if (!documentKind && field('department').value === 'union') field('show_on_home').checked = true;
+    field('show_on_home').disabled = $('save-content').hidden || (!documentKind && field('department').value === 'union');
+    const destinations = [];
+    if (field('department').value !== 'union' && !(documentKind && field('department').value === 'docs')) destinations.push(departments[field('department').value].label);
+    if (documentKind) destinations.push('公開文件庫');
+    if (field('show_on_home').checked) destinations.push('首頁最新消息');
+    const hint = `設為「已發布」後顯示於：${destinations.join('、')}。`;
+    if ($('publication-hint').textContent !== hint) $('publication-hint').textContent = hint;
     const custom = field('category').value === '__custom__';
     $('custom-category-row').hidden = !custom;
     $('custom-category').required = custom;
@@ -245,15 +266,17 @@ function updatePreview() {
     $('activity-template').hidden = field('kind').value !== 'announcement' || $('save-content').hidden;
 }
 
-function openEditor(item = null) {
-    if (!member) return;
+function openEditor(item = null, defaults = {}) {
+    if (!member || (defaults.kind && !mayEdit(member, defaults.kind))) return;
     editing = item; dirty = false; saving = false; recoverableDraft = null;
     form.reset();
     const readonly = item && (!mayEdit(member, item.kind) || (item.status === 'published' && !mayPublish(member)));
     for (const control of form.elements) control.disabled = Boolean(readonly);
     $('close-editor').disabled = false;
     $('save-content').hidden = Boolean(readonly);
-    field('kind').value = item?.kind || (mayEdit(member, 'announcement') ? 'announcement' : 'document');
+    field('kind').value = item?.kind || defaults.kind || (mayEdit(member, 'announcement') ? 'announcement' : 'document');
+    field('department').value = item?.department || defaults.department || (field('kind').value === 'document' ? 'docs' : 'union');
+    field('show_on_home').checked = item?.show_on_home ?? true;
     for (const option of field('kind').options) option.disabled = !mayEdit(member, option.value);
     for (const option of field('status').options) option.disabled = option.value === 'published' && !mayPublish(member);
     if (item) {
@@ -262,7 +285,7 @@ function openEditor(item = null) {
         const now = new Date();
         field('date').value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
     }
-    setCategories(field('kind').value, item?.category || categories[field('kind').value][0]);
+    setCategories(field('kind').value, item?.category || defaults.category || categories[field('kind').value][0]);
     $('editor-heading').textContent = readonly ? '檢視內容' : item ? '編輯內容' : '新增內容';
     notice('editor-status', readonly ? '你目前可編輯草稿；修改或下架已發布內容，需要發布權限。' : '');
     recoverableDraft = readonly ? null : draftStore?.load(item?.id);
@@ -278,6 +301,7 @@ function openEditor(item = null) {
     updatePreview(); dialog.showModal();
 }
 field('kind').addEventListener('change', () => {
+    if (field('kind').value === 'document' && field('department').value === 'union') field('department').value = 'docs';
     const previous = categoryValue();
     const isPreset = Object.values(categories).flat().includes(previous);
     setCategories(field('kind').value, isPreset ? categories[field('kind').value][0] : previous);
@@ -287,7 +311,10 @@ form.addEventListener('change', () => { dirty = true; updatePreview(); saveLocal
 $('restore-draft').addEventListener('click', () => {
     if (!recoverableDraft || !mayEdit(member, recoverableDraft.values.kind)) return;
     const draft = recoverableDraft;
-    for (const [key, value] of Object.entries(draft.values)) if (key !== 'category') field(key).value = value;
+    for (const [key, value] of Object.entries(draft.values)) {
+        if (key === 'show_on_home') field(key).checked = value;
+        else if (key !== 'category') field(key).value = value;
+    }
     setCategories(draft.values.kind, draft.values.category);
     if (!mayPublish(member) && field('status').value === 'published') field('status').value = 'draft';
     if (editing) editing = { ...editing, version: draft.version };
@@ -302,6 +329,7 @@ $('discard-draft').addEventListener('click', () => {
 $('activity-template').addEventListener('click', () => {
     if (field('body').value.trim() && !confirm('套用範本會替換目前內文，確定繼續嗎？')) return;
     setCategories('announcement', '校園活動');
+    field('department').value = 'activities';
     field('body').value = '活動時間：\n活動地點：\n參加對象：\n報名方式：\n注意事項：';
     dirty = true; updatePreview(); saveLocalDraft();
     notice('editor-status', '請填妥活動時間、地點與報名方式，再發布。活動頁會同步顯示「校園活動」類別的已發布公告。');
@@ -343,9 +371,12 @@ form.addEventListener('submit', async event => {
         dirty = false; dialog.close();
         notice('dashboard-status', item.status === 'published' ? '已發布。官網重新載入後即可看見更新。' : item.status === 'archived' ? '已下架，這份內容不再公開。' : '草稿已儲存，尚未公開。', 'success');
         $('view-published').hidden = item.status !== 'published';
+        $('view-location').hidden = item.status !== 'published';
         if (item.status === 'published') {
-            $('view-published').href = item.kind === 'document' ? item.url : `../announcement.html?id=${encodeURIComponent(data.id)}`;
+            $('view-published').href = contentHref({ ...item,id:data.id }, '../announcement.html');
             $('view-published').textContent = item.kind === 'document' ? '查看這份文件 ↗' : '查看這則公告 ↗';
+            $('view-location').href = new URL(departments[item.department].path, new URL('../', location.href)).href;
+            $('view-location').textContent = `查看發布頁面（${departments[item.department].label}） ↗`;
         }
         await loadContent();
     } catch (error) { if (current === generation) notice('editor-status', displayError(error), 'error'); }

@@ -17,6 +17,7 @@ test('PostgreSQL policies enforce public, editor and administrator boundaries', 
         grant execute on all functions in schema auth to anon, authenticated;
     `);
     await db.exec(await readFile(new URL('../supabase/migrations/001_content_management.sql', import.meta.url), 'utf8'));
+    await db.exec(await readFile(new URL('../supabase/migrations/002_publication_locations.sql', import.meta.url), 'utf8'));
     await db.exec(`
         insert into staff_members (email, role, edit_announcements, edit_documents, can_publish) values
           ('admin@example.com','admin',true,true,true),
@@ -69,13 +70,25 @@ test('PostgreSQL policies enforce public, editor and administrator boundaries', 
         assert.equal((await db.query("update content set title='stale edit' where id=$1 and version=1 returning id",[item.id])).rows.length,0);
         await assert.rejects(insert('document','published','https://example.com/file'), /row-level/i);
     });
-    await t.test('database rejects unsafe URLs, missing document links and invalid statuses', async () => {
+    await t.test('database rejects unsafe URLs, missing document sources and invalid statuses', async () => {
         await as('admin@example.com');
         for (const url of [null,'http://example.com','javascript:alert(1)','https://user:pass@example.com']) {
             await assert.rejects(insert('document','draft',url), /check constraint/i);
         }
         await assert.rejects(insert('announcement','invalid'), /check constraint/i);
         await assert.rejects(db.exec("update content set version=99"), /permission/i);
+    });
+    await t.test('locations and inline minutes follow the existing edit and publish permissions',async()=>{
+        await as('admin@example.com');
+        const {rows:[row]}=await db.query("insert into content(kind,title,category,date,body,department,show_on_home,status) values ('document','會議紀錄','會議紀錄','2026-10-24','完整紀錄','docs',true,'published') returning id");
+        await as(null);
+        assert.equal((await db.query("select title from content where id=$1 and show_on_home=true",[row.id])).rows[0].title,'會議紀錄');
+        await assert.rejects(db.query("update content set department='pr' where id=$1",[row.id]),/permission/i);
+        await as('editor@example.com');
+        assert.equal((await db.query("update content set department='rights' where id=$1 returning id",[row.id])).rows.length,0);
+        await db.query("insert into content(kind,title,category,date,department,show_on_home) values ('announcement','公關草稿','公關消息','2026-10-24','pr',false)");
+        await as(null);
+        assert.equal((await db.query("select title from content where department='pr'")).rows.length,0);
     });
     await t.test('admin can authorize staff, database auditing records actor, and last admin remains protected', async () => {
         await as('admin@example.com');

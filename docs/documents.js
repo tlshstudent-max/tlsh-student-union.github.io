@@ -1,4 +1,5 @@
 import { fetchDocuments } from '../public-data.js';
+import { contentHref } from '../lib/publication.js';
 (() => {
     const elements = {
         list: document.getElementById('archive-list'),
@@ -65,9 +66,9 @@ import { fetchDocuments } from '../public-data.js';
 
         const link = document.createElement('a');
         link.className = 'download-link';
-        link.href = item.url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
+        const href = contentHref(item, '../announcement.html');
+        link.href = href;
+        if (new URL(href, location.href).origin !== location.origin) { link.target = '_blank'; link.rel = 'noopener noreferrer'; }
         link.textContent = '檢視文件 ↗';
         link.setAttribute('aria-label', `檢視文件：${item.title}`);
         article.append(meta, body, link);

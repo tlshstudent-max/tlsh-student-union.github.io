@@ -60,6 +60,9 @@
 .draft-recovery { margin-top: 20px; padding: 16px; border: 1px solid #776d42; background: #292616; }
 .draft-recovery p { margin: 0 0 12px; overflow-wrap: anywhere; }
 #view-published { margin-bottom: 12px; }
+#view-location { margin-bottom: 12px; }
+.department-filter { max-width: 360px; margin: 0 0 20px; }
+#publication-hint { margin: 0; }
 @media (max-width: 900px) {
     .login-panel { gap: 35px; }
     .content-filters { grid-template-columns: 1fr 1fr; }

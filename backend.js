@@ -1,4 +1,5 @@
 import { siteConfig } from './site-config.js';
+import { publication } from './lib/publication.js';
 
 export const isConfigured = Boolean(siteConfig.supabaseUrl && siteConfig.supabasePublishableKey);
 export const usesSupabaseForContent = isConfigured && siteConfig.publicDataSource !== 'sheets';
@@ -25,12 +26,22 @@ export function getClient() {
     return clientPromise;
 }
 
-export async function publishedContent(kind, id) {
+export async function publishedContent(kind, id, { department, home = false } = {}) {
     const client = await getClient();
-    let query = client.from('content').select('id,kind,title,summary,body,category,date,academic_year,url,updated_at')
-        .eq('status', 'published').eq('kind', kind).order('date', { ascending: false }).order('id');
-    if (id) query = query.eq('id', id);
-    const { data, error } = await query.abortSignal(AbortSignal.timeout(12000));
+    const columns = 'id,kind,title,summary,body,category,date,academic_year,url,updated_at';
+    const query = withLocations => {
+        let request = client.from('content').select(withLocations ? `${columns},department,show_on_home` : columns)
+            .eq('status', 'published').order('date', { ascending: false }).order('id');
+        if (kind) request = request.eq('kind', kind);
+        if (id) request = request.eq('id', id);
+        if (withLocations && department) request = request.eq('department', department);
+        if (withLocations && home) request = request.eq('show_on_home', true);
+        return request.abortSignal(AbortSignal.timeout(12000));
+    };
+    let { data, error } = await query(true);
+    // Keep public reading available while an existing project's additive migration is pending.
+    if (['42703', 'PGRST204'].includes(error?.code)) ({ data, error } = await query(false));
     if (error) throw error;
-    return data;
+    return data.map(item => ({ ...item, ...publication(item) }))
+        .filter(item => (!department || item.department === department) && (!home || item.show_on_home));
 }

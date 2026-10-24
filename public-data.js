@@ -1,5 +1,6 @@
 import { parseCsv, safeHttpsUrl, normalizeDate } from './lib/content.js';
 import { usesSupabaseForContent, publishedContent } from './backend.js';
+import { publication } from './lib/publication.js';
 export { safeHttpsUrl, normalizeDate };
 const dataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQEU3zPSLHP7riuOfJrG3jurKybYQRV3ecfPQfdUItMZvX-2H2oYyZUxJGQVCILoCL4IWDuPildQFAT/pub?gid=20260713&single=true&output=csv';
 
@@ -9,27 +10,28 @@ export async function fetchRows() {
     return parseCsv(await response.text());
 }
 
-export async function fetchAnnouncements() {
-    if (usesSupabaseForContent) return (await publishedContent('announcement')).map(item => ({
-        ...item, date: normalizeDate(item.date), url: safeHttpsUrl(item.url),
-    }));
-    return (await fetchRows()).slice(1).filter(cols => (cols[9] || '').trim()).map(cols => ({
-        title: cols[9].trim(), date: normalizeDate(cols[7]), category: (cols[8] || '學生會公告').trim(),
-        summary: (cols[10] || '').trim(), url: safeHttpsUrl(cols[11]),
-    }));
+async function publicEntries(kind, options = {}) {
+    let items;
+    if (usesSupabaseForContent) items = await publishedContent(kind, null, options);
+    else items = (await fetchRows()).slice(1).flatMap(cols => {
+        const records = [];
+        if ((cols[9] || '').trim()) records.push({ kind:'announcement',title:cols[9].trim(),date:normalizeDate(cols[7])?.iso,
+            category:(cols[8] || '學生會公告').trim(),summary:(cols[10] || '').trim(),body:'',url:safeHttpsUrl(cols[11]) });
+        const date = normalizeDate(cols[0]), url = safeHttpsUrl(cols[5]);
+        if (date && url && (cols[3] || '').trim()) records.push({ kind:'document',title:cols[3].trim(),date:date.iso,
+            category:(cols[2] || '其他公開文件').trim(),summary:(cols[4] || '').trim(),body:'',url,academic_year:(cols[1] || '').trim() });
+        return records;
+    });
+    return items.map(item => ({ ...item, ...publication(item),date:normalizeDate(item.date),url:safeHttpsUrl(item.url) }))
+        .filter(item => (!kind || item.kind === kind) && (!options.department || item.department === options.department) && (!options.home || item.show_on_home));
 }
 
+export const fetchAnnouncements = () => publicEntries('announcement');
+export const fetchHomeContent = () => publicEntries(null, { home:true });
+export const fetchDepartmentContent = (department, kind) => publicEntries(kind, { department });
+
 export async function fetchDocuments() {
-    if (usesSupabaseForContent) return (await publishedContent('document')).map(item => ({
-        ...item, date: normalizeDate(item.date)?.label, isoDate: item.date,
-        timestamp: normalizeDate(item.date)?.timestamp, year: item.academic_year, description: item.summary,
-        url: safeHttpsUrl(item.url),
-    })).filter(item => item.url && item.timestamp !== undefined);
-    return (await fetchRows()).slice(1).map(cols => {
-        const date = normalizeDate(cols[0]), url = safeHttpsUrl(cols[5]);
-        if (!url || !date || !(cols[3] || '').trim()) return null;
-        return { date: date.label, isoDate: date.iso, timestamp: date.timestamp,
-            year: (cols[1] || '').trim(), category: (cols[2] || '其他公開文件').trim(),
-            title: cols[3].trim(), description: (cols[4] || '').trim(), url };
-    }).filter(Boolean);
+    return (await publicEntries('document')).map(item => ({ ...item,date:item.date?.label,isoDate:item.date?.iso,
+        timestamp:item.date?.timestamp,year:item.academic_year,description:item.summary }))
+        .filter(item => (item.url || item.body?.trim()) && item.timestamp !== undefined);
 }
