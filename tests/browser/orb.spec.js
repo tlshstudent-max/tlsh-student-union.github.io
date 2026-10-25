@@ -16,6 +16,7 @@ test('glass badge renders in both themes and supports drag, interruption, keyboa
     const baseline=await canvas.screenshot();
     const box=await orb.boundingBox();
     await page.mouse.move(box.x+box.width*.45,box.y+box.height*.5);await page.mouse.down();
+    await expect(orb).toHaveCSS('outline-style','none');
     await page.mouse.move(box.x+box.width*.73,box.y+box.height*.65,{steps:10});
     await expect(orb).toHaveClass(/orb-dragging/);
     const dragged=await canvas.screenshot();expect(dragged.equals(baseline)).toBe(false);
@@ -26,6 +27,7 @@ test('glass badge renders in both themes and supports drag, interruption, keyboa
     await page.getByRole('button',{name:'回正',exact:true}).click();
     await expect(page.locator('#orb-status')).toHaveText('會標已回正。');
     await orb.focus();await page.keyboard.press('ArrowRight');
+    await expect(orb).toHaveCSS('outline-style','dashed');
     await expect(page.locator('#orb-status')).toContainText('已轉動');
     await page.keyboard.press('Home');await expect(page.locator('#orb-status')).toHaveText('會標已回正。');
     await page.screenshot({path:testInfo.outputPath('orb-dark.png')});
@@ -57,7 +59,24 @@ test('unsupported graphics retain the real badge without dead controls',async({p
     });
     await page.goto('/');await expect(page.locator('.hero-logo')).toBeVisible();
     await expect(page.locator('#orb-reset')).toBeHidden();await expect(page.locator('.orb-canvas')).toBeHidden();
+    await expect(page.locator('.orb-lamp')).toBeHidden();
     await expect(page.locator('#glass-orb')).not.toHaveAttribute('tabindex');
+});
+
+test('exhibition light stays above the sphere in both themes and narrow desktop layouts',async({page})=>{
+    await page.goto('/');
+    const orb=page.locator('#glass-orb');await expect(orb).toHaveClass(/orb-ready/);
+    for(const width of [1440,1024,850]) {
+        await page.setViewportSize({width,height:1000});
+        const lamp=page.locator('.orb-lamp');await expect(lamp).toBeVisible();
+        const light=await lamp.boundingBox(),sphere=await orb.boundingBox();
+        expect(light.y).toBeGreaterThan(75);
+        expect(light.y+light.height).toBeLessThan(sphere.y);
+        expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+    }
+    await page.setViewportSize({width:390,height:844});
+    await expect(orb).toBeHidden();
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 
 test('context loss falls back to the real badge and restoration resumes the controls',async({page})=>{
