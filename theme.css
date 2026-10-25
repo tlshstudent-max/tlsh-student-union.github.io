@@ -85,7 +85,7 @@ html[data-theme="light"] .urgent-error button { color: #8b3c1b; border-color: #b
 @media (prefers-contrast: more) {
     :root[data-theme="light"] { --ui-muted: #41483b; --ui-line: #7b846f; --ui-control-border: #657057; --material-edge: #7b846f; }
 }
-@media (prefers-reduced-motion: no-preference) {
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
     html[data-theme-changing] :is(body, .sitebar, .home-hero, .card, .info-card, .news-card, .button, .hero-directory, .workspace-panel, #content-dialog, .editor-topbar, .editor-actions) { transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease; }
 }
 

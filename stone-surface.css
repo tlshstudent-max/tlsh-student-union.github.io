@@ -1,10 +1,11 @@
 /* 共用石澗材質：低紋理的霧面黑色，保留原有黑金色盤。 */
 body {
+    --stone-image: url("stone-texture.svg?v=20260729");
     background-color: #050606 !important;
     background-image:
         radial-gradient(ellipse 80% 45% at 48% -12%, rgba(220, 218, 204, 0.045) 0%, transparent 72%),
         linear-gradient(rgba(5, 6, 6, 0.78), rgba(5, 6, 6, 0.78)),
-        url("stone-texture.svg?v=20260729") !important;
+        var(--stone-image) !important;
     background-repeat: no-repeat, no-repeat, repeat !important;
     background-position: center top, center, center top !important;
     background-size: 100% 100%, 100% 100%, 1280px 1280px !important;
@@ -32,10 +33,13 @@ body {
     opacity: 0.72 !important;
 }
 
-@media (max-width: 768px) {
+/* Rasterize the same stone once at build time instead of evaluating its large
+   turbulence filters on a touch device. Keep the original texture on desktop. */
+@media (max-width: 820px), (pointer: coarse) {
     body {
+        --stone-image: url("assets/stone-texture-mobile.webp?v=1");
         background-attachment: scroll, scroll, scroll !important;
-        background-size: 160% 100%, 100% 100%, 920px 920px !important;
+        background-size: 100% 28rem, 100% 100%, 512px 512px !important;
     }
 
     #cursor-glow {

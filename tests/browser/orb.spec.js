@@ -79,6 +79,18 @@ test('exhibition light stays above the sphere in both themes and narrow desktop 
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 
+test('the renderer loads on demand when the hidden mobile hero becomes visible',async({page})=>{
+    const requested=[];page.on('request',request=>requested.push(new URL(request.url()).pathname));
+    await page.setViewportSize({width:390,height:844});await page.goto('/');
+    await page.locator('.sitebar').waitFor();await expect(page.locator('#glass-orb')).toBeHidden();
+    expect(requested).not.toContain('/lib/orb-renderer.js');
+    await page.setViewportSize({width:1440,height:1000});
+    await expect(page.locator('#glass-orb')).toHaveClass(/orb-ready/);
+    expect(requested).toContain('/lib/orb-renderer.js');
+    await page.locator('#glass-orb').focus();await page.keyboard.press('ArrowRight');
+    await expect(page.locator('#orb-status')).toContainText('已轉動');
+});
+
 test('context loss falls back to the real badge and restoration resumes the controls',async({page})=>{
     const errors=[];page.on('pageerror',e=>errors.push(e.message));
     await page.goto('/');const orb=page.locator('#glass-orb');await expect(orb).toHaveClass(/orb-ready/);

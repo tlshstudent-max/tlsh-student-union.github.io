@@ -48,6 +48,13 @@
 * **玻璃會標**：桌機首頁的玻璃球內，以會標中央 TLSH 與「斗中學生會」字形建立有厚度、倒角與側面光影的立體核心，去除圓底與周圍裝飾。支援拖曳旋轉、慣性減速、方向鍵微調與回正，材質由 `glass-orb.js`、`lib/orb-renderer.js`、`lib/orb-lettering.js` 與 `glass-orb.css` 負責。閒置或離開視窗時停止繪製，不支援 WebGL 時顯示正式原圖；手機維持原本精簡首頁與導覽會標，避免裝飾影響第一屏消息。沒有新增套件或付費服務。
 * **風格調整**：跨頁字級與互動放在 `ui.css`；讀取在其後的 `material.css` 集中材質、圓角及首頁構圖，背景底層由 `stone-surface.css` 共用，後台細節放在 `admin/admin.css`。`theme.css` 提供白色版，`theme.js` 在樣式載入前恢復使用者選擇，預設維持黑金版。最後的 `glass.css` 集中導覽／操作面板的毛玻璃、按鈕按壓及可及性替代樣式，意見回饋排版由 `president/feedback.css` 負責。各組的 `style.css` 保留必要的部門特色，避免重複定義共用元件。
 
+
+## 手機材質效能
+
+手機與觸控裝置使用由原版石紋預先轉出的 512 × 512 WebP，讓手機直接讀取已完成濾鏡運算的石紋；導覽列與表單保留色澤、高光與細邊，使用不需即時背景模糊的材質。桌面沿用原版材質。
+
+若修改 `stone-texture.svg`，可另行執行 `CHROMIUM_PATH=/usr/bin/chromium node scripts/rasterize-stone.mjs` 更新手機圖片；一般網站建置不需要啟動瀏覽器。
+
 ---
 
 ## 🏛️ 版權資訊
