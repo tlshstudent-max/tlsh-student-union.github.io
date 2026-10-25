@@ -1,11 +1,13 @@
 // Run before styles: keep the chosen appearance consistent across pages without a flash.
 (() => {
     const key = 'tlsh-appearance', root = document.documentElement;
+    const animateTheme = matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
     let timer;
     function apply(value, animate = false) {
         const theme = value === 'light' ? 'light' : 'dark';
         clearTimeout(timer);
-        if (animate) {
+        root.removeAttribute('data-theme-changing');
+        if (animate && animateTheme.matches) {
             root.setAttribute('data-theme-changing', '');
             timer = setTimeout(() => root.removeAttribute('data-theme-changing'), 180);
         }

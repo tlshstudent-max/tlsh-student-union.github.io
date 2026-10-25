@@ -1,5 +1,3 @@
-import { createOrbRenderer } from './lib/orb-renderer.js?v=gallery-1';
-
 const stage = document.getElementById('glass-orb');
 const canvas = stage.querySelector('canvas'), fallback = stage.querySelector('img');
 const reset = document.getElementById('orb-reset'), help = document.getElementById('orb-help'), status = document.getElementById('orb-status');
@@ -46,10 +44,15 @@ function staticBadge() {
     canvas.hidden = reset.hidden = true; fallback.removeAttribute('aria-hidden'); help.textContent = 'TLSH STUDENT UNION';
 }
 async function initialize() {
-    if (renderer || loading || failed || !visible) return;
+    if (renderer || loading || failed || !visible || document.hidden) return;
     loading = true;
     try {
+        // The mobile hero hides this exhibit. Do not download the renderer or
+        // its distance-field code until the sphere is actually visible.
+        const { createOrbRenderer } = await import('./lib/orb-renderer.js?v=gallery-1');
+        if (!visible || document.hidden) return;
         const image = new Image(); image.src = new URL('assets/union-logo.jpg', import.meta.url).href; await image.decode();
+        if (!visible || document.hidden) return;
         renderer = createOrbRenderer(canvas, image);
         if (!renderer) { failed = true; return; }
         canvas.hidden = false; reset.hidden = false;
@@ -113,7 +116,7 @@ stage.addEventListener('keydown', event => {
 stage.addEventListener('blur', () => stage.classList.remove('orb-pointer-focus'));
 reduced.addEventListener('change', () => { stop(); schedule(); });
 solid.addEventListener('change', schedule); contrast.addEventListener('change', schedule);
-document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else schedule(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else { initialize(); schedule(); } });
 window.addEventListener('pagehide', stop);
 canvas.addEventListener('webglcontextlost', event => { event.preventDefault(); staticBadge(); });
 canvas.addEventListener('webglcontextrestored', () => { failed = false; initialize(); });
