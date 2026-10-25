@@ -1,6 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { navyMask, signedLetterField } from '../lib/orb-lettering.js';
+import { navyMask, signedLetterField, clearCropEdges } from '../lib/orb-lettering.js';
+
+test('cropped ornaments disappear while interior letter strokes and disconnected dots survive',()=>{
+    const mask = new Uint8Array(64);
+    for (const i of [0, 9, 18, 7, 14, 21, 35, 43, 51, 37]) mask[i] = 1;
+    clearCropEdges(mask,8,8);
+    assert.deepEqual([...mask.entries()].filter(([,v])=>v).map(([i])=>i),[35,37,43,51]);
+});
 
 test('letter extraction retains navy ink and rejects paper, ornaments, neutral shadows and transparency',()=>{
     const pixels=new Uint8ClampedArray([

@@ -1,4 +1,4 @@
-import { createOrbRenderer } from './lib/orb-renderer.js?v=solid-1';
+import { createOrbRenderer } from './lib/orb-renderer.js?v=gallery-1';
 
 const stage = document.getElementById('glass-orb');
 const canvas = stage.querySelector('canvas'), fallback = stage.querySelector('img');
@@ -70,6 +70,7 @@ stage.addEventListener('pointerdown', event => {
     if (!renderer || !event.isPrimary || event.button !== 0) return;
     target = null; vx = vy = 0; lastTime = 0;
     pointer = { id: event.pointerId, x: event.clientX, y: event.clientY, time: event.timeStamp, startX: event.clientX, startY: event.clientY, moved: false };
+    stage.classList.add('orb-pointer-focus');
     stage.setPointerCapture(event.pointerId); stage.focus({ preventScroll: true }); status.textContent = '';
 });
 stage.addEventListener('pointermove', event => {
@@ -100,6 +101,7 @@ function recenter() {
 }
 reset.addEventListener('click', recenter);
 stage.addEventListener('keydown', event => {
+    stage.classList.remove('orb-pointer-focus');
     if (!renderer || event.altKey || event.ctrlKey || event.metaKey) return;
     if (event.key === 'Home') { event.preventDefault(); recenter(); return; }
     if (event.key === 'Escape') { stop(); schedule(); return; }
@@ -108,6 +110,7 @@ stage.addEventListener('keydown', event => {
     event.preventDefault(); stop(); yaw += directions[event.key][0]; pitch = clamp(pitch + directions[event.key][1], bound); schedule();
     status.textContent = '已轉動會標。按 Home 或「回正」可重新置中。';
 });
+stage.addEventListener('blur', () => stage.classList.remove('orb-pointer-focus'));
 reduced.addEventListener('change', () => { stop(); schedule(); });
 solid.addEventListener('change', schedule); contrast.addEventListener('change', schedule);
 document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else schedule(); });

@@ -1,19 +1,34 @@
 /* The native badge remains the fallback and the source for crawlers without WebGL. */
-.orb-stage { position: relative; width: clamp(15rem, 26vw, 22rem); max-width: 100%; aspect-ratio: 1; border-radius: 50%; }
+.orb-stage { position: relative; isolation: isolate; width: clamp(15rem, 26vw, 22rem); max-width: 100%; aspect-ratio: 1; border-radius: 50%; }
 .orb-stage .hero-logo { width: 100%; height: 100%; }
-.orb-canvas { position: absolute; inset: -6%; width: 112%; height: 112%; pointer-events: none; }
+.orb-canvas { position: absolute; inset: -6%; width: 112%; height: 112%; pointer-events: none; z-index: 1; }
 .orb-ready { cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
 .orb-ready .orb-fallback { opacity: 0; }
-.orb-ready::before { content: ''; position: absolute; inset: 5% 0 -12%; pointer-events: none; z-index: -1; background: radial-gradient(ellipse at 50% 85%, #d9c47718, transparent 60%); }
-.orb-ready::after { content: ''; position: absolute; bottom: -9%; left: 18%; width: 64%; height: 8%; border-radius: 50%; background: #0003; filter: blur(12px); pointer-events: none; }
+/* A fixed exhibition light; only the sculpture responds to the gesture. */
+.orb-lamp { display: none; position: absolute; top: -31%; left: 36%; width: 28%; height: 28%; pointer-events: none; z-index: 2; }
+.orb-lamp svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.orb-ready .orb-lamp { display: block; }
+.lamp-cord { stroke: #74766b; stroke-width: 1.2; }
+.lamp-shell { fill: #292d2b; stroke: #555950; stroke-width: .7; }
+.lamp-lip { fill: #5d5740; }
+.lamp-light { fill: #fff1c9; filter: drop-shadow(0 2px 5px #ffedb08c); }
+.orb-ready::before { content: ''; position: absolute; inset: -18% -14% -17%; z-index: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 34%, #fff0c90d, transparent 57%), radial-gradient(ellipse at 50% 88%, #d9c47710, transparent 42%); }
+.orb-ready::after { content: ''; position: absolute; bottom: -10%; left: 22%; width: 56%; height: 6%; border-radius: 50%; background: #0008; filter: blur(12px); pointer-events: none; z-index: 0; }
 .orb-ready.orb-dragging { cursor: grabbing; }
-.orb-stage:focus-visible { outline: 2px solid var(--ui-gold); outline-offset: 1rem; }
+.orb-stage:focus { outline: none; }
+.orb-stage:focus-visible:not(.orb-pointer-focus) { outline: 2px dashed var(--ui-gold); outline-offset: .75rem; }
+@media (min-width: 821px) { .home-page .hero-identity { padding-top: 5rem; align-content: center; } }
 .orb-controls { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .5rem 1rem; margin-top: 2rem; min-height: 44px; }
 .orb-controls .hero-brand-caption { margin: 0; font-size: .75rem; letter-spacing: .06em; }
 .orb-reset { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; padding: .5rem .875rem; border: 1px solid var(--ui-control-border); border-radius: 2rem; background: transparent; color: var(--ui-text); font: inherit; font-size: .8125rem; cursor: pointer; }
 .orb-reset:active { background: #d9c47720; }
 .orb-status { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); }
-html[data-theme="light"] .orb-ready::after { background: #4d574021; }
+html[data-theme="light"] .lamp-cord { stroke: #a8aaa3; }
+html[data-theme="light"] .lamp-shell { fill: #e2e3dd; stroke: #b6b9af; }
+html[data-theme="light"] .lamp-lip { fill: #bcb9a8; }
+html[data-theme="light"] .lamp-light { fill: #fffdf4; filter: drop-shadow(0 2px 4px #e7d5a6a6); }
+html[data-theme="light"] .orb-ready::before { background: radial-gradient(ellipse at 50% 40%, #ffffffd9, transparent 65%), radial-gradient(ellipse at 50% 90%, #c7b78416, transparent 43%); }
+html[data-theme="light"] .orb-ready::after { background: #464b3b30; }
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
     .orb-ready::before, .orb-ready::after { display: none; }
 }
