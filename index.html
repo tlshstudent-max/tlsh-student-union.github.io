@@ -37,11 +37,11 @@
       "@graph": [
         {
           "@type": "Organization",
-          "@id": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/#organization",
+          "@id": "https://tlshstudent-max.github.io/#organization",
           "name": "國立斗六高級中學學生會",
           "alternateName": "斗六高中學生會",
           "description": "國立斗六高中學生會官方網站，提供最新公告、校園活動、學生權益管道、會議紀錄與公開文件。",
-          "url": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/",
+          "url": "https://tlshstudent-max.github.io/",
           "logo": {
             "@type": "ImageObject",
             "url": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/assets/union-logo.jpg",
@@ -58,12 +58,21 @@
         },
         {
           "@type": "WebSite",
-          "@id": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/#website",
+          "@id": "https://tlshstudent-max.github.io/#website",
           "name": "斗六高中學生會",
-          "alternateName": ["國立斗六高中學生會", "TLSH Student Union"],
-          "url": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/",
+          "alternateName": ["國立斗六高中學生會", "斗中學生會", "TLSH Student Union"],
+          "url": "https://tlshstudent-max.github.io/",
           "inLanguage": "zh-TW",
-          "publisher": { "@id": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/#organization" }
+          "publisher": { "@id": "https://tlshstudent-max.github.io/#organization" }
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/#webpage",
+          "url": "https://tlshstudent-max.github.io/tlsh-student-union.github.io/",
+          "name": "國立斗六高中學生會 | 官方網站",
+          "inLanguage": "zh-TW",
+          "isPartOf": { "@id": "https://tlshstudent-max.github.io/#website" },
+          "about": { "@id": "https://tlshstudent-max.github.io/#organization" }
         }
       ]
     }

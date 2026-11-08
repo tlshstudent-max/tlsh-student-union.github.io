@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, access } from 'node:fs/promises';
-import { articleMetadata, publicRoot } from '../lib/seo.js';
+import { articleMetadata, publicRoot, siteIdentity } from '../lib/seo.js';
 
 const pages=['','activities/','president/','pr/','rights/','design/','docs/','general/','privacy.html'];
 test('public source pages expose unique canonical metadata and existing share assets without JavaScript',async()=>{
@@ -53,4 +53,23 @@ test('article metadata uses published identity and bounded plain descriptions',(
     assert.equal(meta.description.length,160);assert.ok(!meta.description.includes('\n'));
     assert.equal(meta.url,publicRoot+'announcement.html?id='+item.id+'&kind=document');
     assert.equal(articleMetadata({...item,body:''},'announcement').description,'閱讀斗六高中學生會的公告：會議紀錄');
+});
+
+test('all public page identities belong to one hostname website while retaining their own canonical URLs',async()=>{
+    assert.equal(siteIdentity.url,new URL('/',publicRoot).href);
+    for(const path of [...pages,'announcement.html']) {
+        const file=path.endsWith('.html')?path:path+'index.html';
+        const html=await readFile(new URL('../'+file,import.meta.url),'utf8');
+        const blocks=[...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(match=>JSON.parse(match[1]));
+        const objects=blocks.flatMap(block=>block['@graph']||[block]);
+        const page=objects.find(item=>['WebPage','CollectionPage'].includes(item['@type']));
+        assert.ok(page,file);assert.equal(page.isPartOf['@id'],siteIdentity.websiteId,file);
+        if(path!=='announcement.html')assert.equal(page.url,publicRoot+path,file);
+        for(const item of objects)if(item['@type']==='WebSite') {
+            assert.equal(item['@id'],siteIdentity.websiteId,file);
+            assert.equal(item.url,siteIdentity.url,file);
+            assert.equal(item.name,siteIdentity.name,file);
+        }
+        assert.ok(html.includes(`<meta property="og:site_name" content="${siteIdentity.name}">`),file);
+    }
 });

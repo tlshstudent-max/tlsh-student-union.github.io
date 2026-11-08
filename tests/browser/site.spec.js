@@ -1246,8 +1246,11 @@ test('published articles get clean metadata and unavailable content is excluded 
     expect(await page.locator('link[rel=canonical]').getAttribute('href')).toBe(`https://tlshstudent-max.github.io/tlsh-student-union.github.io/announcement.html?id=${id}`);
     expect(await page.locator('meta[name=robots]').getAttribute('content')).toContain('index, follow');
     expect(await page.locator('meta[name=description]').getAttribute('content')).toBe(article.summary);
-    const data=JSON.parse(await page.locator('script[type="application/ld+json"]').textContent());
+    const data=await page.locator('script[type="application/ld+json"]').evaluateAll(nodes=>nodes.map(node=>JSON.parse(node.textContent)).find(item=>item['@type']==='Article'));
     expect(data.headline).toBe('<script>無法執行</script>');
+    expect(data.publisher['@id']).toBe('https://tlshstudent-max.github.io/#organization');
+    expect(data.publisher.url).toBe('https://tlshstudent-max.github.io/');
+    expect(data.isPartOf['@id']).toBe('https://tlshstudent-max.github.io/#website');
     mock.setContents([]);await page.reload();await expect(page.locator('#article-status')).toContainText('未公開');
     expect(await page.locator('meta[name=robots]').getAttribute('content')).toBe('noindex, follow');
     await expect(page.locator('link[rel=canonical]')).toHaveCount(0);

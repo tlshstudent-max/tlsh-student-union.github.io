@@ -1,7 +1,7 @@
 import { publishedContent } from './backend.js';
 import { safeHttpsUrl, normalizeDate } from './lib/content.js';
 import { departments } from './lib/publication.js';
-import { setPublicArticleMetadata } from './lib/seo.js';
+import { setPublicArticleMetadata } from './lib/seo.js?v=site-name-1';
 
 const status = document.getElementById('article-status'), feedback = document.getElementById('article-feedback');
 const article = document.getElementById('article'), retry = document.getElementById('article-retry');

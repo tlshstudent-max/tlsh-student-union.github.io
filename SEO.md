@@ -2,13 +2,21 @@
 
 首頁與各部門的標題、說明、canonical、Open Graph／Twitter 分享資訊直接存在 HTML，搜尋器無須執行 JavaScript 就能讀取。首頁也提供 Organization／WebSite 結構化資料。不要在說明或結構化資料中填入未公告的活動、保證回覆時間或虛構評分。
 
+## 共用網站名稱
+
+免費根網址 `https://tlshstudent-max.github.io/` 的品牌首頁位於獨立儲存庫 `tlshstudent-max.github.io`。它和本專案共同代表同一個網站，首選名稱為「斗六高中學生會」，別名為「國立斗六高中學生會」、「斗中學生會」及「TLSH Student Union」。維護根首頁時，應同步保持這些公開名稱一致。
+
+全站共用 `https://tlshstudent-max.github.io/#website` 與 `https://tlshstudent-max.github.io/#organization`。本專案首頁是該網站中的 `WebPage`，文件庫是 `CollectionPage`，公告是 `Article`；各頁保留原本的 canonical 和實際內容網址，不把所有頁面 canonical 指向根網址，也不更改登入回呼。
+
+Google 的 favicon、網站名稱、頁面標題及摘要是不同項目。圖示更新不代表名稱已採用。若仍顯示 GitHub，先在 Search Console 審查根網址並查看 Google 已檢索的 HTML，確認 `WebSite.name`、`WebSite.url`、`og:site_name` 與可見品牌名稱，再對更新後的根首頁與原官網首頁請求重新索引。Search Console 沒有直接指定搜尋網站名稱的欄位，更新結構化資料也不保證 Google 一定採用。
+
 ## Google 搜尋結果
 
 - Google 可自行改寫標題、網站名稱與摘要。上線不代表搜尋結果會立即改變，也無法保證顯示縮圖。
 - 首頁可見介紹與 meta description 都直接說明官網用途。部門導覽使用 `data-nosnippet`，讓這份導覽清單不成為 Google 的搜尋摘要；導覽連結仍可正常使用及被探索。這個設定需要 Google 重新抓取，且不保證採用指定描述。參考：[Google 摘要控制](https://developers.google.com/search/docs/appearance/snippet)。
-- Google 的「網站名稱」以網域或子網域為單位，不支援本專案使用的 `/tlsh-student-union.github.io/` 子目錄。此處的品牌資料仍有助辨識頁面，但無法保證取代搜尋結果中的「GitHub Pages documentation」。參考：[Google 網站名稱說明](https://developers.google.com/search/docs/appearance/site-names)。
+- Google 的「網站名稱」以網域或子網域為單位，不支援本專案使用的 `/tlsh-student-union.github.io/` 子目錄另有獨立名稱。名稱設定應以已建立的根網址品牌首頁為主，各內容頁共用同一網站識別。參考：[Google 網站名稱說明](https://developers.google.com/search/docs/appearance/site-names)。
 - 現有 GitHub Pages 地址可繼續免費使用；未來若已有學校提供的子網域，再評估綁定即可，無須為此購買服務。
-- 搜尋結果左側小圖示（favicon）也以主機名稱為單位，不支援子目錄各自設定。網站瀏覽器分頁可用本專案自己的圖示，但 Google 搜尋不一定會使用。若要同時控制網站名稱與搜尋 favicon，可另行評估遷移到 GitHub Pages 主機根目錄，或使用學校提供的子網域；遷移會牽涉登入回呼與連結，不能只移檔案。參考：[Google favicon 指引](https://developers.google.com/search/docs/appearance/favicon-in-search)。
+- 搜尋結果左側小圖示（favicon）也以主機名稱為單位，不支援子目錄各自設定。目前根網址品牌首頁已提供正式會標 favicon，本專案也保留相同圖示。Google 仍自行決定抓取與顯示。參考：[Google favicon 指引](https://developers.google.com/search/docs/appearance/favicon-in-search)。
 - 在已驗證的 Google Search Console 網址資源提交 `sitemap.xml`，並用「網址審查」對首頁提出重新索引。這項操作需由該 Search Console 資源的擁有者執行。
 - 子目錄內的 `robots.txt` 不會成為整個 `tlshstudent-max.github.io` 主機的 robots 規則。公開頁面與後台另外使用 HTML robots meta；`noindex` 不取代後台的登入及資料庫權限控制。
 - Sitemap 只列已存在的靜態公開頁，移除過時且無法持續維護的日期與優先級，避免假造更新時間。新增靜態頁時，請同步加入 sitemap。
